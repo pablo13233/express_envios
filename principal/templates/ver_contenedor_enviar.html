@@ -1,0 +1,391 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+
+<section class="content">
+    <div class="container-fluid">
+      <br> 
+        <input type="hidden" value="{{url}}" id="url">
+          <form id="TrasladarForm"  method="POST" action="{% url 'trasladar_contenedor' %}" >
+            {% csrf_token %}
+            <div class="col-md-12">
+              <div class="col-md-3">
+                  <label>Trasladar a:</label>
+                  <select class="select2" style="width: 100%;" id="id_estado_envio" name="estado_envio">
+                      {% for estado_ in estados %}
+                        <option value="{{estado_.pk}}" >{{estado_.estado}} </option>
+                      {% endfor %}
+                  </select>
+              </div> 
+
+              <input type="hidden" value="{{contenedor.pk}}" id="id_contenedor" name="contenedor_pk">
+            </div>
+              <br>
+              <button type="submit" class="btn float-left btn-info">Aplicar traslado</button>
+          </form>
+       <br>
+       <br>
+       <a href="{% url 'lista_guias_faltante' contenedor.pk %}" class="btn float-left btn-danger" style="display: none;" id="id_cajas_faltantes" target="_blank"><i style="font-size: 20px; color: white" class="fa fa-plus" ></i>Guías sin cargar</a>
+        <br>
+        <br>
+         <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#home">Información</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#menu1">Historial de transferencias</a>
+          </li>
+          <!--<li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#menu2">Menu 2</a>
+          </li>-->
+        </ul>
+
+        <div class="tab-content">
+          <div id="home" class="container tab-pane active"><br>
+             <h1>Detalle de contenedor</h1>
+              <table class="table table-striped">
+               
+                <tbody>
+                  <tr>
+                    <th scope="row">CÓDIGO ORIGINAL:</th>
+                    <td>{{contenedor.codigo_original}}</td>
+                  </tr>
+                  
+                  <tr>
+                    <th scope="row">CÓDIGO EEHN:</th>
+                    <td>{{contenedor.codigo_express}}</td>
+                  </tr>
+
+                  <tr>
+                    <th scope="row">DESTINO:</th>
+                    <td>{{contenedor.pais_destino}}</td>
+                  </tr>
+
+
+                  <tr>
+                    <th scope="row">PIES CÚBICOS:</th>
+                    <td>{{contenedor.pies_cubicos}}</td>
+                  </tr>
+
+                   <tr>
+                    <th scope="row">ESTADO:</th>
+                    <td>{{contenedor.estado}}</td>
+                  </tr>
+
+                   <tr>
+                    <th scope="row">PIES CÚBICOS DISPONIBLES:</th>
+                    <td>{{disponible}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              {% if contenedor.estado.pk == 1 or contenedor.estado.pk == 2 or contenedor.estado.pk == 3 or contenedor.estado.pk == 4 %}
+                <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'ver_contenedor_enviar' contenedor.pk  %}" id="addFormCajaContenedor" >
+                  {% csrf_token %}
+                    <div>
+                      <label for="">GUIA</label>
+                      <input type="text" name="guia" id="id_guia" onkeypress="return runScript(event)">
+                    </div>
+                  
+                </form>
+              {% endif %}
+
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Envia</th>
+                            <th>Recibe</th>
+                            <th>Caja</th>
+                            <th>Cantidad</th>
+                            <th>Guía padre</th>
+                            <th>Guía hija</th>
+                            <th>Accón</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in detalle_contenedor  %}
+                            <tr >
+                                <td>{{detalle.envio.quien_envia}}</td>
+                                <td>{{detalle.envio.quien_recibe}}</td>
+                                <td>{{detalle.tipo_caja}}</td>
+                                <td>{{detalle.cantidad}}</td>
+                                <td>{{detalle.envio.codigo}}</td>
+                                <td>{{detalle.codigo}}</td>
+                                <td>
+                                    <form id="TrasladarFormGuia"  method="POST" action="{% url 'trasladar_guia' detalle.envio.pk detalle.codigo %}" >
+                                      {% csrf_token %}
+                                          <label>Trasladar a:</label>
+                                          <select class="select2" style="width: 100%;" id="id_estado_envio_guia" name="estado_envio_guia">
+                                              {% for estado_ in estados %}
+                                                {% if estado_.pk == detalle.envio.estado_envio.pk %}
+                                                     <option value="{{estado_.pk}}" selected >{{estado_.estado}} </option>
+                                                {% else %}
+                                                    <option value="{{estado_.pk}}" >{{estado_.estado}} </option>
+                                                
+                                                {% endif %}
+                                               
+                                              {% endfor %}
+                                          </select>
+                                        
+                                        <input type="hidden" value="{{contenedor.pk}}" id="id_contenedor" name="contenedor_pk_guia">
+                                     
+                                        <br>
+                                        <button type="submit" class="btn float-left btn-info">Aplicar traslado</button>
+                                      </form>
+                                </td>
+                               
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    
+                </table>
+          </div>
+
+          <div id="menu1" class="container tab-pane fade"><br>
+            <table id="transferencias" class="table table-bordered table-striped" cellspacing="0" width="100%" >
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Comentario</th>
+                            <th>Usuario</th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for historial in historial_contenedor  %}
+                            <tr >
+                                <td>{{historial.estado.estado}}</td>
+                                <td>{{historial.fecha}}</td>
+                                <td>{{historial.comentario}}</td>
+                                <td>{{historial.usuario_registro}}</td>
+                                
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    
+                </table>
+          </div>
+           <!--<div id="menu2" class="container tab-pane fade"><br>
+            <h3>Menu 2</h3>
+            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+          </div>-->
+        </div>
+       
+    </div>
+
+
+</section>
+ 
+	
+
+{% endblock contenido %}
+{% block js %}
+<script type="text/javascript">
+
+ document.getElementById("id_guia").focus();
+	var table = $('#example1,#transferencias').DataTable({
+		  "oLanguage": {
+                            "sProcessing":     "Procesando...",
+                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                            "sZeroRecords":    "No se encontraron resultados",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                            "sInfo":           "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty":      "Mostrando 0 - 0 de un total de 0 registros",
+                            "sInfoFiltered":   "<br>(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix":    "",
+                            "sSearch":         "Buscar:",
+                            "sUrl":            "",
+                            "sInfoThousands":  ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst":    "Primero",
+                                "sLast":     "Último",
+                                "sNext":     "Sig.",
+                                "sPrevious": "Ant."
+                            },
+                      },
+                responsive: true
+	});
+
+function runScript(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+      document.getElementById("addFormCajaContenedor").submit();
+    }
+}
+
+{% if error %}
+     
+      $.notify("Error, {{error}}",{
+        className: 'error',
+        globalPosition:"right bottom", 
+        clickToHide: true,
+        autoHide: true,
+        autoHideDelay: 5000,
+        arrowShow: true,
+        arrowSize: 5,
+        style: 'bootstrap',
+        showAnimation: 'slideDown',
+        showDuration: 400,
+        hideAnimation: 'slideUp',
+        hideDuration: 200,
+        gap: 2
+      });
+    {% endif %}
+{% if 'ok' in request.GET %} 
+      $.notify('Caja cargada!',{
+        className: 'success',
+        globalPosition:"right bottom", 
+        clickToHide: true,
+        autoHide: true,
+        autoHideDelay: 5000,
+        arrowShow: true,
+        arrowSize: 5,
+        style: 'bootstrap',
+        showAnimation: 'slideDown',
+        showDuration: 400,
+        hideAnimation: 'slideUp',
+        hideDuration: 200,
+        gap: 2
+      });
+      
+    {% endif %}
+
+{% if 'traslado' in request.GET %} 
+      $.notify('Contenedor con traslado exitoso!',{
+        className: 'success',
+        globalPosition:"right bottom", 
+        clickToHide: true,
+        autoHide: true,
+        autoHideDelay: 5000,
+        arrowShow: true,
+        arrowSize: 5,
+        style: 'bootstrap',
+        showAnimation: 'slideDown',
+        showDuration: 400,
+        hideAnimation: 'slideUp',
+        hideDuration: 200,
+        gap: 2
+      });
+      
+    {% endif %}
+
+{% if 'reversion' in request.GET %} 
+     
+      $.notify('Reversiòn exitoso!',{
+        className: 'success',
+        globalPosition:"right bottom", 
+        clickToHide: true,
+        autoHide: true,
+        autoHideDelay: 5000,
+        arrowShow: true,
+        arrowSize: 5,
+        style: 'bootstrap',
+        showAnimation: 'slideDown',
+        showDuration: 400,
+        hideAnimation: 'slideUp',
+        hideDuration: 200,
+        gap: 2
+      });
+    /*history.pushState(null, "", $('#url').val());*/
+    window.location.replace($('#url').val());
+    {% endif %}
+
+$('#TrasladarForm').on('submit', function(e){
+            e.preventDefault();
+            var url = $(this).attr('action');
+            $.post(url, $(this).serialize(), function(data) {
+                
+                if(data.option == 'error'){
+                    $.notify(data.detalle_error,{
+                        className: 'error',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+
+                    if(data.tipo_error == 1){
+                      $("#id_cajas_faltantes").show();
+                    }
+                }else{
+                    if(data.tipo_error == 1){
+                      $("#id_cajas_faltantes").show();
+                    }
+                    $.notify("Datos guardados exitosamente!",{
+                        className: 'success',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                    window.location.href =data.url;
+                }
+            }, 'json');
+        });
+
+/*$('#TrasladarFormGuia').on('submit', function(e){
+            e.preventDefault();
+            var url = $(this).attr('action');
+            $.post(url, $(this).serialize(), function(data) {
+                alert(data.option);
+                if(data.option == 'error'){
+                    $.notify(data.detalle_error,{
+                        className: 'error',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+
+                    history.pushState(null, "", $('#url').val());
+                }else{
+                   
+                    $.notify("Reversión exitosamente!",{
+                        className: 'success',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                     history.pushState(null, "", $('#url').val());
+                }
+            }, 'json');
+        });*/
+</script>
+{% endblock js %}

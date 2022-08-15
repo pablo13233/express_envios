@@ -1,0 +1,121 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>REPORTE {{comentario}}</h3>
+                </div>
+
+                <div class="card-body">
+                    <div class="tab-content" id="custom-content-below-tabContent">
+                        <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+                            <br>
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Valor</th>
+                                        <th>Guía</th>
+                                        <th>Usuario registro</th>
+                                        <th>Descripción</th>
+                                       
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for abono in abonos  %}
+                                        <tr >
+                                            <td>{{abono.cliente}}</td>
+                                            <td>{{abono.fecha}}</td>
+                                            <td>{{abono.valor}}</td>
+                                            <td>{{abono.guia}}</td>
+                                            <td>{{abono.registro}}</td>
+                                            <td>{{abono.descripcion}}</td>
+                                        </tr>
+                                    {% endfor %}
+
+                                     {% for dato in datos  %}
+                                        <tr >
+                                            <td>{{dato.cliente}}</td>
+                                            <td>{{dato.fecha}}</td>
+                                            <td>{{dato.valor}}</td>
+                                            <td>{{dato.guia}}</td>
+                                            <td>{{dato.registro}}</td>
+                                            <td>{{dato.descripcion}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Valor</th>
+                                        <th>Guía</th>
+                                        <th>Usuario registro</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<!-- jQuery -->
+<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static  'admin/dist/js/demo.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+
+<!-- DATATABLES-->
+<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+
+<script>
+  $(function () {
+    $('#example1').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      responsive: true,
+       "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+                },
+    });
+  });
+</script>
+
+{% endblock js %}

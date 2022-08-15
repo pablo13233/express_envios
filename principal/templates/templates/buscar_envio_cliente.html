@@ -1,0 +1,92 @@
+{% extends "base_cliente.html" %}
+{% load humanize %} {% load static %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+ <!-- ***** Breadcumb Area Start ***** -->
+    <div class="breadcumb-area bg-img " style="background-color: white;"></div>
+    <!-- ***** Breadcumb Area End ***** -->
+
+    <!-- ***** Listing Destinations Area Start ***** -->
+    <section class="dorne-listing-destinations-area section-padding-100-50">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-12">
+                    <div class="section-heading dark text-center">
+                        <h4>Rastrea tus paquetes aqui</h4>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <!-- Hero Search Form -->
+                    <div class="hero-search-form ">
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-places" role="tabpanel" aria-labelledby="nav-places-tab">
+                                
+                                <form method="POST" enctype='multipart/form-data'>
+                                    {% csrf_token %}
+                                    <div class="col-md-5 col-sm-12"><center><h6>Ingrese el número de seguimiento</h6></center></div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <input type="text" id="codigo" name="codigo" class="form-control" placeholder="EEXXXXXX">
+                                    </div>
+                                    <div class="col-md-3 col-sm-12">
+                                        <center>
+                                            <span id="id_search" type="submit" class="btn dorne-btn">
+                                                <i class="fa fa-search pr-2" aria-hidden="true"></i>Buscar
+                                            </span> 
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div id="datos"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--<div class="breadcumb-area bg-img bg-overlay" style="background-image: url(img/bg-img/hero-1.jpg)"></div>-->
+{% endblock contenido %}
+{% block js %}
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            $('#id_search').click( function(e){
+                      var codigo = $('#codigo').val();
+                      var cont = 0;
+                        if(codigo != '')
+                        {  
+                            cont+=1;
+                        }
+                        if(cont < 1)
+                        {
+                            alert("Ingrese el número de guia para realizar la busqueda");        
+                        }
+                        else
+                        { 
+                            // realizar ajax 
+                            var cont = 0;
+                             $.ajax({
+                                  type: "POST",
+                                  url: "{% url 'resultado_busqueda' %}",
+                                  data: {
+                                     'codigo':codigo,
+                                     'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val(),
+                                  },
+                                  success: searchSuccess,
+                                  dataType: 'html'  
+                              });
+                                    // limpiar caja de texto
+                                    document.getElementById("#codigo").value = "";
+                            return false; //este return es para evitar refrescar la pagina
+                         }   
+            });
+          
+        });
+
+        //funcion que muestrea los resultado de cuentas
+        function searchSuccess(data, textStatus, jqXHR)
+        {
+            $('#datos').html(data);
+        }
+    </script> 
+{% endblock js %}

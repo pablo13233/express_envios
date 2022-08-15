@@ -1,0 +1,248 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Gestion de Empleados</h3>
+                </div>
+
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="custom-content-below-home-tab" data-toggle="pill" href="#custom-content-below-home" role="tab" aria-controls="custom-content-below-home" aria-selected="true"><strong>Ver Ingresados</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-content-below-profile-tab" data-toggle="pill" href="#custom-content-below-profile" role="tab" aria-controls="custom-content-below-profile" aria-selected="false"><strong>Agregar Nuevo</strong></a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="custom-content-below-tabContent">
+                        <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+                            <br>
+                            {% if user.is_superuser %}
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Empresa</th>
+                                            <th>Nombre completo</th>
+                                            <th>Telefono</th>
+                                            <th>Correo</th>
+                                            <th>Usuario</th>
+                                            <th>Perfil</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for a in empleados  %}
+                                            <tr >
+                                                <td>{{a.empresa.nombre_empresa}}</td>
+                                                <td>{{a.empleado.nombres_empleado}} {{a.empleado.apellidos_empleado}}</td>
+                                                <td>{{a.empleado.telefono_empleado}}</td>
+                                                <td>{{a.empleado.correo_empleado}}</td>
+                                                <td>{{a.empleado.usuario}}</td>
+                                                {% if a.empleado.usuario.is_active %}
+                                                    <td><a type='button' class="btn btn-success" href="{% url 'desactivar_usuario' a.empleado.usuario.pk %}">Desactivar</a></td>
+                                                {% else %}
+                                                    <td><a type='button' class="btn btn-success" href="{% url 'activar_usuario' a.empleado.usuario.pk %}">Activar</a></td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Empresa</th>
+                                            <th>Nombre completo</th>
+                                            <th>Telefono</th>
+                                            <th>Correo</th>
+                                            <th>Usuario</th>
+                                            <th>Perfil</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            {% else %}
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre completo</th>
+                                            <th>Telefono</th>
+                                            <th>Correo</th>
+                                            <th>Usuario</th>
+                                            <th>Perfil</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for a in empleados  %}
+                                            <tr >
+                                                <td>{{a.empleado.nombres_empleado}} {{a.empleado.apellidos_empleado}}</td>
+                                                <td>{{a.empleado.telefono_empleado}}</td>
+                                                <td>{{a.empleado.correo_empleado}}</td>
+                                                <td>{{a.empleado.usuario}}</td>
+                                                {% if a.empleado.usuario.is_active %}
+                                                    <td><a type='button' class="btn btn-success" href="{% url 'desactivar_usuario' a.empleado.usuario.pk %}">Desactivar</a></td>
+                                                {% else %}
+                                                    <td><a type='button' class="btn btn-success" href="{% url 'activar_usuario' a.empleado.usuario.pk %}">Activar</a></td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Nombre completo</th>
+                                            <th>Telefono</th>
+                                            <th>Correo</th>
+                                            <th>Usuario</th>
+                                            <th>Perfil</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            {% endif %}
+                            
+                        </div>
+                        <div class="tab-pane fade" id="custom-content-below-profile" role="tabpanel" aria-labelledby="custom-content-below-profile-tab">
+                            <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'empleados' %}">
+                                {% csrf_token %}
+                                <div class="form-group row">
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_nombres_empleado" class="col-form-label">Nombre:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" name="nombres_empleado" id="id_nombres_empleado" placeholder="Nombre del empleado">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_apellidos_empleado" class="col-form-label">Apellido:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" name="apellidos_empleado" id="id_apellidos_empleado" placeholder="Apellido del empleado">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_telefono_empleado" class="col-form-label">Telefono:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" name="telefono_empleado" id="id_telefono_empleado" data-inputmask='"mask": "(999) 999-9999"' data-mask>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_correo_empleado" class="col-form-label">Correo:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="email" class="form-control" name="correo_empleado" id="id_correo_empleado" placeholder="Correo empleado">
+                                        </div>
+                                    </div>
+                                    {% if rol_empleado_actual.empleado.rol_empleado.pk == 1 %}
+                                        <div class="col-md-6">
+                                            <div class="col-md-12">
+                                                <label>Empresa:</label>
+                                                <select class="form-control select2" style="width: 100%;" name="empresa_empleado">
+                                                {% for e in empresas %}
+                                                    {% ifequal e.pk ret_data.nombre_empresa  %}
+                                                        <option value="{{e.pk}}" >{{e.nombre_empresa}}</option>
+                                                    {% else %}
+                                                        <option value="{{e.pk}}">{{e.nombre_empresa}}</option>
+                                                    {% endifequal %}
+                                                {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <div class="col-md-6">
+                                        <div class="col-md-12">
+                                            <label>Rol:</label>
+                                            <select class="form-control select2" style="width: 100%;" name="rol_empleado">
+                                            {% for rol in rol_empleado %}
+                                                {% ifequal rol.pk ret_data.rol_empleado  %}
+                                                    <option value="{{rol.pk}}" >{{rol.rol}}</option>
+                                                {% else %}
+                                                    <option value="{{rol.pk}}">{{rol.rol}}</option>
+                                                {% endifequal %}
+                                            {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn float-right btn-info">Agregar</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<!-- jQuery -->
+<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static  'admin/dist/js/demo.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+  
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  
+    });
+</script>
+<!-- DATATABLES-->
+<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker4').datetimepicker({
+            format: 'L'
+        });
+    });
+</script>
+<script>
+  $(function () {
+    $("#example1").DataTable({
+        responsive: true
+    });
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      responsive: true
+    });
+  });
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+
+{% endblock js %}

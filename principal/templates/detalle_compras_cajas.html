@@ -1,0 +1,149 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Detalle de Compras de Caja: {{caja}}</h3>
+                </div>
+
+                <div class="card-body">
+                    <h2>Existencia: {{caja.existencia}}</h2>
+                    <hr>
+                    <table id="example1" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Fecha Ingreso</th>
+                                <th>Accion</th>
+                                <th>Cantidad</th>
+                                <th>Valor</th>
+                                <th>Recibo N°</th>
+                                <th>Recibo</th>
+                                <th>Usuario Registro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{caja.fecha}}</td>
+                                <td>Compra Inicial</td>
+                                <td>{{caja.compra}}</td>
+                                <td>{{caja.valor|unlocalize|intcomma}}</td>
+                                <td>{{caja.recibo_no}}</td>
+                                <td><center><a class="btn btn-success" href="{% url 'ver_recibos_cajas' caja.pk %}" target="blank">Ver</a></center></td>
+                                <td>{{caja.usuario_registro}}</td>
+                            </tr>
+                            {% for c in compras  %}
+                                <tr >
+                                    <td>{{c.fecha}}</td>
+                                    {% if c.accion %}
+                                        <td>Entregado</td>
+                                    {% else %}
+                                        <td>Comprado</td>
+                                    {% endif %}
+                                    <td>{{c.cantidad}}</td>
+                                    <td>{{c.valor|unlocalize|intcomma}}</td>
+                                    <td>{{c.recibo_no}}</td>
+                                    {% if c.accion %}
+                                        <td><center><a class="btn btn-success" href="{% url 'recibo_caja_pdf' c.recibo_caja.pk %}" target="blank">Ver</a></center></td>
+                                    {% else %}
+                                        <td><center><a class="btn btn-success" href="{% url 'ver_detalle_recibos_cajas' c.pk %}" target="blank">Ver</a></center></td>
+                                    {% endif %}
+                                    <td>{{c.usuario_registro}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Fecha Ingreso</th>
+                                <th>Accion</th>
+                                <th>Cantidad</th>
+                                <th>Valor</th>
+                                <th>Recibo N°</th>
+                                <th>Recibo</th>
+                                <th>Usuario Registro</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<!-- jQuery -->
+<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static  'admin/dist/js/demo.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+  
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  
+    });
+</script>
+<!-- DATATABLES-->
+<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            format: 'L'
+        });
+        $('#datetimepicker2').datetimepicker({
+            format: 'L'
+        });
+    });
+</script>
+<script>
+  $(function () {
+    $("#example1").DataTable({
+        responsive: true
+    });
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      responsive: true
+    });
+    $("#example3").DataTable({
+        responsive: true
+    });
+  });
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+
+{% endblock js %}

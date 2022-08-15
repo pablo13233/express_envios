@@ -1,0 +1,201 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Registro de Envios</h3>
+                </div>
+
+                <div class="card-body">
+                    <div class="tab-content" id="custom-content-below-tabContent">
+                        <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'registrar_envio' %}">
+                            {% csrf_token %}
+                            <div class="form-group row">
+                                <div class="col-md-5">
+                                    <div class="col-md-12"><label>CAJA:</label></div>
+                                    <div class="col-md-6" style="float:left">
+                                        <select class="form-control select2" style="width: 100%;" id="id_caja" name="caja">
+                                            <option value="0" >SELECCIONE</option>
+                                            {% for p in pais %}
+                                                {% ifequal p.pk ret_data.pais  %}
+                                                    <option value="{{p.pk}}" >{{p.nombre}} </option>
+                                                {% else %}
+                                                    <option value="{{p.pk}}">{{p.nombre}}</option>
+                                                {% endifequal %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2" style="float:left">
+                                        <input type="number" class="form-control" name="cantidad" id="id_cantidad" value="1">
+                                    </div>
+                                    <div class="col-md-2" style="float:left">
+                                        <input class="btn btn-success" name="btnInsertar" id="btnInsertar" type="button" value="+" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" style="height:300;overflow-y: scroll;">
+                                <table id="tblDatos" name="tblDatos_list" class="table table-bordered table-striped tablaDatos">
+                                    <thead>
+                                        <tr class="tablaDatosTitulo">
+                                            <th>Caja</th>
+                                            <th></th>
+                                            <th hidden>Empresa</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            <tr > 
+                                                <td>{{a.slogan_empresa}}</td>
+                                                <th></th>
+                                                <td hidden>{{a.telefono_empresa}}</td>
+                                            </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="submit" class="btn float-right btn-info">Agregar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<!-- jQuery -->
+<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static  'admin/dist/js/demo.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+  
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  
+    });
+
+    
+</script>
+<!-- DATATABLES-->
+<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+<script>
+    $(function () {
+        $("#example1").DataTable({
+            responsive: true
+        });
+        $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            responsive: true
+        });
+    });
+    $(function () {
+        $('#datetimepicker4').datetimepicker({
+            format: 'L'
+        });
+    });
+</script>
+<script>
+    //AGREGAR CAJA A DESCRIPCION
+$(function() { 
+    $("#btnInsertar").click(addcaja); 
+});
+var caja;
+$( document ).ready(function() {
+    $(document).on('change', '#id_producto', function () {
+        var seleccion=document.getElementById('id_producto');
+        var producto=$('#id_producto option:selected').text(); 
+        inv = producto; 
+    });
+});
+    function addcaja(){
+        var texto = inv.split("|");
+        var id_producto = $("#id_producto").val();
+        var cantidad = $("#cantidad_asignada").val();
+        var tablaDatos= $("#tblDatos");
+        
+        var nombre_articulo=texto[1];
+        var informacion = id_producto.split("|")
+        var subtotal = parseFloat(cantidad) * informacion[1].replace(",",".")
+        var precio = informacion[1].replace(",",".")
+        var isv_pagar = (parseFloat(subtotal)*(parseFloat(informacion[2])/100))
+        var agrego = 0;
+        //CALCULOS TASA CAMBIO
+        if(tasa_cambio != "" ){
+            subtotal = subtotal / parseFloat(tasa_cambio.replace(",","."));
+            precio = precio / parseFloat(tasa_cambio.replace(",","."));
+            isv_pagar = isv_pagar / parseFloat(tasa_cambio.replace(",","."));
+        }
+        //
+        if(cantidad== ""){
+            alert("Ingrese una cantidad del producto");
+            reset_cant();
+        }else if(cantidad!=" " || id_producto !=" " ){ 
+            var oTable = document.getElementById('tblDatos');
+            var i;
+            var rowLength = oTable.rows.length;
+            for (i = 1; i < rowLength; i++) {
+                var oCells = oTable.rows.item(i).cells;
+                if (informacion[0] == oCells[0].firstChild.data) {
+                    cantidad = parseInt(parseInt(oCells[2].firstChild.data) + parseInt(cantidad));
+                    subtotal = cantidad * (informacion[1].replace(",",".") / parseFloat(tasa_cambio.replace(",",".")));
+                    isv_pagar = (parseFloat(subtotal)*(parseFloat(informacion[2])/100));
+                    //seleccionar(oCells[8].firstChild.data);
+                    //document.getElementById("tblDatos").deleteRow(oCells[8].firstChild.data);
+
+                    document.getElementById('can'+oCells[8].firstChild.data).firstChild.data = cantidad;
+                    document.getElementById('su'+oCells[8].firstChild.data).firstChild.data =lempira_dolar+accounting.formatNumber(subtotal,2,",",".");
+                    document.getElementById('impuesto'+oCells[8].firstChild.data).firstChild.data = isv_pagar;
+                    var cp = document.getElementById('cprod'+oCells[8].firstChild.data).value;
+                    //document.getElementById('cprod'+oCells[8].firstChild.data).val();
+                    var cprod = cp.split("|");
+                    var nc = cantidad +'|'+ cprod[1]+'|'+ cprod[2]+'|'+ cprod[3];
+                    document.getElementById('cprod'+oCells[8].firstChild.data).value = nc;
+                    agrego = 1 ;
+                }
+            }
+            acum+= 1;
+            
+            if (parseInt(agrego)==0){
+                tablaDatos.append("<tr id="+acum+" ><td>"+informacion[0]+"</td><td>"+nombre_articulo+"</td><td id=can"+acum+">"+cantidad+"</td><td>"+lempira_dolar+accounting.formatNumber(precio,2,",",".")+"</td><td id=su"+acum+" class='subtotal'"+acum+">"+lempira_dolar+ accounting.formatNumber(subtotal,2,",",".") +"</td><td id=impuesto"+acum+" class='isv'  hidden>"+ isv_pagar +"</td><td hidden ><input id=cprod"+acum+" name='productos' value="+cantidad +'|'+id_producto+"></></td><td><input type='button' class='btn btn-danger btn-sm' value='Eliminar' onclick='seleccionar("+acum+");'></td><td hidden>"+acum+"</td></tr>"); 
+            }
+            
+            reset_campos();
+        }
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+
+{% endblock js %}

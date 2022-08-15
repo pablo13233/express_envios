@@ -1,0 +1,84 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Registro de Envios</h3>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="custom-content-below-tabContent">
+                        <form class="form-horizontal" enctype='multipart/form-data' method="post" action="{% url 'reporte_ventas' %}" target="_blank">
+                            {% csrf_token %}
+                            <div class="form-group row">
+                                <div class="col-md-5">
+                                    <div class="col-md-12">
+                                        <label>Vendedor:</label>
+                                        <select class="form-control select2" style="width: 100%;" id="id_quien_envia" name="vendedor">
+                                            <!--<option value="0" >TODOS</option>-->
+                                            {% for empleado in empleados %}
+                                                <option value="{{empleado.pk}}">{{empleado}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                </div>
+                                 <div class="col-md-3">
+                                    <div class="col-md-12">
+                                        <label>Inicio: 
+                                     </div>
+                                      <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                                        <input  type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" name="fecha_inicio" required/>
+                                        <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                 </div>
+
+                                 <div class="col-md-3">
+                                    <div class="col-md-12">
+                                        <label>Fin: 
+                                     </div>
+                                      <div class="input-group date" id="datetimepicker3" data-target-input="nearest" >
+                                        <input  type="text" class="form-control datetimepicker-input" data-target="#datetimepicker3" name="fecha_fin" required />
+                                        <div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker" >
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                 </div>     
+                             
+                            </div>
+                            <button type="submit" class="btn float-right btn-info">Ver</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+      
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+
+<script>
+     $('#datetimepicker3,#datetimepicker2').datetimepicker({
+
+              format: 'DD/MM/YYYY',
+             
+          });
+</script>
+
+
+{% endblock js %}

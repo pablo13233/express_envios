@@ -1,0 +1,1432 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />  
+ <link rel="stylesheet" href="{% static 'admin/css/pnotify.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/pnotify.buttons.css' %}"> 
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Registro de Envios</h3>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="custom-content-below-tabContent">  
+                        {% if 'ok' in request.GET %}
+                            <div class="alert alert-primary">
+                                <h5><i class="icon fas fa-check-circle"></i> Envio Registrado!</h5>
+                                <input type="text" id="enviopk" name="descuento" hidden>
+                                <div id="mostrarenvio" class="row"><div class="col-md12"><a href="#" onclick="ver()">haga click aqui para ver el recibo</a></div>
+                                    <!--Haga click en el buton para ver el recibo<button class="btn float-right btn-info" onclick="ver()">Ver Recibo</button>-->
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if errores %}
+                            <div class="alert alert-danger">
+                                <h5><i class="icon fas fa-ban"></i> Alerta revisar!</h5>
+                                <div class="row">
+                                    <div class="col-md-12">{% if errores.extra %}- {{errores.extra}}} {% endif %}</div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.quien_envia %}- {{errores.quien_envia}}{% endif %}</div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.quien_recibe %}- {{errores.quien_recibe}}{% endif %}</div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.pais %}- {{errores.pais}}{% endif %} <br></div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.departamento %}- {{errores.departamento}}{% endif %}</div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.direccion %}- {{errores.direccion}}{% endif %}</div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.guia_revendedor %}- {{errores.guia_revendedor}}{% endif %}</div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.valor_envio %}- {{errores.valor_envio}}{% endif %}</div>
+                                    <!--<div class="col-md-6" style="float:inline-start">{% if errores.departamento %}- {{errores.departamento}}{% endif %}</div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.departamento %}- {{errores.departamento}}{% endif %}</div>
+                                    <div class="col-md-6" style="float:inline-start">{% if errores.departamento %}- {{errores.departamento}}{% endif %}</div>-->
+                                </div>
+                            </div>
+                        {% endif %}                      
+                        <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'registrar_envio' %}">
+                            {% csrf_token %}
+                            <div class="form-group row">
+                                <div class="col-md-5">
+                                    <div class="col-md-12">
+                                        <label>Envia:</label>
+                                        <select class="form-control select2" style="width: 100%;" id="id_quien_envia" name="quien_envia">
+                                            <option value="0" >SELECCIONE</option>
+                                            {% for cliente in quien_envia %}
+                                                {% ifequal cliente.pk ret_data.quien_envia  %}
+                                                    <option value="{{cliente.pk}}" >{{cliente.celular}} | {{cliente.nombre_completo}} </option>
+                                                {% else %}
+                                                    <option value="{{cliente.pk}}">{{cliente.celular}} | {{cliente.nombre_completo}}</option>
+                                                {% endifequal %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-5">
+                                    <div class="col-md-12">
+                                        <label>Recibe: 
+                                    </label>
+
+                                        <a title="Agregar" style="margin-left: 5px" id="btn_add_recibe" data-toggle="modal" data-target="#add_recibe" data-backdrop="static" data-keyboard="false"><i style="font-size: 20px; color: green" class="fa fa-plus"></i></a>
+
+                                         <a title="Editar" style="margin-left: 5px" id="btn_edit_recibe" data-toggle="modal" data-target="#edit_recibe" data-backdrop="static" data-keyboard="false"><i id="id_li_edit" style="font-size: 20px; color:blue;display: none; " class="fa fa-edit"></i></a>
+
+                                        <select class="form-control select2" style="width: 100%;" id="id_quien_recibe" name="quien_recibe">
+                                            <option value="0" >SELECCIONE REMITENTE PRIMERO</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-2">
+                                    <div class="col-md-12">
+                                        <div class="col-md-12">
+                                            <label for="id_guia_revendedor" class="col-form-label">Codigo de guia</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" name="guia_revendedor" id="id_guia_revendedor" value="{% if ret_data.guia_revendedor != None %}{{ret_data.guia_revendedor}}{% endif %}" placeholder="Guia de revendedor" required="">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!--
+                                <div class="col-md-11">
+                                    <br>
+                                    <div id="accordion">
+                                        
+                                        <div class="card card-primary card-outline">
+                                            <div class="card-header">
+                                                <h4 class="card-title">
+                                                    <strong><a style="color: black;" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Agregar quien recibe</a></strong>
+                                                </h4>
+                                            </div>
+                                          <div id="collapseOne" class="panel-collapse collapse in">
+                                            <div class="card-body">
+                                                <div class="form-group row">
+                                                    <div class="col-md-3">
+                                                        <div class="col-md-12">
+                                                            <label for="id_nombre_completo" class="col-form-label">Nombre Completo:</label>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <input type="text" class="form-control" name="nombre_completo" id="id_nombre_completo" placeholder="Nombre del empleado">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="col-md-12">
+                                                            <label for="id_celular" class="col-form-label">Telefono:</label>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <input type="text" class="form-control" name="celular" id="id_celular" data-inputmask='"mask": "(999) 999-9999"' data-mask>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <div class="col-md-12">
+                                                            <label for="id_direccion" class="col-form-label">Direccion:</label>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <input type="text" class="form-control" name="direccion" id="id_direccion" placeholder="Direccion">
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <button type="button" onclick="Registrar();" class="form-control btn float-right btn-success">Agregar</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                                </div>-->
+
+                                <!--id='datos_quien_recibe' hidden -->
+                                <div class="col-md-4">
+                                    <div class="col-md-12">
+                                        <label for="id_celular_registrar" class="col-form-label">Telefono:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="celular_registrar" id="id_celular_registrar" >
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="col-md-12">
+                                        <label for="id_direccion_registrar" class="col-form-label">Direccion:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="direccion_registrar" id="id_direccion_registrar" placeholder="Direccion">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="col-md-12">
+                                        <label>Pais:</label>
+                                        <select class="select2" style="width: 100%;" id="id_pais" name="pais">
+                                            <option value="0" >SELECCIONE</option>
+                                            {% for p in pais %}
+                                                {% ifequal p.pk ret_data.pais  %}
+                                                    <option value="{{p.pk}}" >{{p.nombre}} </option>
+                                                {% else %}
+                                                    <option value="{{p.pk}}">{{p.nombre}}</option>
+                                                {% endifequal %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="col-md-12">
+                                        <div class="col-md-12">
+                                            <label>Departamento:</label>
+                                        </div>
+                                        <div class="col-md-9" style="float:left">
+                                            <select class="form-control select2" style="width: 100%;" id="id_departamento" name="departamento">
+                                                <option value="0" >SELECCIONE</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2" style="float:left">
+                                            <div class="col-md-12">
+                                                <input class="btn btn-success" onclick="Mostrar();" type="button" value="Mostrar" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="col-md-12">
+                                        <label>Tipo Contenido:</label>
+                                        <select class="select2" style="width: 100%;" id="id_tipo_contenido" name="tipo_contenido">
+                                            <option value="0" >SELECCIONE</option>
+                                            {% for p in tipo_contenido %}
+                                                {% ifequal p.pk ret_data.tipo_contenido  %}
+                                                    <option value="{{p.pk}}" >{{p.tipo_contenido}} </option>
+                                                {% else %}
+                                                    <option value="{{p.pk}}">{{p.tipo_contenido}}</option>
+                                                {% endifequal %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="col-md-12">
+                                        <label>Tipo Envio:</label>
+                                        <select class="select2" style="width: 100%;" id="id_tipo_envio" name="tipo_envio">
+                                            <option value="0" >SELECCIONE</option>
+                                            {% for p in tipo_envio %}
+                                                {% ifequal p.pk ret_data.tipo_envio  %}
+                                                    <option value="{{p.pk}}" >{{p.tipo_envio}} </option>
+                                                {% else %}
+                                                    <option value="{{p.pk}}">{{p.tipo_envio}}</option>
+                                                {% endifequal %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <!--
+                                <div class="col-md-12">
+                                    <div class="col-md-12">
+                                        <label for="exampleFormControlTextarea1">Descripcion del embarque</label>
+                                        <textarea class="form-control" id="id_descripcion_embarque" style="text-transform: uppercase;" name="descripcion_embarque" rows="3" maxlength="300" required></textarea>
+                                    </div>
+                                </div>-->
+                                <br><br>
+                                <div class="col-md-12" id="id_div_productos" style="display:none;" >
+                                    <div class="card card-primary card-outline">
+                                            <div class="card-header">
+                                                <h4 class="card-title">
+                                                    <strong><a style="color: black;" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Detalle de cajas</a></strong>
+                                                </h4>
+                                            </div>
+                                            <table id="table_caja">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <label>Tipo de caja</label>
+                                                             <a title="Agregar" style="margin-left: 5px" id="btn_add_caja" data-toggle="modal" data-target="#add_caja" data-backdrop="static" data-keyboard="false"><i style="font-size: 20px; color: green" class="fa fa-plus"></i></a>
+
+                                                              <a title="Editar" style="margin-left: 5px" id="btn_edit_tipo_caja" data-toggle="modal" data-target="#edit_caja" data-backdrop="static" data-keyboard="false"><i id="id_li_edit_caja" style="font-size: 20px; color:blue;display: none; " class="fa fa-edit"></i></a>
+
+                                                            <select class="form-control select2" style="width: 100%;" id="id_tipo_caja" name="tipo_caja">
+                                                            <option value="0" >SELECCIONE</option>
+                                                            </select> 
+                                                        </td>
+
+                                                        <td>
+                                                            <label>Cantidad</label>
+                                                            <input type="number" class="form-control" name="cantidad_cajas" id="id_cantidad_cajas" onkeypress="return solonumeros_nada_mas(event);"  min="1" value="1">
+                                                        </td>
+
+                                                         <td colspan="2" width="10%">
+                                                            <label>Acción</label>
+                                                            <input class="btn btn-success" name="btnInsertar" id="btnInsertar" type="button" value="Insertar" />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                    </div>
+
+                                      <table class="table table-bordered table-striped" id="tblDatos" name="tblDatos_list">
+                                            <thead>
+                                                <tr>
+                                                    <th> Tipo </th>
+                                                    <th> Cantidad </th>
+                                                    <th >Precio</th>
+                                                    <th >Subtotal</th>
+                                                    <th hidden > datos </th>
+                                                    <th>Acción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody >
+                                                                               
+                                            </tbody>
+                                        </table>
+                                </div>
+
+                                <div class="col-md-2 " onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 46 && event.charCode <= 57" min="0.0" >
+                                    <div class="col-md-12">
+                                        <label for="id_valor_envio" class="col-form-label">Valor Envio:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="valor_envio" id="id_valor_envio" required readonly="true" value="0" >
+                                    </div>
+                                </div>
+                                <div class="col-md-2 " onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 46 && event.charCode <= 57" min="0.0">
+                                    <div class="col-md-12">
+                                        <label for="id_valor_adicional" class="col-form-label">Adicional:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="valor_adicional" id="id_valor_adicional">
+                                    </div>
+                                </div>
+                                <div class="col-md-2 " onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 46 && event.charCode <= 57" min="0.0">
+                                    <div class="col-md-12">
+                                        <label for="id_valor_emplasticado" class="col-form-label">Emplasticado:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="valor_emplasticado" id="id_valor_emplasticado">
+                                    </div>
+                                </div>
+                                <div class="col-md-2 " onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 46 && event.charCode <= 57" min="0.0">
+                                    <div class="col-md-12">
+                                        <label for="id_valor_seguro" class="col-form-label">Seguro:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="valor_seguro" id="id_valor_seguro">
+                                    </div>
+                                </div>
+                                <div class="col-md-2 " onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 46 && event.charCode <= 57" min="0.0">
+                                    <div class="col-md-12">
+                                        <label for="id_pago_recibido" class="col-form-label">Pago recibido:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="pago_recibido" id="id_pago_recibido" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="col-md-12">
+                                        <label for="exampleFormControlTextarea1">Comentario</label>
+                                        <textarea class="form-control" id="id_comentario" style="text-transform: uppercase;" name="comentario" rows="3" maxlength="300"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn float-right btn-info">Agregar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {# Modal de Agregar Recibe #}
+        <div class="modal fade" id="add_recibe" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">             
+                    <div class="modal-header" >
+                        <h4 style="color:#000000" class="modal-title" id="myModalLabel">Agregar recibe</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">    <span class="fas fa-times" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <form action="{% url 'modal_agregar_recibe' %}" method="post" id="addFormRecibe">
+                        <div class="modal-body">
+                            {% csrf_token %}
+                            <input type="hidden" id="id_envia_pk" value="0" name="envia_pk">
+                            <p>
+                                <label>Nombre: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="nombre_recibe" id="id_nombre_recibe_modal" required class="form-control" maxlength="100" autofocus/>
+                            </p>
+
+                             <p>
+                                <label>Celular: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="telefono_recibe" id="id_telefono_recibe_modal" required class="form-control" maxlength="100" autofocus/>
+                            </p>
+
+                             <p>
+                                <label>Dirección: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="direccion_recibe" id="id_direccion_recibe_modal" required class="form-control" maxlength="100" autofocus/>
+                            </p>
+                            <!--
+                            <p>
+                                <label>Pais:<a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <select class="select2" style="width: 100%;" id="id_pais_recibe" name="pais_recibe_modal" required>
+                                    <option value="0" >SELECCIONE</option>
+                                    {% for p in pais %}
+                                        {% ifequal p.pk ret_data.pais  %}
+                                            <option value="{{p.pk}}" >{{p.nombre}} </option>
+                                        {% else %}
+                                            <option value="{{p.pk}}">{{p.nombre}}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </p>
+                            <p>
+                                <label >Departamento<a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                             <select class="form-control select2" style="width: 100%;" id="id_departamento_recibe_modal" name="departamento_recibe_modal" required>
+                                    <option value="0" >SELECCIONE</option>
+                                </select>
+                            </p>-->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+         {# Modal de Editar Recibe #}
+        
+          {# Modal de Editar Recibe #}
+        <div class="modal fade" id="edit_recibe" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">             
+                    <div class="modal-header" >
+                        <h4 style="color:#000000" class="modal-title" id="myModalLabel">Editar recibe</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">    <span class="fas fa-times" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <form action="{% url 'modal_editar_recibe' %}" method="post" id="editFormRecibe">
+                        <div class="modal-body">
+                            {% csrf_token %}
+                            <input type="hidden" id="id_recibe_pk_modal_edit" value="" name="recibe_pk_modal_Edit" >
+                            <p>
+                                <label>Nombre: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="nombre_recibe_edit" id="id_edit_nombre_recibe_modal" required class="form-control" maxlength="100" autofocus/>
+                            </p>
+
+                             <p>
+                                <label>Celular: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="telefono_recibe_edit" id="id_edit_telefono_recibe_modal" required class="form-control" maxlength="100" autofocus/>
+                            </p>
+
+                             <p>
+                                <label>Dirección: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="direccion_recibe_edit" id="id_edit_direccion_recibe_modal" required class="form-control" maxlength="100" autofocus/>
+                            </p>
+                             <!--
+                            <p>
+                                <label>Pais:<a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <select class="select2" style="width: 100%;" id="id_pais_recibe_edit" name="pais_recibe_modal_edit" required>
+                                    <option value="0" >SELECCIONE</option>
+                                    {% for p in pais %}
+                                        {% ifequal p.pk ret_data.pais  %}
+                                            <option value="{{p.pk}}" >{{p.nombre}} </option>
+                                        {% else %}
+                                            <option value="{{p.pk}}">{{p.nombre}}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </p>
+                            <p>
+                                <label >Departamento<a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                             <select class="form-control select2" style="width: 100%;" id="id_departamento_recibe_edit" name="departamento_recibe_modal_Edit" required>
+                                    <option value="0" >SELECCIONE</option>
+                                </select>
+                            </p>-->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive" id="guardar_recibo"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# Modal de Agregar Caja #}
+        <div class="modal fade" id="add_caja" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">             
+                    <div class="modal-header" >
+                        <h4 style="color:#000000" class="modal-title" id="myModalLabel">Tipo de Caja</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">    <span class="fas fa-times" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <form action="{% url 'modal_agregar_tipo_caja' %}" method="post" id="addFormCajas">
+                        <div class="modal-body">
+                            {% csrf_token %}
+                            <input type="hidden" id="id_pais_caja" value="0" name="pais_caja">
+                            <p>
+                                <label>Descripción: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="descripcion_caja" id="id_descripcion_caja" required class="form-control" maxlength="100" autofocus/>
+                            </p>
+
+                             <p>
+                                <label>Largo: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="largo" id="id_largo" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos()" value="0"/>
+                            </p>
+
+                             <p>
+                                <label>Ancho: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="ancho" id="id_ancho" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos()" value="0"/>
+                            </p>
+
+                            <p>
+                                <label>Alto: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="alto" id="id_alto" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos()" value="0"/>
+                            </p>
+
+                            <p>
+                                <label>Pie cúbico: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="pie_cubico" id="id_pie_cubico" required class="form-control" maxlength="100" autofocus readonly="true" />
+                            </p>
+
+                            <p>
+                                <label>Precio: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="precio_caja" id="id_precio_caja" required class="form-control" maxlength="100" autofocus onkeypress="return solonumeros_nada_mas(event);" />
+                            </p>
+                           
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+         {# Modal de Modificar Caja #}
+        <div class="modal fade" id="edit_caja" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">             
+                    <div class="modal-header" >
+                        <h4 style="color:#000000" class="modal-title" id="myModalLabel">Editar Tipo de Caja</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">    <span class="fas fa-times" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <form action="{% url 'modal_editar_tipo_caja' %}" method="post" id="editFormCajas">
+                        <div class="modal-body">
+                            {% csrf_token %}
+                            <input type="hidden" id="pk_caja_edit" value="0" name="pk_caja_edit">
+                               <p>
+                                <label>Descripción: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="descripcion_caja_edi" id="id_descripcion_caja_edit" required class="form-control" maxlength="100" autofocus/>
+                            </p>
+
+                             <p>
+                                <label>Largo: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="largo_edi" id="id_largo_edit" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos_edit()" value="0"/>
+                            </p>
+
+                             <p>
+                                <label>Ancho: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="ancho_edi" id="id_ancho_edit" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos_edit()" value="0"/>
+                            </p>
+
+                            <p>
+                                <label>Alto: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="alto_edi" id="id_alto_edit" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos_edit()" value="0"/>
+                            </p>
+
+                            <p>
+                                <label>Pie cúbico: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="pie_cubico_edi" id="id_pie_cubico_edit" required class="form-control" maxlength="100" autofocus readonly="true" />
+                            </p>
+
+                            <p>
+                                <label>Precio: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <input type="text" name="precio_caja_edi" id="id_precio_caja_edit" required class="form-control" maxlength="100" autofocus onkeypress="return solonumeros_nada_mas(event);" />
+                            </p>
+                           
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+ <script src="{% static 'admin/js/notify.js' %}"></script>
+         <script src="{% static 'admin/js/pnotify.js' %}"></script>
+        <script src="{% static 'admin/js/pnotify.buttons.js' %}"></script>
+<script>
+ $("#btn_edit_recibe").click(function(e) {
+    if ($('#id_quien_recibe').val()!= 0){
+            $("#id_recibe_pk_modal_edit").val("");
+            $("#id_edit_nombre_recibe_modal").val("");
+            $("#id_edit_telefono_recibe_modal").val("");
+            $("#id_edit_direccion_recibe_modal").val("");
+            $.ajax({
+                url: "{% url 'datos_recibe' %}",
+                type: "get",
+                data: {
+                    'cliente_recibe': $('#id_quien_recibe').val(),
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    $.each(data, function(key, val) {
+                        $("#id_recibe_pk_modal_edit").val(val.pk);
+                        $("#id_edit_nombre_recibe_modal").val(val.nombre_completo);
+                        $("#id_edit_telefono_recibe_modal").val(val.celular);
+                        $("#id_edit_direccion_recibe_modal").val(val.direccion);
+                    });
+                },
+                error: function(ts) {
+                    alert("Error");
+                }
+            });
+    }
+});
+
+//AGREGAR DEPARTAMENTO AL CAMBIAR PAIS
+$('#id_tipo_caja').on('change',habilitar_caja);  
+    //funcion para extraer los departamentos de cada pais
+    function habilitar_caja() {
+        if ($('#id_tipo_caja').val()!= 0){
+            $("#id_li_edit_caja").show();
+        }else{
+              $("#id_li_edit_caja").hide();
+        }
+    };
+
+
+ $("#btn_edit_tipo_caja").click(function(e) {
+    if ($('#id_tipo_caja').val()!= 0){
+            $("#pk_caja_edit").val("");
+            $("#id_descripcion_caja_edit").val("");
+            $("#id_largo_edit").val("");
+            $("#id_ancho_edit").val("");
+            $("#id_alto_edit").val("");
+            $("#id_precio_caja_edit").val("");
+            $.ajax({
+                url: "{% url 'datos_caja_edit' %}",
+                type: "get",
+                data: {
+                    'pk_caja': $('#id_tipo_caja').val(),
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    $.each(data, function(key, val) {
+
+                        $("#pk_caja_edit").val(val.pk);
+                        $("#id_descripcion_caja_edit").val(val.tipo_caja__descripcion);
+                        $("#id_largo_edit").val(val.tipo_caja__largo);
+                        $("#id_ancho_edit").val(val.tipo_caja__ancho);
+                        $("#id_alto_edit").val(val.tipo_caja__alto);
+                        $("#id_precio_caja_edit").val(val.precio);
+                    });
+                    calculo_cubicos_edit();
+                },
+                error: function(ts) {
+                    alert(ts);
+                }
+            });
+    }
+});
+
+
+ $('#addFormCajas').on('submit', function(e){
+            e.preventDefault();
+            var url = $(this).attr('action');
+            $.post(url, $(this).serialize(), function(data) {
+                if(data.option == 'error'){
+                    $.notify(data.detalle_error,{
+                        className: 'error',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                }else{
+                    $('#id_tipo_caja').append(data.option)
+                    $("#id_tipo_caja").select2();
+                    /*$('#id_quien_recibe').selectpicker('refresh');*/
+                    $('#add_caja').modal('hide');
+                    $.notify("Datos guardados exitosamente!",{
+                        className: 'success',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                    
+                    $('#id_descripcion_caja').val('');
+                    $('#id_acho').val('');
+                    $('#id_alto').val('');
+                    $('#id_largo').val('');
+                    $('#id_pie_cubico').val('');
+                    $('#id_precio_caja').val('');
+                   
+
+                }
+            }, 'json');
+        });
+
+ $('#editFormCajas').on('submit', function(e){
+            e.preventDefault();
+            var url = $(this).attr('action');
+            $.post(url, $(this).serialize(), function(data) {
+                if(data.option == 'error'){
+                    $.notify(data.detalle_error,{
+                        className: 'error',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                }else{
+                    $('#id_tipo_caja').append(data.option)
+                    $("#id_tipo_caja").select2();
+                    /*$('#id_quien_recibe').selectpicker('refresh');*/
+                    $('#edit_caja').modal('hide');
+                    $.notify("Datos guardados exitosamente!",{
+                        className: 'success',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                   
+                    $('#pk_caja_edit').val('');
+                    $('#id_descripcion_caja_edit').val('');
+                    $('#id_ancho_edit').val('');
+                    $('#id_alto_edit').val('');
+                    $('#id_largo_edit').val('');
+                    $('#id_pie_cubico_edit').val('');
+                    $('#id_precio_caja_edit').val('');
+                   
+
+                }
+            }, 'json');
+        });
+
+$('#addFormRecibe').on('submit', function(e){
+            e.preventDefault();
+            var url = $(this).attr('action');
+            $.post(url, $(this).serialize(), function(data) {
+                if(data.option == 'error'){
+                    $.notify(data.detalle_error,{
+                        className: 'error',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                }else{
+                    $('#id_quien_recibe').append(data.option)
+                    $("#id_quien_recibe").select2();
+                    /*$('#id_quien_recibe').selectpicker('refresh');*/
+                    $('#add_recibe').modal('hide');
+                    $.notify("Datos guardados exitosamente!",{
+                        className: 'success',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                    $('#id_quien_recibe').trigger('change');
+                   /* const e = new Event("change");
+                    const element = document.querySelector('#id_quien_recibe')
+                    element.dispatchEvent(e);*/
+                    $('#id_envia_pk').val(0);
+                    $('#id_nombre_recibe_modal').val('');
+                    $('#id_telefono_recibe_modal').val('');
+                    $('#id_direccion_recibe_modal').val('');
+                    $("#id_pais_recibe").select2();
+                    $("#id_departamento_recibe").select2();
+                    $.ajax({
+                        url: "{% url 'datos_recibe' %}",
+                        type: "get",
+                        data: {
+                            'cliente_recibe': $('#id_quien_recibe').val(),
+                        },
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function(data) {
+                            $.each(data, function(key, val) {
+                                $("#id_celular_registrar").val(val.celular);
+                                $("#id_direccion_registrar").val(val.direccion);
+                            });
+                            $('#datos_quien_recibe').removeAttr('hidden');
+                            $('#datos_quien_recibe').addClass('show');
+                        },
+                        error: function(ts) {
+                            alert("Error");
+                        }
+                    });
+                }
+            }, 'json');
+        });
+
+$('#editFormRecibe').on('submit', function(e){
+            e.preventDefault();
+            var url = $(this).attr('action');
+            $.post(url, $(this).serialize(), function(data) {
+                if(data.option == 'error'){
+                    $.notify(data.detalle_error,{
+                        className: 'error',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                }else{
+                    $('#id_quien_recibe').append(data.option)
+                    $("#id_quien_recibe").select2();
+                    /*$('#id_quien_recibe').selectpicker('refresh');*/
+                    $('#edit_recibe').modal('hide');
+                    $.notify("Datos guardados exitosamente!",{
+                        className: 'success',
+                        globalPosition:"right bottom", 
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+                    /*$('#id_quien_recibe').trigger('change');*/
+                    $("#id_recibe_pk_modal_edit").val("");
+                    $("#id_edit_nombre_recibe_modal").val("");
+                    $("#id_edit_telefono_recibe_modal").val("");
+                    $("#id_edit_direccion_recibe_modal").val("");
+                    $("#id_pais_recibe").select2();
+                    $("#id_departamento_recibe").select2();
+                     $.ajax({
+                        url: "{% url 'datos_recibe' %}",
+                        type: "get",
+                        data: {
+                            'cliente_recibe': $('#id_quien_recibe').val(),
+                        },
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function(data) {
+                            $.each(data, function(key, val) {
+                                $("#id_celular_registrar").val(val.celular);
+                                $("#id_direccion_registrar").val(val.direccion);
+                            });
+                            $('#datos_quien_recibe').removeAttr('hidden');
+                            $('#datos_quien_recibe').addClass('show');
+                        },
+                        error: function(ts) {
+                            alert("Error");
+                        }
+                    });
+                }
+            }, 'json');
+        });
+
+function solonumeros_nada_mas(e){
+        var keynum = window.event ? window.event.keyCode : e.which;
+        if ((keynum == 8))
+        return true;
+        return /\d/.test(String.fromCharCode(keynum));
+    }
+
+function calculo_cubicos_edit(){
+        var largo = $("#id_largo_edit").val();
+        var alto =$("#id_alto_edit").val();
+        var ancho =$("#id_ancho_edit").val();
+        var pies_cubicos = 0;
+        var precio = 0;
+        pies_cubicos=(largo*alto*ancho)/1728;
+        $("#id_pie_cubico_edit").val(pies_cubicos.toFixed(2));
+        if (pies_cubicos>= 0 && pies_cubicos< 2){
+            precio = pies_cubicos * 50;
+        }else if(pies_cubicos>=2.1 && pies_cubicos <2.5){
+            precio = pies_cubicos * 25;
+        }else if(pies_cubicos>=2.51 && pies_cubicos <3.4){
+            precio = pies_cubicos * 25;
+        }else if(pies_cubicos>=3.41 && pies_cubicos <4.7){
+            precio = pies_cubicos * 25;
+        }else if(pies_cubicos>=4.71 && pies_cubicos <7){
+            precio = pies_cubicos * 22;
+        }else if(pies_cubicos>=7.01 && pies_cubicos <8){
+            precio = pies_cubicos * 20;
+        }else if(pies_cubicos>=8.01 && pies_cubicos <9){
+            precio = pies_cubicos * 18.89;
+        }else if(pies_cubicos>=9.01 && pies_cubicos <10){
+            precio = pies_cubicos * 18.80;
+        }else if(pies_cubicos>=10.01 && pies_cubicos <11){
+            precio = pies_cubicos * 17.27;
+        }else if(pies_cubicos>=11.01 && pies_cubicos <12){
+            precio = pies_cubicos * 16.25;
+        }else if(pies_cubicos>=12.01 && pies_cubicos <13){
+            precio = pies_cubicos * 15.35;
+        }else if(pies_cubicos>=13.01 && pies_cubicos <14){
+            precio = pies_cubicos * 15;
+        }else if(pies_cubicos>14.01 && pies_cubicos <15){
+            precio = pies_cubicos * 14.67;
+        }else if(pies_cubicos>=15.01 && pies_cubicos <20.25){
+            precio = pies_cubicos * 14.25;
+        }else {
+            precio = pies_cubicos * 13;
+        }
+        $("#id_precio_caja_edit").val(precio.toFixed(2));
+    }
+
+function calculo_cubicos(){
+        var largo = $("#id_largo").val();
+        var alto =$("#id_alto").val();
+        var ancho =$("#id_ancho").val();
+        var pies_cubicos = 0;
+        var precio = 0;
+        pies_cubicos=(largo*alto*ancho)/1728;
+        $("#id_pie_cubico").val(pies_cubicos.toFixed(2));
+        if (pies_cubicos>= 0 && pies_cubicos< 2){
+            precio = pies_cubicos * 50;
+        }else if(pies_cubicos>=2.1 && pies_cubicos <2.5){
+            precio = pies_cubicos * 25;
+        }else if(pies_cubicos>=2.51 && pies_cubicos <3.4){
+            precio = pies_cubicos * 25;
+        }else if(pies_cubicos>=3.41 && pies_cubicos <4.7){
+            precio = pies_cubicos * 25;
+        }else if(pies_cubicos>=4.71 && pies_cubicos <7){
+            precio = pies_cubicos * 22;
+        }else if(pies_cubicos>=7.01 && pies_cubicos <8){
+            precio = pies_cubicos * 20;
+        }else if(pies_cubicos>=8.01 && pies_cubicos <9){
+            precio = pies_cubicos * 18.89;
+        }else if(pies_cubicos>=9.01 && pies_cubicos <10){
+            precio = pies_cubicos * 18.80;
+        }else if(pies_cubicos>=10.01 && pies_cubicos <11){
+            precio = pies_cubicos * 17.27;
+        }else if(pies_cubicos>=11.01 && pies_cubicos <12){
+            precio = pies_cubicos * 16.25;
+        }else if(pies_cubicos>=12.01 && pies_cubicos <13){
+            precio = pies_cubicos * 15.35;
+        }else if(pies_cubicos>=13.01 && pies_cubicos <14){
+            precio = pies_cubicos * 15;
+        }else if(pies_cubicos>14.01 && pies_cubicos <15){
+            precio = pies_cubicos * 14.67;
+        }else if(pies_cubicos>=15.01 && pies_cubicos <20.25){
+            precio = pies_cubicos * 14.25;
+        }else {
+            precio = pies_cubicos * 13;
+        }
+        $("#id_precio_caja").val(precio.toFixed(2));
+    }
+$(function () {
+    $("#example1").DataTable({
+        responsive: true
+    });
+    $('#example2').DataTable({
+        "paging": true,
+        "lengthChange": false,
+        "searching": false,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        responsive: true
+    });
+});
+$(function () {
+    $('#datetimepicker4').datetimepicker({
+        format: 'L'
+    });
+});
+function Registrar()
+{
+    var valor = 0;
+    var quien_envia = $("#id_quien_envia").val();
+    var nombre = $("#id_nombre_completo").val();
+    var celular = $("#id_celular").val();
+    var correo = $("#id_correo").val();
+    var direccion = $("#id_direccion").val();
+    if (quien_envia == 0){
+        alert('Seleccione un cliente para realizar la operacion');
+        
+    }else{
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            url: "{% url 'recibe' %}",
+            data: {
+                'quien_envia': quien_envia,
+                'nombre': nombre,
+                'celular': celular,
+                'correo': correo,
+                "credentials": 'include',
+                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
+                'direccion': direccion
+            },
+            success: function(data){
+                valor = data.valor;
+                Limpiar();
+                $('#collapseOne').removeClass('show')
+                quien_recibe_ver();
+            }
+        });
+        
+        alert("Éxito!" + '\n' + "Cliente agregado correctamente!");
+        /*$( ".confirm" ).click(function() {
+            window.location.href = '/ver/paquetes/'+'{{estado.pk}}';
+        });*/
+
+    }
+    
+}   
+function Limpiar()
+{
+    $("#id_nombre_completo").val("");
+    $("#id_celular").val("");
+    $("#id_direccion").val("");
+}
+function quien_recibe_ver()
+{
+    $('#id_quien_recibe').find('option').remove();
+    $('#id_quien_recibe').append("<option value='0'selected>Seleccion una opción</option>");
+    var quien_envia = $("#id_quien_envia").val();
+
+    $.ajax({
+        url: "{% url 'ver_recibe' %}",
+        type: "get",
+        data: {
+            'quien_envia': quien_envia
+        },
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data) {
+            $.each(data, function(key, val) {
+                $("#id_quien_recibe").append('<option value='+val.pk+'>'+val.nombre_completo +'|'+val.celular +'</option>');
+            });
+        $("#id_quien_recibe").select2(); //se tiene que iniciar la clase select
+        },
+        error: function(ts) {
+            
+        }
+    });
+
+}
+//AGREGAR DEPARTAMENTO AL CAMBIAR PAIS
+$('#id_pais').on('change',departamentos);  
+    //funcion para extraer los departamentos de cada pais
+    function departamentos() {
+            if ($('select[name="pais"] option:selected').text() == 'MEXICO'){
+                $('#id_tipo_envio').prop('disabled', false);
+                $('#id_tipo_contenido').prop('disabled', false);
+                
+            }else{
+                $('#id_tipo_envio').prop('disabled', 'disabled');
+                $('#id_tipo_contenido').prop('disabled', 'disabled');
+            }
+            $('#id_departamento').find('option').remove();
+            $('#id_departamento').append("<option value='0'selected>Seleccion una opción</option>");
+            $.ajax({
+                url: "{% url 'departamento' %}",
+                type: "get",
+                data: {
+                    'idpais': $(this).val(),
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    $.each(data, function(key, val) {
+                        $("#id_departamento").append('<option value='+val.id+'>'+val.nombre+'</option>');
+                    });
+                $("#id_departamento").select2(); //se tiene que iniciar la clase select
+              
+                },
+                error: function(ts) {
+                    
+                }
+            });
+          $("#id_div_productos").show();
+          $("#id_pais_caja").val($(this).val());
+        
+    };
+
+
+$('#id_pais_recibe').on('change',departamentos_recibe);  
+    //funcion para extraer los departamentos de cada pais
+    function departamentos_recibe() {   
+                   
+            $('#id_departamento_recibe_modal').find('option').remove();
+            $('#id_departamento_recibe_modal').append("<option value='0'selected>Seleccion una opción</option>");
+            $.ajax({
+                url: "{% url 'departamento' %}",
+                type: "get",
+                data: {
+                    'idpais': $(this).val(),
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    $.each(data, function(key, val) {
+                       
+                        $("#id_departamento_recibe_modal").append('<option value='+val.id+'>'+val.nombre+'</option>');
+                    });
+                $("#id_departamento_recibe_modal").select2(); //se tiene que iniciar la clase select
+              
+                },
+                error: function(ts) {
+                    alert(ts);
+                }
+            });
+        
+        
+    };
+
+//AGREGAR DEPARTAMENTO QUIEN RECIBE EDIT
+$('#id_pais_recibe_edit').on('change',departamentos_recibe_edit);  
+    //funcion para extraer los departamentos de cada pais
+    function departamentos_recibe_edit() {              
+            $('#id_departamento_recibe_edit').find('option').remove();
+            $('#id_departamento_recibe_edit').append("<option value='0'selected>Seleccion una opción</option>");
+            $.ajax({
+                url: "{% url 'departamento' %}",
+                type: "get",
+                data: {
+                    'idpais': $(this).val(),
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    $.each(data, function(key, val) {
+                        $("#id_departamento_recibe_edit").append('<option value='+val.id+'>'+val.nombre+'</option>');
+                    });
+                $("#id_departamento_recibe_edit").select2(); //se tiene que iniciar la clase select
+              
+                },
+                error: function(ts) {
+                    
+                }
+            });
+        
+        
+    };
+
+//AGREGAR CAJAS DE PAIS CAMBIAR PAIS
+$('#id_pais').on('change',cajas);  
+   
+    function cajas() {
+            $('#id_tipo_caja').find('option').remove();
+            $('#id_tipo_caja').append("<option value='0'selected>Seleccion una opción</option>");
+            $.ajax({
+                url: "{% url 'cajas_tipo' %}",
+                type: "get",
+                data: {
+                    'idpais': $(this).val(),
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    $.each(data, function(key, val) {
+                        $("#id_tipo_caja").append("<option value='"+val.tipo_caja__pk+"|"+val.tipo_caja__descripcion+"|"+val.precio+"|"+val.pk+"'>"+val.tipo_caja__descripcion+" | Precio=>"+val.precio+"</option>");
+                    });
+                $("#id_tipo_caja").select2(); //se tiene que iniciar la clase select
+                },
+                error: function(ts) {
+                    
+                }
+            });
+    };
+
+ $(function() { 
+   $("#btnInsertar").click(addcajas); 
+}); 
+
+var acum = 0;
+
+
+function calcular(){
+    var oTable = document.getElementById('tblDatos');
+    var i;
+    var rowLength = oTable.rows.length;
+    var subtotal_global =0;
+    for (i = 1; i < rowLength; i++) {
+        var oCells = oTable.rows.item(i).cells;
+        subtotal_global += parseFloat(oCells[3].firstChild.data);          
+    }
+    document.getElementById("id_valor_envio").value = subtotal_global.toFixed(2);
+}
+function addcajas(){
+    
+    var caja = $("#id_tipo_caja").val();
+    var cantidad = $("#id_cantidad_cajas").val();
+    var tablaDatos= $("#tblDatos");
+    var subtotal =0;
+     if (parseInt(caja) == 0 || parseInt(cantidad)== 0){
+       $.notify("Error, debes agregar la cantidad de cajas y seleccionar el tipo",{
+                className: 'error',
+                globalPosition:"right bottom", 
+                clickToHide: true,
+                autoHide: true,
+                autoHideDelay: 5000,
+                arrowShow: true,
+                arrowSize: 5,
+                style: 'bootstrap',
+                showAnimation: 'slideDown',
+                showDuration: 400,
+                hideAnimation: 'slideUp',
+                hideDuration: 200,
+                gap: 2
+            });
+     }else{
+        var detalle = caja.split("|");
+        var pk = detalle[0];
+        var descripcion = detalle[1];
+        var precio = detalle[2];
+        var pk_caja = detalle[3];
+        var agrego = 0;
+        
+
+      
+       subtotal = precio * cantidad;
+        var oTable = document.getElementById('tblDatos');
+        var i;
+        var rowLength = oTable.rows.length;
+        var subtotal_global =0;
+        for (i = 1; i < rowLength; i++) {
+            var oCells = oTable.rows.item(i).cells;
+            var cp = document.getElementById('cdetalle'+oCells[6].firstChild.data).value;
+            var cprod = cp.split("|");  
+            if (pk  ==  cprod[0]) {
+                /* 6 representa el dato hidden que esta del acumulador para saber que fila va sumar*/
+                cantidad = parseInt(parseInt(oCells[1].firstChild.data) + parseInt(cantidad));
+                subtotal=parseInt(cantidad) * parseFloat(precio);
+                document.getElementById('cant'+oCells[6].firstChild.data).firstChild.data = cantidad;
+                document.getElementById('sub'+oCells[6].firstChild.data).firstChild.data = subtotal;
+                var nc = cprod[0]+'|'+cantidad+'|'+cprod[2];
+                document.getElementById('cdetalle'+oCells[6].firstChild.data).value = nc;
+                agrego = 1 ;
+            }
+        }
+        acum+= 1;
+         if (parseInt(agrego)==0){
+                  tablaDatos.append("<tr id="+acum+" ><td>"+descripcion+"</td><td id=cant"+acum+">"+cantidad+"</td><td>"+precio+"</td><td id=sub"+acum+" class='subtotal'"+acum+">"+subtotal+"</td>"+"<td hidden ><input id=cdetalle"+acum+" name='cajas' value="+pk +'|'+cantidad+'|'+pk_caja+"></></td><td><input type='button' class='btn btn-danger btn-sm' value='Eliminar' onclick='eliminar_caja("+acum+");'></td><td hidden>"+acum+"</td></tr>"); 
+           } 
+          calcular();
+     }
+
+   
+}
+
+ function eliminar_caja(id_fila)
+  {
+
+    var parent = document.getElementById(id_fila).parentNode;
+    parent.removeChild(document.getElementById(id_fila));
+    calcular();
+  }
+//AGREGAR QUIEN RECIBE AL CAMBIAR QUIEN ENVIA
+$('#id_quien_envia').on('change',quien_recibe);
+    
+    function quien_recibe() {
+        if($('#id_quien_envia').val() == 0){
+            $('#datos_quien_recibe').addAttr('hidden');
+            $('#datos_quien_recibe').removeClass('show');
+        }
+           
+            $("#id_envia_pk").val($(this).val());
+            $('#id_quien_recibe').find('option').remove();
+            $('#id_quien_recibe').append("<option value='0'selected>Seleccion una opción</option>");
+            $.ajax({
+                url: "{% url 'ver_recibe' %}",
+                type: "get",
+                data: {
+                    'quien_envia': $(this).val()
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    $.each(data, function(key, val) {
+                        $("#id_quien_recibe").append('<option value='+val.pk+'>'+val.nombre_completo +' | '+val.celular +'</option>');
+                    });
+                $("#id_quien_recibe").select2(); //se tiene que iniciar la clase select
+                },
+                error: function(ts) {
+                    
+                }
+            });
+            
+    };
+//AGREGAR DATOS DE QUIEN RECIBE A INPUTS
+$('#id_quien_recibe').on('change',datos);   
+    //funcion para extraer los departamentos de cada pais
+    function datos() {
+        if ($('#id_quien_recibe').val()!= 0){
+            $("#id_li_edit").show();
+            $("#id_celular_registrar").val("");
+            $("#id_direccion_registrar").val("");
+            $.ajax({
+                url: "{% url 'datos_recibe' %}",
+                type: "get",
+                data: {
+                    'cliente_recibe': $(this).val(),
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    $.each(data, function(key, val) {
+                        $("#id_celular_registrar").val(val.celular);
+                        $("#id_direccion_registrar").val(val.direccion);
+                        /*
+                        var pais = val.pais;
+                        var depto = val.departamento;
+                        var t = pais + depto + '';
+                        if(t.length > 1){
+                            pais = pais.split("|");
+                            depto = depto.split("|");
+                            $('#id_pais').find('option').remove();
+                            $('#id_departamento').find('option').remove();
+                            $('#id_pais').append("<option value='"+pais[0]+"'selected>"+pais[1]+"</option>");
+                            $('#id_departamento').append("<option value='"+depto[0]+"'selected>"+depto[1]+"</option>");
+                        }else{
+                            $('#id_pais').find('option').remove();
+                            $('#id_departamento').find('option').remove();
+                            $("#id_pais").append("<option value='0' >SELECCIONE</option>");
+                            $("#id_departamento").append("<option value='0' >SELECCIONE</option>");
+                            {% for p in pais %}
+                                $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
+                            {% endfor %}
+                        }*/
+                        
+                    });
+                    $('#datos_quien_recibe').removeAttr('hidden');
+                    $('#datos_quien_recibe').addClass('show');
+                },
+                error: function(ts) {
+                    alert("Error");
+                }
+            });
+        }else{
+            $("#id_li_edit").hide();
+             $("#id_celular_registrar").val("");
+            $("#id_direccion_registrar").val("");
+            {% for p in pais %}
+                $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
+            {% endfor %}
+            /*0departamentos();*/
+        }
+    };
+    function Mostrar(){
+        {% for p in pais %}
+            $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
+        {% endfor %}
+    }
+</script>
+<script>
+ 
+    /**
+    * Funcion que captura las variables pasados por GET
+    * Devuelve un array de clave=>valor
+    */
+    function getGET()
+    {
+        // capturamos la url
+        var loc = document.location.href;
+        // si existe el interrogante
+        if(loc.indexOf('?')>1)
+        {
+            // cogemos la parte de la url que hay despues del interrogante
+            var getString = loc.split('?')[1];
+            // obtenemos un array con cada clave=valor
+            var GET = getString.split('&');
+            var get = {};
+            // recorremos todo el array de valores
+            for(var i = 0, l = GET.length; i < l; i++){
+                var tmp = GET[i].split('=');
+                get[tmp[0]] = unescape(decodeURI(tmp[1]));
+            }
+            return get;
+        }
+    }
+    window.onload = function()
+    {
+        // Cogemos los valores pasados por get
+        var valores=getGET();
+        if(valores)
+        {
+            //recogemos los valores que nos envia la URL en variables para trabajar 
+                //con ellas
+            var id = valores['envio'];
+                // hacemos un bucle para pasar por cada indice del array de valores
+            document.getElementById("enviopk").value = id;  
+        }
+    }
+    </script>
+<script>
+function ver() {
+    id = $('#enviopk').val();
+    window.open("/envio/pdf/"+id +"/",'_blank');
+}
+</script>
+
+
+{% endblock js %}

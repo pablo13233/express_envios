@@ -1,0 +1,152 @@
+{% extends "base_cliente.html" %}
+{% load humanize %} {% load static %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block active-inicio %}class="nav-item "{% endblock %}
+{% block active-servicio %}class="nav-item active"{% endblock %}
+{% block active-portafolio %}class="nav-item"{% endblock %}
+{% block contenido %}
+    <div class="breadcumb-area bg-img" style="background-color: white;"></div>
+
+    <section class="dorne-about-area section-padding-0-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="about-content text-justify">
+                        <h2 class="text-center"><br>Servicio de encomidas es de puerta a puerta <span>346-228-1479 / 832-538-1046</span></h2>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 style="border-bottom: 1px solid gray" class="text-center"><span>Honduras</span></h2>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong> CAJA GRANDE 28X28X34"</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CAJA MEDIANA 24X24X24"</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CAJA PEQUEÑA 20X20X20"</strong></h4></div>
+                                </center>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/moving-truck.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>SERVICIO DE MUDANZA</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/boxes.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CARGA CONSOLIDADA</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/car.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>EMBARQUE DE VEHICULOS</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-6">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/container.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>RENTA DE CONTENEDORES</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-6">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/mobile-shopping.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CASILLERO COMPRAS EN LINEA</strong></h4></div>
+                                </center>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 style="border-bottom: 1px solid gray" class="text-center"><span>NICARAGUA   -   MÉXICO   -   EL SALVADOR</span></h2>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong> CAJA GRANDE 28X28X34"</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CAJA MEDIANA 24X24X24"</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CAJA PEQUEÑA 20X20X20"</strong></h4></div>
+                                </center>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h2 style="border-bottom: 1px solid gray" class="text-center"><span>GUATEMALA</span></h2>
+                            </div>
+                        
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong> CAJA GRANDE 28X28X34"</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CAJA MEDIANA 24X24X24"</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/package.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CAJA PEQUEÑA 20X20X20"</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/boxes.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CARGA CONSOLIDADA</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/car.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>EMBARQUE DE VEHICULOS</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-4">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/container.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>RENTA DE CONTENEDORES</strong></h4></div>
+                                </center>
+                            </div>
+                            <div class="col-md-12">
+                                <center>
+                                    <img class="img-responsive" src="{% static 'cliente/img/mobile-shopping.png'%}" />
+                                    <div class="col-md-10"><h4> <strong>CASILLERO COMPRAS EN LINEA</strong></h4></div>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock contenido %}

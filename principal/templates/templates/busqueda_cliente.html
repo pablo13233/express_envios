@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %} {% load tz %}
+
+<head>
+    <meta charset="utf-8">
+    <title>EXPRESS ENVIOS | Empresa de Logistica</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+    <!-- Favicons -->
+    <link href="{% static  'cliente/img/favicon.ico' %}" rel="icon">
+    <link href="{% static  'cliente/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Montserrat:300,400,500,700" rel="stylesheet">
+    <!-- Bootstrap CSS File -->
+    <link href="{% static  'cliente/lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Libraries CSS Files -->
+    <link href="{% static  'cliente/lib/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static  'cliente/lib/animate/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static  'cliente/lib/ionicons/css/ionicons.min.css' %}" rel="stylesheet">
+    <link href="{% static  'cliente/lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="{% static  'cliente/lib/lightbox/css/lightbox.min.css' %}" rel="stylesheet">
+    <!-- Main Stylesheet File -->
+    <link href="{% static  'cliente/css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    <header id="header" class="fixed-top">
+        <div class="container">
+            <div class="logo float-left">
+                <!-- Uncomment below if you prefer to use an image logo -->
+                <!-- <h1 class="text-light"><a href="#header"><span>NewBiz</span></a></h1> -->
+                <a href="{% url 'inicio_cliente'%}"><img src="{% static  'cliente/img/logo.png' %}" alt="" class="img-fluid"></a>
+            </div>
+            <nav class="main-nav float-right d-none d-lg-block">
+                <ul>
+                    <li ><a href="{% url 'inicio_cliente'%}">Inicio</a></li>
+                    <li class="active"><a href="{% url 'buscar_envio_cliente'%}">Rastrear</a></li>
+                    <li><a href="{% url 'inicio_admin' %}">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main id="main" >
+        <section id="why-us" style="min-height: 100vh;">
+            <div class="container" style="padding-top: 20px;">
+                
+                <header class="section-header">
+                    <h3>Ingrese su número de guia:</h3>
+                </header>
+                <div class="row">
+                    <div style="margin: auto;">
+                        <div class="col-md-8" style="float:left">
+                            <input type="text" name="guia" class="form-control text-uppercase" maxlength="16" id="codigo" placeholder="N° de Guia" data-rule="minlen:6" data-msg="Por favor ingrese su codigo de almenos 8 caracteres"/>
+                            <div class="validation"></div>
+                        </div>
+                        <div class="col-md-2" style="float:left">
+                            <div class="col-md-12">
+                                <input class="btn btn-success" id="id_search" type="button" value="Mostrar" />
+                            </div>
+                        </div>
+                    </div>
+                    <div id="datos" class="col-md-12"></div>
+                </div><br>
+                <div id="servicios" class="row row-eq-height justify-content-center">
+                    <div class="col-lg-4 mb-4">
+                        <div class="card wow bounceInUp">
+                            <i class="ion-social-dropbox"></i>
+                            <div class="card-body">
+                                <h5 class="card-title">Envio de Encomiendas</h5>
+                                <p class="card-text">Con nuestro sistema de seguimiento puedes revisar en cualquier momento la ubicación de tu encomienda y avisos programados de llegada.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="card wow bounceInUp">
+                            <i class="ion-cube"></i>
+                            <div class="card-body">
+                                <h5 class="card-title">Carga Consolidada</h5>
+                                <p class="card-text">Tiene mucho que enviar y poco espacio? Con nuestro servicio de carga consolidad recogemos sus cajas y las almacenamos en nuestras bodegas y son enviadas al dar la confirmacion asi llegara al mismo tiempo todo.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="card wow bounceInUp">
+                            <i class="ion-model-s"></i>
+                        <div class="card-body">
+                            <h5 class="card-title">Embarque de Vehiculos</h5>
+                            <p class="card-text">Desea enviar un vehiculo a su pais? Ya sea en su direccion o comprado por subasta brindamos el mejor y más seguro servicio de envios.</p>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer id="footer" style="position: fixed;bottom: 0;width: 100%;">
+                <div class="container">
+                    <div class="copyright">
+                        &copy; Copyright <strong>Cargo Internacional</strong>. Todos los derechos reservados
+                        <div class="col-md-12" >
+                            <div class="social-links">
+                                Siguenos en <a style="color: white;" href="https://www.facebook.com/Cargo-Internacional-105342851037441/" class="facebook"><strong>Facebook</strong></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </footer><!-- #footer -->
+        </section>
+    </main>
+  
+    <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+    <!-- Uncomment below i you want to use a preloader -->
+    <!-- <div id="preloader"></div> -->
+    <!-- JavaScript Libraries -->
+    <script src="{% static  'cliente/lib/jquery/jquery.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/jquery/jquery-migrate.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/easing/easing.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/mobile-nav/mobile-nav.js' %}"></script>
+    <script src="{% static  'cliente/lib/wow/wow.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/isotope/isotope.pkgd.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/lightbox/js/lightbox.min.js' %}"></script>
+    <!-- Template Main Javascript File -->
+    <script src="{% static  'cliente/js/main.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#id_search').click( function(e){
+                var codigo = $('#codigo').val();
+                var cont = 0;
+                if(codigo != '')
+                {  
+                    cont+=1;
+                }
+                if(cont < 1)
+                {
+                    alert("Ingrese el número de guia para realizar la busqueda");        
+                }
+                else
+                { 
+                    // realizar ajax
+                    document.getElementById("servicios").hidden = true;
+                    var cont = 0;
+                        $.ajax({
+                            type: "GET",
+                            url: "{% url 'resultado_busqueda' %}",
+                            data: {
+                                'codigo':codigo,
+                                'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val(),
+                            },
+                            success: searchSuccess,
+                            dataType: 'html'  
+                        });
+                            // limpiar caja de texto
+                            document.getElementById("#codigo").value = "";
+                    return false; //este return es para evitar refrescar la pagina
+                    }   
+            });
+          
+        });
+
+        //funcion que muestrea los resultado de cuentas
+        function searchSuccess(data, textStatus, jqXHR)
+        {
+            $('#datos').html(data);
+        }
+    </script> 
+  </body>
+  </html>

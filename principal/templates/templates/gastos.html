@@ -1,0 +1,491 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Gestion de Gastos</h3>
+                </div>
+
+                <div class="card-body">
+                    {% if 'okt' in request.GET %}
+                        <div class="alert alert-primary">
+                            <h5><i class="icon fas fa-check-circle"></i> Tipo de Gasto Registrado!</h5>
+                        </div>
+                    {% endif %}
+                    {% if 'ok' in request.GET %}
+                        <div class="alert alert-primary">
+                            <h5><i class="icon fas fa-check-circle"></i> Gasto Registrado!</h5>
+                        </div>
+                    {% endif %}
+                    {% if errores_tipo_gasto %}
+                        <div class="alert alert-danger">
+                            <h5><i class="icon fas fa-ban"></i> Alerta revisar!</h5>
+                            <div class="row">
+                                <div class="col-md-12">{% if errores.extra %}- {{errores.extra}}} {% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.quien_envia %}- {{errores.quien_envia}}{% endif %}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if errores %}
+                        <div class="alert alert-danger">
+                            <h5><i class="icon fas fa-ban"></i> Alerta revisar!</h5>
+                            <div class="row">
+                                <div class="col-md-12">{% if errores.extra %}- {{errores.extra}}} {% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.tipo_gasto %}- {{errores.tipo_gasto}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.recibo %}- {{errores.recibo}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.valor %}- {{errores.valor}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.descripcion %}- {{errores.descripcion}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.pdf %}- {{errores.pdf}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.fecha %}- {{errores.fecha}}{% endif %}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="ver_cajas-tab" data-toggle="pill" href="#ver_cajas" role="tab" aria-controls="ver_cajas" aria-selected="true"><strong>Ver Ingresados</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="agregar_nueva_caja-tab" data-toggle="pill" href="#agregar_nueva_caja" role="tab" aria-controls="agregar_nueva_caja" aria-selected="false"><strong>Agregar Tipo de Gasto</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="aumentar_inventario-tab" data-toggle="pill" href="#aumentar_inventario" role="tab" aria-controls="aumentar_inventario" aria-selected="false"><strong>Agregar Gastos</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="detalle_caja-tab" data-toggle="pill" href="#detalle_caja" role="tab" aria-controls="detalle_caja" aria-selected="false"><strong>Ver Detalle Gastos</strong></a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="custom-content-below-tabContent">
+                        <div class="tab-pane fade show active" id="ver_cajas" role="tabpanel" aria-labelledby="ver_cajas-tab">
+                            <br>
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo Gasto</th>
+                                        <th>Descripcion</th>
+                                        <th>Fecha</th>
+                                        <th>Recibo N°</th>
+                                        <th>Valor</th>
+                                        <th>Recibo</th>
+                                        <th>Usuario</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for g in gastos  %}
+                                        <tr >
+                                            {% if user.is_superuser and es_sadmin.rol_empleado.pk == 1 %}
+                                                <td>{{g.tipo_gasto.empresa.nombre_empresa}} | {{g.tipo_gasto.tipo_gasto}}</td>
+                                            {% else %}
+                                                <td>{{g.tipo_gasto.tipo_gasto}}</td>
+                                            {% endif %}
+                                            <td>{{g.descripcion}}</td>
+                                            <td>{{g.fecha}}</td>
+                                            <td>{{g.recibo}}</td>
+                                            <td>{{g.valor|unlocalize|intcomma}}</td>
+                                            <td><a class="btn btn-success" href="{% url 'ver_recibo_gastos' g.pk %}" target="blank">Ver</a></td>
+                                            <td>{{g.usuario_registro}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Tipo Gasto</th>
+                                        <th>Descripcion</th>
+                                        <th>Fecha</th>
+                                        <th>Recibo N°</th>
+                                        <th>Valor</th>
+                                        <th>Recibo</th>
+                                        <th>Usuario</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            
+                        </div>
+                        <!------------>
+                        <div class="tab-pane fade" id="agregar_nueva_caja" role="tabpanel" aria-labelledby="agregar_nueva_caja-tab">
+                            <div class=" col-md-5" style="float:left">
+                                <form class="form-group form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'tipo_gasto' %}">
+                                    {% csrf_token %}
+                                    <br>
+                                    <div class="col-md-8">
+                                        <div class="col-md-12">
+                                            <label for="id_tipo_gasto" class="col-form-label">Tipo de gasto:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control text-uppercase" name="tipo_gasto" id="id_tipo_gasto" placeholder="Tipo Gasto">
+                                        </div>
+                                    </div>
+                                    {% if user.is_superuser and es_sadmin.rol_empleado.pk == 1 %}
+                                        <div class="col-md-8">
+                                            <div class="col-md-12">
+                                                <label class="col-form-label">Empresa:</label>
+                                                <select class="form-control select2" style="width: 100%;" name="empresa">
+                                                {% for e in empresas %}
+                                                    {% ifequal e.pk ret_data.e_empresa  %}
+                                                        <option value="{{e.pk}}" >{{e.nombre_empresa}}</option>
+                                                    {% else %}
+                                                        <option value="{{e.pk}}">{{e.nombre_empresa}}</option>
+                                                    {% endifequal %}
+                                                {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-md-8">
+                                            <div class="col-md-12">
+                                                <label class="col-form-label">Empresa:</label>
+                                                <select class="form-control select2" style="width: 100%;" name="empresa">
+                                                {% for e in empresas %}
+                                                    {% ifequal e.pk ret_data.e_empresa  %}
+                                                        <option value="{{e.empresa.pk}}" >{{e.empresa.nombre_empresa}}</option>
+                                                    {% else %}
+                                                        <option value="{{e.empresa.pk}}">{{e.empresa.nombre_empresa}}</option>
+                                                    {% endifequal %}
+                                                {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <button type="submit" class="btn float-right btn-info">Agregar</button>
+                                </form>
+                            </div>
+                            <div class="col-md-5" style="float: right;">
+                                <table id="example2" class="table table-bordered table-striped">
+                                    {% if user.is_superuser and es_sadmin.rol_empleado.pk == 1 %}
+                                        <thead>
+                                            <tr>
+                                                <th>Tipo Gasto</th>
+                                                <th>Empresa</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for t in tipo_gasto  %}
+                                                <tr>
+                                                    <td>{{t.tipo_gasto}}</td>
+                                                    <td>{{t.empresa.nombre_empresa}}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Tipo Gasto</th>
+                                                <th>Empresa</th>
+                                            </tr>
+                                        </tfoot>
+                                    {% else %}
+                                        <thead>
+                                            <tr>
+                                                <th>Tipo Gasto</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for t in tipo_gasto  %}
+                                                <tr>
+                                                    <td>{{t.tipo_gasto}}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>Tipo Gasto</th>
+                                            </tr>
+                                        </tfoot>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                        <!------------>
+                        <div class="tab-pane fade" id="aumentar_inventario" role="tabpanel" aria-labelledby="aumentar_inventario-tab">
+                            <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'gastos' %}">
+                                {% csrf_token %}
+                                <br>
+                                {% if tipo_gasto %}
+                                    <div class="form-group row">
+                                        {% if user.is_superuser and es_sadmin.rol_empleado.pk == 1 %}
+                                            <div class="col-md-4">
+                                                <div class="col-md-12">
+                                                    <label class="col-form-label">Tipo Gasto:</label>
+                                                    <select class="form-control select2" style="width: 100%;" name="tipo_gasto_ingresar">
+                                                        {% for tg in tipo_gasto %}
+                                                            {% ifequal tg.pk ret_data.tipo_gasto  %}
+                                                                <option value="{{tg.pk}}" >{{tg.tipo_gasto}} | {{tg.empresa.nombre_empresa}}</option>
+                                                            {% else %}
+                                                                <option value="{{tg.pk}}">{{tg.tipo_gasto}} | {{tg.empresa.nombre_empresa}}</option>
+                                                            {% endifequal %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="col-md-4">
+                                                <div class="col-md-12">
+                                                    <label class="col-form-label">Tipo Gasto:</label>
+                                                    <select class="form-control select2" style="width: 100%;" name="tipo_gasto_ingresar">
+                                                        {% for tg in tipo_gasto %}
+                                                            {% ifequal tg.pk ret_data.tipo_gasto  %}
+                                                                <option value="{{tg.pk}}" >{{tg.tipo_gasto}}</option>
+                                                            {% else %}
+                                                                <option value="{{tg.pk}}">{{tg.tipo_gasto}}</option>
+                                                            {% endifequal %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        <div class="col-md-3">
+                                            <div class="col-md-12">
+                                                <label for="id_recibo" class="col-form-label">Recibo Nº:</label>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <input type="text" class="form-control" name="recibo" id="id_recibo" placeholder="Numero de recibo">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="col-md-12">
+                                                <label for="id_valor" class="col-form-label">Valor compra:</label>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <input type="text" class="form-control" name="valor" id="id_valor" placeholder="Valor">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="col-md-12">
+                                                <label for="id_pdf" class="col-form-label">Recibo escaneado:</label>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <input class="" type="file" type="text" name="pdf">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <div class="col-md-12">
+                                                <label for="id_fecha" class="col-form-label">Fecha compra:</label>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                                                    <input name="fecha" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2"/>
+                                                    <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="col-md-12">
+                                                <label for="exampleFormControlTextarea1">Descripcion del gasto</label>
+                                                <textarea class="form-control" id="id_descripcion" style="text-transform: uppercase;" name="descripcion" rows="2" maxlength="300" required></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn float-right btn-info">Agregar</button>
+                                {% else %}
+                                    <div class="alert alert-danger">
+                                        <h5><i class="icon fas fa-ban"></i> Alerta revisar!</h5>
+                                        <div class="row">
+                                            <div class="col-md-12">Por favor ingrese un tipo de gasto antes</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                        <!------------>
+                        <div class="tab-pane fade" id="detalle_caja" role="tabpanel" aria-labelledby="detalle_caja-tab">
+                            <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'detalle_cajas' %}">
+                                {% csrf_token %}
+                                <br>
+                                {% if gastos %}
+                                    <div class="col-md-12">
+                                        <!-- we are adding the .class so bootstrap.js collapse plugin detects it -->
+                                        <div class="card card-primary card-outline">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <div class="form-check col-md-2" style="float:left">
+                                                                <input class="form-check-input" type="radio" id="global" name="global"  onclick="checkRadio(name)">
+                                                                <label class="form-check-label">Reporte global</label>
+                                                            </div>
+                                                            <div class="form-check col-md-3" style="float:left">
+                                                                <div class="form-check " style="float:left">
+                                                                <input class="form-check-input" type="radio" id="xgasto" name="xgasto"  onclick="checkRadio(name)">
+                                                                <label class="form-check-label">Reporte por tipo de gasto</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    {% if user.is_superuser and es_sadmin.rol_empleado.pk == 1 %}
+                                                        <div class="col-md-4">
+                                                            <div class="col-md-12">
+                                                                <label class="col-form-label">Empresa:</label>
+                                                                <select class="form-control select2" style="width: 100%;" id="empresa" name="empresa">
+                                                                {% for e in empresas %}
+                                                                    {% ifequal e.pk ret_data.e_empresa  %}
+                                                                        <option value="{{e.pk}}" >{{e.nombre_empresa}}</option>
+                                                                    {% else %}
+                                                                        <option value="{{e.pk}}">{{e.nombre_empresa}}</option>
+                                                                    {% endifequal %}
+                                                                {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if user.is_superuser and es_sadmin.rol_empleado.pk == 1 %}
+                                                        <div class="col-md-4">
+                                                            <div class="col-md-12">
+                                                                <label class="col-form-label">Empresa:</label>
+                                                                <select class="form-control select2" style="width: 100%;" id="tipo_gasto" name="tipo_gasto">
+                                                                    {% for c in tipo_gasto %}
+                                                                        {% ifequal c.pk ret_data.caja  %}
+                                                                            <option value="{{c.pk}}" >{{c.tipo_gasto}}</option>
+                                                                        {% else %}
+                                                                            <option value="{{c.pk}}">{{c.tipo_gasto}}</option>
+                                                                        {% endifequal %}
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12">
+                                                            <label for="id_desde" class="col-form-label">Desde:</label>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                                                                <input name="desde" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
+                                                                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12">
+                                                            <label for="id_hasta" class="col-form-label">Hasta:</label>
+                                                        </div>
+                                                        <div class="col-sm-12">
+                                                            <div class="input-group date" id="datetimepicker4" data-target-input="nearest">
+                                                                <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker4"/>
+                                                                <div class="input-group-append" data-target="#datetimepicker4" data-toggle="datetimepicker">
+                                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button type="button" onclick="Registrar();" class="form-control btn float-right btn-success">Ver</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-danger">
+                                        <h5><i class="icon fas fa-ban"></i> Alerta revisar!</h5>
+                                        <div class="row">
+                                            <div class="col-md-12">Por favor ingrese un gasto antes</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<!-- jQuery -->
+<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static  'admin/dist/js/demo.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<script>
+    function checkRadio(name) {
+        if(name == "global"){
+        console.log("Choice: ", name);
+            document.getElementById("global").checked = true;
+            document.getElementById("empresa").disabled = false;
+            document.getElementById("tipo_gasto").disabled = true;
+            document.getElementById("xgasto").checked = false;
+    
+        } else if (name == "xgasto"){
+            console.log("Choice: ", name);
+            document.getElementById("xgasto").checked = true;
+            document.getElementById("empresa").disabled = true;
+            document.getElementById("tipo_gasto").disabled = false;
+            document.getElementById("global").checked = false;
+        }
+    }
+    </script>
+<script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+  
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  
+    });
+</script>
+<!-- DATATABLES-->
+<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+<script>
+  $(function () {
+    $("#example1").DataTable({
+        responsive: true
+    });
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      responsive: true
+    });
+    $("#example3").DataTable({
+        responsive: true
+    });
+  });
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            format: 'L'
+        });
+        $('#datetimepicker4').datetimepicker({
+            format: 'L'
+        });
+    });
+</script>
+{% endblock js %}

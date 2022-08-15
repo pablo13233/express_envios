@@ -1,0 +1,84 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+
+{% block contenido %}
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Gestion de Envios</h3>
+                </div>
+                {{kraken_envio}}
+                <div class="card-body">
+                    <div class="row">
+                        {% if user.is_superuser %}
+                            {% for d in dic_datos_seguimiento  %}
+                                <div class="col-lg-3 col-6">
+                                    <!-- small box -->
+                                    {% if d.pk == 1 %}
+                                    <div class="small-box bg-info">
+                                        <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
+                                        <div class="icon"><i class="fas fa-boxes"></i></div>
+                                        <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                    {% elif d.pk == 2 %}
+                                    <div class="small-box bg-success">
+                                        <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
+                                        <div class="icon"><i class="fas fa-pallet"></i></div>
+                                        <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                    {% elif d.pk == 3 %}
+                                    <div class="small-box bg-warning">
+                                        <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
+                                        <div class="icon"><i class="fas fa-ship"></i></div>
+                                        <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                    {% elif d.pk == 4 %}
+                                    <div class="small-box bg-danger">
+                                        <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
+                                        <div class="icon"><i class="fas fa-pallet"></i></div>
+                                        <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                    {% elif d.pk == 5 %}
+                                    <div class="small-box bg-info">
+                                        <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
+                                        <div class="icon"><i class="fas fa-boxes"></i></div>
+                                        <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                    {% elif d.pk == 6 %}
+                                    <div class="small-box bg-success">
+                                        <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
+                                        <div class="icon"><i class="fas fa-shipping-fast"></i></div>
+                                        <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                    {% elif d.pk == 7 %}
+                                    <div class="small-box bg-warning">
+                                        <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
+                                        <div class="icon"><i class="fas fa-user-check"></i></div>
+                                        <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                    {% elif d.pk == 8 %}
+                                    <div class="small-box bg-danger">
+                                        <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
+                                        <div class="icon"><i class="fas fa-user-check"></i></div>
+                                        <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block script%}
+
+{% endblock script %}

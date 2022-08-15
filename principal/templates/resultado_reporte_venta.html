@@ -1,0 +1,177 @@
+{% extends "base_admin.html" %}
+{% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-edit"></i>VENTAS DEL {{inicio}} AL {{fin}}</h3></div>
+
+                <div class="card-body">
+                  <div class="tab-content" id="custom-content-below-tabContent">
+                    {% if 'ok' in request.GET %}
+                      <div class="alert alert-primary">
+                          <h5><i class="icon fas fa-check-circle"></i> Envios Aprobados Correctamente!</h5>
+                      </div>
+                    {% endif %}
+                    <div >
+                      <h4 class="header">VENTAS DEL {{inicio}} AL {{fin}} <strong>|</strong> EMPLEADO: {{empleado}} <br>TOTAL FACTURAS: ${{saldo}}  <strong>|</strong>  TOTAL CAJAS: ${{saldo_cajas}}  <strong>|</strong>  TOTAL VEHICULOS: ${{saldo_vehiculos}}  <strong>|</strong>  TOTAL CONTENEDORES: ${{saldo_contenedores}}  <strong>|</strong>  TOTAL PAGOS EFECTIVO: ${{saldo_pagos_efectivo}}  <strong>|</strong>  TOTAL NETO PAGOS: ${{saldo_pagos}}</h4>
+                     
+                      <div class="col-md-12"><br>
+                        <h4 class="header"><strong>Facturas</strong></h4>
+                        <table id="dtBasicExample" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                          <thead>
+                            <tr>
+                              <th>Fact N°</th>
+                              <!--<th>Encomiendas</th>-->
+                              <th>Comentario</th>
+                              <th>Pago Recibido</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for envio in datos  %}
+                                <tr>
+                                  <td>{{envio.codigo}} | {{envio.cliente}}</td>         
+                                  <td>{{envio.embarque}}</td>
+                                  <td class="text-right" >{{envio.pago}}</td>
+                                </tr>
+                              {% endfor %}
+                          </tbody>
+                        </table>
+                        <br>
+                        <h4 class="header"><strong>Cajas</strong></h4>
+                        <table id="dtBasicExample2" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                          <thead>
+                            <tr>
+                              <th>Codigo</th>
+                              <th>Cliente</th>
+                              <th>Descripcion</th>
+                              <th>Pago</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for t in dic_cajas  %}
+                                <tr>
+                                  <td>{{t.codigo}}</td>
+                                  <td>{{t.cliente}}</td> 
+                                  <td>{{t.size_caja}}</td>            
+                                  <td class="text-right" >{{t.valor_caja}}</td>
+                                </tr>
+                              {% endfor %}
+                          </tbody>
+                        </table>
+                        <br>
+                        <h4 class="header"><strong>Vehiculos</strong></h4>
+                        <table id="dtBasicExample2" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                          <thead>
+                            <tr>
+                              <th>Codigo</th>
+                              <th>Cliente</th>
+                              <th>Vehiculo</th>
+                              <th>Pago</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for t in dic_vehiculos  %}
+                                <tr>
+                                  <td>{{t.codigo}}</td>
+                                  <td>{{t.cliente}}</td> 
+                                  <td>{{t.marca_vehiculo}} | {{t.modelo_vehiculo}}</td>          
+                                  <td class="text-right" >{{t.valor_vehiculo}}</td>
+                                </tr>
+                              {% endfor %}
+                          </tbody>
+                        </table>
+                        <br>
+                        <h4 class="header"><strong>Contenedores</strong></h4>
+                        <table id="dtBasicExample2" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                          <thead>
+                            <tr>
+                              <th>Codigo</th>
+                              <th>Cliente</th>
+                              <th>Contenedor</th>
+                              <th>Pago</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for t in dic_contenedores  %}
+                                <tr>
+                                  <td>{{t.codigo}}</td>
+                                  <td>{{t.cliente}}</td> 
+                                  <td>{{t.pais_destino}} | {{t.tamano_contenedor}} </td>            
+                                  <td class="text-right" >{{t.valor_contenedor}}</td>
+                                </tr>
+                              {% endfor %}
+                          </tbody>
+                        </table>
+                        <br>
+                        <h4 class="header"><strong>Pagos Credito</strong></h4>
+                        <table id="dtBasicExample3" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                          <thead>
+                            <tr>
+                              <th>Factura N°</th>
+                              <!--<th>Encomiendas</th>-->
+                              <th>Tipo Pago</th>
+                              <th>Pago Recibido</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for p in pagos  %}
+                                <tr>
+                                  <td>{{p.factura}}</td>
+                                  <td>{% if p.tipo == True %}EFECTIVO{% else %}DEPOSITO{% endif %}</td>            
+                                  <td class="text-right" >{{p.pago}}</td>
+                                </tr>
+                              {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+
+<script type="text/javascript">
+
+  var table = $('#dtBasicExample3,#dtBasicExample2,#dtBasicExample').DataTable({
+      "oLanguage": {
+                            "sProcessing":     "Procesando...",
+                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                            "sZeroRecords":    "No se encontraron resultados",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                            "sInfo":           "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty":      "Mostrando 0 - 0 de un total de 0 registros",
+                            "sInfoFiltered":   "<br>(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix":    "",
+                            "sSearch":         "Buscar:",
+                            "sUrl":            "",
+                            "sInfoThousands":  ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst":    "Primero",
+                                "sLast":     "Último",
+                                "sNext":     "Sig.",
+                                "sPrevious": "Ant."
+                            },
+                      },
+                responsive: true
+  });
+
+</script>
+
+{% endblock js %}

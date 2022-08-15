@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %} {% load tz %}
+
+{% block style %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Cargo Internacional</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicons -->
+    <link href="{% static  'cliente/img/favicon.ico' %}" rel="icon">
+    <link href="{% static  'cliente/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css' %}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static  'admin/dist/css/adminlte.min.css' %}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+</head>
+{% endblock%}
+<body class="hold-transition login-page" style="background-image: url('{% static  'cliente/img/intro-bg.png' %}');">
+    <div class="login-box" >
+        <div class="login-logo">
+          <img src="{% static  'admin/dist/img/logo-trans.png' %}" alt="CARGO INTERNACIONAL Logo" class="brand-image" width="100%">
+        </div>
+        <!-- /.login-logo -->
+        <div class="card">
+          <div class="card-body login-card-body">
+            <h5 class="login-box-msg" style="color:black;"><strong>Cambio de Contraseña</strong></h5>
+      
+            <form method="post" action="{% url 'editarpass' %}">
+              {% csrf_token %}
+              <div class="input-group mb-3">
+                <input type="password" class="form-control" name="password" placeholder="Nueva Contraseña">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fas fa-lock"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="input-group mb-3">
+                <input type="password" class="form-control" name="password2" placeholder="Confirmar Contraseña">
+                <div class="input-group-append">
+                  <div class="input-group-text">
+                    <span class="fas fa-lock"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <button type="submit" class="btn btn-primary btn-block">Cambiar</button>
+                </div>
+              </div>
+            </form>
+            {% if mensaje %}
+            <div class="row">
+                <div class="col-12">
+                    <center><strong><p style="color: red;">{{mensaje}}</p></strong></center>
+                </div>
+            </div>
+            {% endif %}
+          </div>
+          <!-- /.login-card-body -->
+        </div>
+      </div>
+  
+    {% block js %}
+        <!-- jQuery -->
+        <script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+        <!-- jQuery UI 1.11.4 -->
+        <script src="{% static  'admin/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+        <!-- AdminLTE for demo purposes -->
+        <script src="{% static  'admin/dist/js/demo.js' %}"></script>
+    {% endblock js %}
+
+</body>
+</html>

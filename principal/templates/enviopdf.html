@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+{% load static %} {% load tz %} {% load humanize %} {% load l10n %}
+<html lang="es">
+ 
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
+  <title>Envio No. {{envio.pk}} | {{envio.quien_envia}}</title>
+  <style>
+    * {
+      font-size: 14px;
+      font-family: 'Times New Roman';
+      font-weight: bold;
+    }
+     
+    .centrado {
+      text-align: center;
+      align-content: center;
+    }
+     
+    .ticket {
+      width: 287px;
+      max-width: 287px;
+    }
+     
+    img {
+      max-width: inherit;
+    }
+    /* @page 
+    {
+        size:  auto;   /* auto es el valor inicial 
+        margin: 5mm;  /* afecta el margen en la configuración de impresión 
+    }*/
+  </style>
+<script>
+/*$(document).ready(function(){
+
+	
+var element = $("#html-content-holder"); // global variable
+var getCanvas; // global variable
+ 
+    $("#btn-Preview-Image").on('click', function () {
+         html2canvas(element, {
+         onrendered: function (canvas) {
+                $("#previewImage").append(canvas);
+                getCanvas = canvas;
+             }
+         });
+    });
+
+	$("#btn-Convert-Html2Image").on('click', function () {
+    var imgageData = getCanvas.toDataURL("image/png");
+    // Now browser starts downloading it instead of just showing it
+    var newData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
+    $("#btn-Convert-Html2Image").attr("download", "your_pic_name.png").attr("href", newData);
+	});
+
+});*/
+
+</script>
+</head>
+ 
+<body >
+	<!--<input id="btn-Preview-Image" type="button" value="Preview"/>
+    <a id="btn-Convert-Html2Image" href="#">Download</a>
+    <br/>
+    <h3>Preview :</h3>
+    <div id="previewImage" style="background-color:white;">
+    </div>-->
+  <div id="html-content-holder">
+    <table>
+      <tbody>
+        <tr>
+          <td width="200" >
+              <img src="http://forithn.com/media/portafolio/eehn.png">
+          </td>
+          <td>
+            <center>
+              <span style="font-size: 40px;">EXPRESS ENVIOS HN</span><br><br>
+              <span style="font-size: 20px;">6004 W 34TH ST HOUSTON, TX 77092 UNIDAD 6004-H<br>TELÉFONO: 346-228-1479 / 832-538-1046<br>HN: 3341-7724 / 3275-7273</span><br><span style="font-size: 20px;">FMC No. 3172NF</span>
+            </center>  
+          </td>
+        </tr>
+      </tbody>
+    </table><br>
+<!--    <img style="text-align:center" width="200px" src="http://forit-hn.com/media/portafolio/eehn.png">
+    <p class="centrado" style="font-size:30px;margin-top:-10px">EXPRESS ENVIOS HN</p><br>
+    <p class="centrado" style="font-size:30px;">TELEFONO: 346-228-1479 / 832-538-1046</p>
+    <p class="centrado" style="font-size:30px;margin-top:-10px">6004 W 34th St Houston, Tx 77092 Unidad 6004 H</p>
+    --> 
+      <table width="100%" >
+        <tbody>
+          <tr>
+            <td width="63%" style="font-size:20px;font-weight: bold;">Fecha: {{envio.fecha_recoleccion}}</td>
+            <td width="15%" style="font-size:30px;font-weight: bold;text-align:right;color:#ff4444">Guia:</td>
+            <td width="10%" style="font-size:30px;font-weight: bold;color:#ff4444">{{envio.codigo}}</td>
+          </tr>        
+        </tbody>
+      </table>
+      <!--REVENDEDOR-->
+      
+      {% if envio.revendedor %}
+        <table style="position: fixed;bottom: 0;right: 0;" width="50%" border="1" cellspacing="3" cellpadding="3">
+          <tbody >
+            <tr ><td bgcolor="#0099CC" width="100%" style="font-size:15px;font-weight: bold;" align="middle">GUIA REVENDEDOR: {{envio.guia_revendedor}}</td></tr>
+          </tbody>
+        </table><!--REVENDEDOR FIN-->
+      {% endif %}
+      <table width="100%" border="1" cellspacing="3" cellpadding="3">
+        <tbody >
+          <tr ><td bgcolor="#0099CC" width="50%" style="font-size:15px;font-weight: bold;" align="middle">NOMBRE DEL CONSIGNATARIO:</td><td width="50%" style="font-size:15px;font-weight: bold;">REMITENTE:</td></tr>
+        </tbody>
+      </table>
+      <table width="100%" border="1" cellspacing="3" cellpadding="3">
+        <tbody >
+          <tr><td width="50%" style="font-size:15px;font-weight: bold;">{{envio.quien_recibe}}</td><td  width="50%" style="font-size:15px;font-weight: bold;">{{envio.quien_envia.nombre_completo}}</td></tr>
+        </tbody>
+      </table>
+      <table width="100%" border="1" cellspacing="3" cellpadding="3">
+        <tbody >
+          <tr ><td bgcolor="#0099CC" width="50%" style="font-size:15px;font-weight: bold;">DIRECCIÓN CONSIGNATARIO:</td><td width="50%" style="font-size:15px;font-weight: bold;">DIRECCIÓN REMITENTE:</td></tr>
+        </tbody>
+      </table>
+      <table width="100%" border="1" cellspacing="3" cellpadding="3">
+        <tbody >
+         <tr><td width="50%" style="font-size:15px;font-weight: bold;">{{envio.departamento_destino}}, {{envio.direccion}}</td><td width="50%" style="font-size:15px;font-weight: bold;">{{envio.quien_envia.direccion}}</td></tr>
+        </tbody>
+      </table>
+      <table width="100%" border="1" cellspacing="3" cellpadding="3">
+        <tbody >
+          <tr><td bgcolor="#0099CC" width="50%" style="font-size:15px;font-weight: bold;">TELÉFONO CONSIGNATARIO:</td><td width="50%" style="font-size:15px;font-weight: bold;">TELÉFONO REMITENTE:</td></tr>
+        </tbody>
+      </table>
+      <table width="100%" border="1" cellspacing="3" cellpadding="3">
+        <tbody >
+          <tr><td width="50%" style="font-size:15px;font-weight: bold;">{{envio.telefonos}}</td><td width="50%" style="font-size:15px;font-weight: bold;">{{envio.quien_envia.celular}}</td></tr>
+        </tbody>
+      </table>
+      <table width="100%" border="1" cellspacing="3" cellpadding="3">
+        <tbody >
+          <tr><td width="100%" style="font-size:15px;font-weight: bold;">CONTENIDO DE EMBARQUE: {{envio.cajas}}.</td></tr>
+        </tbody>
+      </table>
+      {% if envio.emplasticado %}
+        <table width="100%" border="1" cellspacing="3" cellpadding="3">
+          <tbody >
+            <tr ><td bgcolor="#d31b10" width="50%" style="font-size:40px;font-weight: bold;color:white;">EMPLASTICADO</td></tr>
+          </tbody>
+        </table>
+      {% endif %}
+    <!--CANTIDADES DE PAGO-->
+    <br>
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tbody >
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right;">PRECIO EMBARQUE:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right;">${{envio.valor_envio|unlocalize|intcomma}}</td></tr>
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right;">VALOR ADICIONAL:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right;">${{envio.valor_adicional|unlocalize|intcomma}}</td></tr>
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;text-align:left" align="middle">RECIBIDO POR: {{envio.usuario_registro}}</td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">EMPLASTICADO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">{% if envio.valor_emplasticado != None %}${{envio.valor_emplasticado|unlocalize|intcomma}}{% endif %}{% if envio.valor_emplasticado == None %}$0.00{% endif %}</td></tr>
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;text-align:left" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">SEGURO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">{% if envio.valor_seguro != None %}${{envio.valor_seguro|unlocalize|intcomma}}{% endif %}{% if envio.valor_seguro == None %}$0.00{% endif %}</td></tr>
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left" align="middle">¡GRACIAS POR PREFERIRNOS!</td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">PAGO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">${{envio.pago_recibido|unlocalize|intcomma}}</td></tr>
+        <tr><td width="50%" style="font-size:20px;font-weight: bold;" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">SALDO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right;border-bottom: 3px solid black;">${{envio.saldo_pendiente|unlocalize|intcomma}}</td></tr>
+      </tbody>
+    </table>
+    {% if envio.comentario %}
+      <p>COMENTARIOS: {{envio.comentario}}</p>
+    {% endif %}
+    <!--<p class="centrado" style="font-size:30px;border-top:1px black solid;padding-top:5px">Firma Remitente</p>-->
+    <!--<img src="data:image/png;base64,{{codigo}}" height="70" width="250">-->
+    <p class="justify" style="font-size:12px"><strong>EXPRESS ENVIOS HN se limitara a pagar un maximo de $500 por el extravio parcial o total, o por averia en su envio cuando no pague seguro. Al enviar con EXPRESS ENVIOS HN usted a aceptado todos los terminos y condiciones citadas en la parte de abajo de este documento.</strong></p>
+    <p class="centrado" style="font-size:14px">TERMINOS Y CONDICIONES DEL CONTRATO</p>
+    <p style="font-size:12px;text-align:justify;padding-top:-12px;">CONTRATO GENERAL: Al entregarnos sus envios usted da por aceptado los terminos y condiciones contenidos en la misma. Ningun agente, empleado o contratista independiente de EXPRESS ENVIOS HN, puede alterar o modificar estos terminos y condiciones. GUIA NO NEGOCIABLE: Esta guia no es negociable. Usted garantiza que cada articulo enviado esta debidamente descrito en esta guia y es aceptado para ser transportado por nosotros y que el envio ha sido empacado con las condiciones y direccion correcta para permitir su transporte seguro y con el cuidado y manejo ordinario. DERECHO DE INSPECCION: Su envio puede ser abierto o inspeccionado por nosotros o por las dichas autoridades en cualquer momento. ARTICULOS QUE NO SON ACEPTADOS PARA TRANSPORTE:  No se aceptaran articulos que contengan oro o plata en lingotes, cheques viajeros, antiguedades, licores, estampillas, metales preciosos, platos, obras de arte, gemas, explosivos, armas de fuego, municiones, drogas, dinero, animales, productos quimicos, acciones y bonos, instrumentos negociables al portador o articulos restringidos. LIMITE DE RESPONSABILIDAD: La responsabilidad de EXPRESS ENVIOS HN por cualquier perdida o daño del envio esta limitada a $500 del valor declarado en el paquete. Cualquier daño o perdidas mayor a los $500 EXPRESS ENVIOS HN NO se hara responsable. El cliente podra comprar un seguro opcional. EXPRESS ENVIOS HN no es responsable por perdidas, robos o daños por giros postales, cheques personales, cheques de caja o cualquier otro documento de valor o cualquer reclamo con los mismos, tendra que ser presentados por usted diretamente a compañias o entidades que emitan tales documentos. EXPRESS ENVIOS HN no es responsable por demoras con el envio cuando resulte culpable la linea de transporte o cualquier agente distinto a EXPRESS ENVIOS HN, como tambien se exime de responsabilidad por causa fortuita o causa mayor. RECLAMOS: Todo reclamo se efectua en la oficina donde el cliente recibe su encomienda, dentro de 5 dias a partir de la fecha de haber recibido el producto. EXPRESS ENVIOS HN establece el maximo de 15 dias para que el cliente retire su carga de las bodegas de lo contrario queda advertido que se haran acciones necesarias para rematar la mercaderia y recuperar los gastos de flete.</p>
+</div>
+
+</body>
+
+</html>

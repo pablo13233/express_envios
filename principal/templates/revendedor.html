@@ -1,0 +1,207 @@
+{% extends "base_admin.html" %}
+{% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Gestion de Revendedores</h3>
+                </div>
+
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="custom-content-below-home-tab" data-toggle="pill" href="#custom-content-below-home" role="tab" aria-controls="custom-content-below-home" aria-selected="true"><strong>Ver Ingresados</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-content-below-profile-tab" data-toggle="pill" href="#custom-content-below-profile" role="tab" aria-controls="custom-content-below-profile" aria-selected="false"><strong>Agregar Nuevo</strong></a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="custom-content-below-tabContent">
+                        <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+                            <br>
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                  <tr>
+                                    <th>Nombre Completo</th>
+                                    <th>Telefono</th>
+                                    <th>Empresa</th>
+                                    <th>Usuario</th>
+                                    <th>Accion</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for a in revendedores  %}
+                                    <tr >
+                                      <td>{{a.nombre_completo}}</td>
+                                      <td>{{a.telefono}}</td>
+                                      <td>{{a.nombre_empresa}}</td>
+                                      <td>{{a.usuario}}</td>
+                                      {% if a.usuario.is_active %}
+                                          <td><a type='button' class="btn btn-success" href="{% url 'desactivar_usuario' a.usuario.pk %}">Desactivar</a></td>
+                                      {% else %}
+                                          <td><a type='button' class="btn btn-success" href="{% url 'activar_usuario' a.usuario.pk %}">Activar</a></td>
+                                      {% endif %}
+                                    </tr>
+                                  {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Nombre Completo</th>
+                                        <th>Telefono</th>
+                                        <th>Empresa</th>
+                                        <th>Usuario</th>
+                                        <th>Accion</th>
+                                    </tr>
+                                </tfoot>
+                              </table>
+                            
+                        </div>
+                        <div class="tab-pane fade" id="custom-content-below-profile" role="tabpanel" aria-labelledby="custom-content-below-profile-tab">
+                            <form class="col s12"  enctype='multipart/form-data' method="POST" action="{% url 'revendedor' %}" >
+                                {% csrf_token %}
+                                <div class="form-group row">
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_nombre_completo" class="col-form-label">Nombre Completo:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" name="nombre_completo" id="id_nombre_completo" placeholder="Nombre del empleado">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_telefono" class="col-form-label">Telefono:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" name="telefono" id="id_telefono" data-inputmask='"mask": "(999) 999-9999"' data-mask>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_nombre_empresa" class="col-form-label">Nombre de la empresa</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input class="form-control" id="id_nombre_empresa" type="text" value="{% if ret_data.nombre_empresa != None %}{{ret_data.nombre_empresa}}{% endif %}" name="nombre_empresa" required="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_logo" class="col-form-label">Logo:</label>
+                                            <input type="file" type="text" name="logo">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_telefono_empresa" class="col-form-label">Telefono empresa</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input class="form-control" id="id_telefono_empresa" type="text" value="{% if ret_data.telefono_empresa != None %}{{ret_data.telefono_empresa}}{% endif %}" name="telefono_empresa" required="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_celular_empresa" class="col-form-label">Celular empresa</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input class="form-control" id="id_celular_empresa" type="text" value="{% if ret_data.celular_empresa != None %}{{ret_data.celular_empresa}}{% endif %}" name="celular_empresa" required="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_correo" class="col-form-label">Correo</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input class="form-control" id="id_correo" type="text" value="{% if ret_data.correo != None %}{{ret_data.correo}}{% endif %}" name="correo" required="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="col-md-12">
+                                            <label for="id_direccion" class="col-form-label">Direccion</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input class="form-control" id="id_direccion" type="text" value="{% if ret_data.direccion != None %}{{ret_data.direccion}}{% endif %}" name="direccion" required="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn float-right btn-info">Agregar</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<!-- jQuery -->
+<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static  'admin/dist/js/demo.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+  
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  
+    });
+</script>
+<!-- DATATABLES-->
+<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker4').datetimepicker({
+            format: 'L'
+        });
+    });
+</script>
+<script>
+  $(function () {
+    $("#example1").DataTable({
+        responsive: true
+    });
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      responsive: true
+    });
+  });
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+
+{% endblock js %}

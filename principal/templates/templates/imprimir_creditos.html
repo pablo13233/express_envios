@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+{% load static %} {% load tz %} {% load humanize %} {% load l10n %}
+<html lang="es">
+ 
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
+  <title>Envio No. {{envio.pk}} | {{envio.quien_envia}}</title>
+  <style>
+    * {
+      font-size: 14px;
+      font-family: 'Times New Roman';
+      font-weight: bold;
+    }
+     
+    .centrado {
+      text-align: center;
+      align-content: center;
+    }
+     
+    .ticket {
+      width: 384px;
+      max-width: 384px;
+    }
+     
+    img {
+      max-width: inherit;
+    }
+    @page 
+    {
+        size:  auto;   /* auto es el valor inicial */
+        margin: 5mm;  /* afecta el margen en la configuración de impresión */
+    }
+  </style>
+<script>
+    function imprimir(){
+      window.print();
+      self.close();
+    }
+</script>
+</head>
+ 
+<body onload="imprimir()">
+  <div>
+    <div style="text-align:center;">
+    <table>
+      <tbody>
+        <tr>
+          <td width="200" >
+             <img width="150px" src="http://forithn.com/media/portafolio/eehn.png"></div>
+          </td>
+          <td>
+            <center>
+              <span style="font-size: 40px;">EXPRESS ENVIOS HN</span><br><br>
+              <span style="font-size: 20px;">6004 W 34TH ST HOUSTON, TX 77092 UNIDAD 6004-H<br>TELÉFONO: 346-228-1479 / 832-538-1046</span><br><span style="font-size: 20px;">FMC No. 3172NF</span>
+            </center>  
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <h2 class="header" style="font-size: 30px;color:#ff4444">CREDITO PENDIENTE ${{saldo}}</h2>
+      <div class="col s12">
+        <table width="100%" id="data-table-simple" class="responsive-table display"  border="1" cellspacing="3" cellpadding="3">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Cliente</th>
+              <th>Comentario</th>
+              <th>Saldo</th>
+            </tr>
+          </thead>
+         
+          <tbody>
+            {% for c in creditos  %}
+              {% if c.estado|join:", " == '4' or c.estado|join:", " == '5'  %}
+                <tr style="color:red;">
+                  <td >{{c.codigo|join:", "}}</td>
+                  <td style="text-align:left;">{{c.cliente|join:", "}} | {{c.celular|join:", "}}</td>
+                  <td style="text-align:left;">{% if c.comentario|join:", " != 'None' %}{{c.comentario|join:", "}}{% else %}SIN COMENTARIO{% endif %}</td>
+                  <td style="text-align:right;">${{c.saldo}}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td>{{c.codigo|join:", "}}</td>
+                  <td style="text-align:left;">{{c.cliente|join:", "}} | {{c.celular|join:", "}}</td>
+                  <td style="text-align:left;">{% if c.comentario|join:", " != 'None' %}{{c.comentario|join:", "}}{% else %}SIN COMENTARIO{% endif %}</td>
+                  <td style="text-align:right;">${{c.saldo}}</td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

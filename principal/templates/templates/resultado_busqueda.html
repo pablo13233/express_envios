@@ -1,0 +1,51 @@
+{% load static %} {% load tz %}
+
+{% load l10n %}
+    <!-- Font Awesome -->
+	<link rel="stylesheet" href="{% static  'admin/plugins/fontawesome-free/css/all.min.css' %}">
+	
+<div class="text-center">
+	{% if resultado.count > 0 %}
+	<br>
+		<div id="servicios" class="row row-eq-height justify-content-center">
+		{% for res in resultado%}
+			<div class="col-lg-3 mb-3">
+				<div class="card wow fadeInUp">
+					{% if res.estado.pk == 1 %}
+						<i class="fas fa-people-carry"></i>
+					{% elif res.estado.pk == 2 %}
+						<i class="fas fa-boxes"></i>
+					{% elif res.estado.pk == 3 %}
+						<i class="fas fa-pallet"></i>
+					{% elif res.estado.pk == 4 %}
+						<i class="fas fa-ship"></i>
+					{% elif res.estado.pk == 5 %}
+						<i class="fas fa-pallet"></i>
+					{% elif res.estado.pk == 6 %}
+						<i class="fas fa-boxes"></i>
+					{% elif res.estado.pk == 7 %}
+						<i class="fas fa-shipping-fast"></i>
+					{% elif res.estado.pk == 8 %}
+						<i class="fas fa-user-check"></i>
+					{% endif %}
+					<div class="card-body">
+						<h5 class="card-title">{{res.estado.estado}}</h5>
+						<p class="card-text">{{res.fechahora}}</p>
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+		</div>
+	{% else %}
+		<br>
+		<div class="row row-eq-height justify-content-center">
+			<div class="col-lg-8 mb-3">
+				<div class="card wow fadeInUp">
+					<div class="card-body">
+						<h5 class="card-title">No hay resultados que coincidan con la busqueda</h5>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+</div>

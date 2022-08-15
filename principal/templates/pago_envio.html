@@ -1,0 +1,232 @@
+{% extends "base_admin.html" %}
+{% load static %} {% load tz %} {% load humanize %} {% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header"><h3 class="card-title"><i class="fas fa-edit"></i>Realizar Pagos</h3></div>
+                {% if 'ok' in request.GET %}
+                  <div class="alert alert-primary">
+                      <h5><i class="icon fas fa-check-circle"></i> Pago Realizado Correctamente!</h5>
+                  </div>
+                {% endif %}
+                <div class="card-body">
+                  <div id="table-datatables">
+                    <h4 class="header">Realizar pago envio:<strong> {{envio.codigo}}</strong></h4>
+                    <form class="col-md-12"  enctype='multipart/form-data' method="POST" action="{% url 'pago_envio' envio.pk %}">
+                      {% csrf_token %}
+                      <div class="form-group row">
+                        <div class="col-md-3">
+                            <div class="col-md-12">
+                                <label for="id_nombre_completo" class="col-form-label">Envia</label>
+                            </div>
+                            <div class="col-sm-12">
+                              <input disabled style="text-transform: uppercase;" type="text" value="{{envio.quien_envia.nombre_completo}}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="col-md-12">
+                                <label for="id_celular" class="col-form-label">Telefono:</label>
+                            </div>
+                            <div class="col-sm-12">
+                              <input disabled style="text-transform: uppercase;" type="text" value="{{envio.quien_envia.celular}}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="col-md-12">
+                              <label for="id_celular" class="col-form-label">Recibe:</label>
+                          </div>
+                          <div class="col-sm-12">
+                            <input disabled style="text-transform: uppercase;" type="text" value="{{envio.quien_recibe}}" class="form-control">
+                          </div>
+                        </div>
+
+                        <div class="col-md-3">
+                          <div class="col-md-12">
+                              <label for="id_celular" class="col-form-label">Valor envío:</label>
+                          </div>
+                          <div class="col-sm-12">
+                            <input disabled style="text-transform: uppercase;" type="text" value="{{envio.total}}" class="form-control">
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="col-md-12">
+                              <label for="id_celular" class="col-form-label">Teléfono:</label>
+                          </div>
+                          <div class="col-sm-12">
+                            <input disabled style="text-transform: uppercase;" type="text" value="{{envio.celular_registrar}}" class="form-control">
+                          </div>
+                        </div>
+                        
+                        <div class="col-md-3" hidden>
+                          <div class="form-group">
+                            <label class="bmd-label-floating"> Id Envio</label>
+                            <input disabled style="text-transform: uppercase;" type="text" name="envio" value="{{envio.pk}}" class="form-control">
+                          </div>
+                        </div>
+  
+                        <div class="col-md-3">
+                          <div class="col-md-12">
+                              <label for="id_celular" class="col-form-label">Saldo:</label>
+                          </div>
+                          <div class="col-md-12">
+                            <input disabled style="text-transform: uppercase;" type="text" value="{{envio.saldo_pendiente|unlocalize|intcomma}}" class="form-control">
+                          </div>
+                        </div>
+                         {% if envio.saldo_pendiente > 0 %}
+                          <div class="col-md-3">
+                            <div class="col-md-12">
+                                <label for="id_celular" class="col-form-label">Pago recibido:</label>
+                            </div>
+                            <div class="col-sm-12">
+                              <input style="text-transform: uppercase;" type="text" name="pago" class="form-control" required>
+                            </div>
+                          </div>
+                          {% endif %}
+                        <div class="col-md-3">
+                          <div class="col-md-12">
+                            <label for="id_celular" class="col-form-label">Tipo de Pago:</label>
+                          </div>
+                          <select class="form-control select2" style="width: 100%;" id="id_tipo_pago"name="tipo_pago">
+                            <option value="0" >DEPOSITO</option>
+                            <option value="1" >EFECTIVO</option>
+                          </select>
+                        </div>
+
+                        <div class="col-md-3">
+                          <div class="col-md-12">
+                            <label for="id_celular" class="col-form-label">Lugar de pago:</label>
+                          </div>
+                          <select class="form-control select2" style="width: 100%;" id="id_ubicacion"name="ubicacion">
+                           
+                            {% for ubi in ubicaciones %}
+                               <option value="{{ubi.pk}}" >{{ubi.ubicacion}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      {% if envio.saldo_pendiente > 0 %}
+                        <div class="col-md-12">
+                          <button type="submit" class="btn btn-primary pull-right">Realizar pago</button>
+                        </div>  
+                      {% endif %}
+                    </form>
+                    <br>
+                    <table id="example1" class="table table-striped table-bordered table-hover display" cellspacing="0">
+                      <thead>
+                        <tr>
+                          <th>Fecha</th>
+                          <th>Pago</th>
+                          <th>Usuario registro</th>
+                          <th>Ubicación</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>{{envio.fecha_recoleccion}}</td>
+                          <td>{{envio.pago_recibido}}</td>
+                          <!--<td>{{envio.saldo_pendiente}}</td>-->
+                          <td>{{envio.usuario_registro}}</td>
+                          <td>&nbsp;</td>
+                        </tr>
+                        {% for c in pagos  %}
+                          <tr>
+                            <td>{{c.fecha}}</td>
+                            <td>{{c.pago|unlocalize|intcomma}}</td> 
+                            <!--<td>{{c.saldo}}</td>-->
+                            <td>{{c.usuario_registro}}</td>
+                            <td>{% if c.ubicacion %}{{c.ubicacion}}{% endif %}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<!-- jQuery -->
+<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static  'admin/dist/js/demo.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<script>
+$('#formtrasladar').submit(function(event) {
+  event.preventDefault(); //this will prevent the default submit
+  var c = () => Array.from(document.getElementsByTagName("INPUT")).filter(cur => cur.type === 'checkbox' && cur.checked).length > 0;
+  if(!c()) { // Si NO hay ningun checkbox chequeado.
+    alert("Seleccione almenos un envio para trasladar");
+  } else {
+    // your code here (But not asynchronous code such as Ajax because it does not wait for response and move to next line.)
+    $(this).unbind('submit').submit(); // continue the submit unbind preventDefault
+  }
+  
+})
+  
+</script>
+<script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+  
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  
+    });
+</script>
+<!-- DATATABLES-->
+<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker4').datetimepicker({
+            format: 'L'
+        });
+    });
+</script>
+<script>
+  $(function () {
+    $("#example1").DataTable({
+        responsive: true
+    });
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      responsive: true
+    });
+  });
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+
+{% endblock js %}

@@ -1,0 +1,105 @@
+{% extends "base_cliente.html" %}
+{% load humanize %} {% load static %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block active-inicio %}class="nav-item "{% endblock %}
+{% block active-servicio %}class="nav-item "{% endblock %}
+{% block active-trabajo %}class="nav-item active"{% endblock %}
+{% block contenido %}
+    <div class="breadcumb-area bg-img" style="background-color: white;"></div>
+
+    <section class="dorne-about-area section-padding-0-100">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="about-content text-justify">
+              <h2 class="text-center"><br>Servicio de encomidas es de puerta a puerta <br><span>346-228-1479 / 832-538-1046</span></h2>
+              <div class="row">
+                <form class="col-md-12"  enctype='multipart/form-data' method="POST" action="{% url 'tareas_clientes' %}" >
+                  {% csrf_token %}
+                    <div class="row">
+                      <div class="col-12 col-md-6">
+                        <label class="bmd-label-floating has-primary"> Nombre:</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Nombre Completo" required>
+                      </div>
+                      <div class="col-12 col-md-3">
+                        <label class="bmd-label-floating has-primary"> Teléfono:</label>
+                        <input type="text" name="telefono" class="form-control" placeholder="346-228-1479" required>
+                      </div>
+                      <div class="col-12 col-md-3">
+                        <label class="bmd-label-floating has-primary"> Seleccione acción:</label>
+                        <select style="text-transform:uppercase;width: 100%;" id="id_accion" name="accion" class="form-control" required>
+                          <option value="1">Entregar caja</option>
+                          <option value="2">Recoger caja</option>
+                        </select>
+                      </div>
+                      <div class="col-12"><br>
+                        <label class="bmd-label-floating has-primary"> Dirección:</label>
+                          <input type="text" name="direccion" class="form-control" placeholder="Direccion en Houston" required>
+                      </div>
+                      <div class="col-12 col-md-6"><br>
+                        <div class="form-group">
+                          <label for="dtp_input2" class="col-md-2 control-label">Fecha</label>
+                          <div class="input-group date form_date col-md-10" data-date="" data-date-format="dd MM yyyy" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                            <input class="form-control" size="16" type="text"  value="" readonly required>
+                            <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
+                          </div>
+                          <input type="hidden" id="dtp_input2" value="" name="fecha" data-date-format="yyyy-mm-dd" /><br/>
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-md-6"><br>
+                        <div class="form-group">
+                          <label for="dtp_input3" class="col-md-2 control-label">Hora</label>
+                          <div class="input-group date form_time col-md-10" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
+                            <input class="form-control" size="16" type="text" value="" name="hora"  readonly required>
+                            <span class="input-group-addon"><span class="fa fa-clock-o"></span></span>
+                          </div>
+                          <input type="hidden" id="dtp_input3" value="" /><br/>
+                        </div>
+                      </div>
+            
+                      <div class="col-12 text-center"><br> 
+                          <button type="submit" class="btn dorne-btn">Agendar</button>
+                      </div>
+                      <div class="col-md-12 text-center">
+                        <p style="color:black"><strong>Gracias por agendar la entrega/recolección de cajas, el dia que usted desea que lo visitemos recibira una llamada para confirmar su disponibilidad</strong></p>
+                      </div>
+                    </div>
+               </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+{% endblock contenido %}
+{% block js %}
+  <script type="text/javascript">
+
+  $('.form_date').datetimepicker({
+        language:  'es',
+        weekStart: 1,
+        todayBtn:  1,
+    autoclose: 1,
+    todayHighlight: 1,
+    startView: 2,
+    minView: 2,
+    forceParse: 0,
+    pickerPosition: "bottom-left"
+    });
+  $('.form_time').datetimepicker({
+        language:  'es',
+        weekStart: 1,
+        todayBtn:  0,
+    autoclose: 1,
+    todayHighlight: 1,
+    startView: 1,
+    minView: 0,
+    maxView: 1,
+    forceParse: 0,
+    pickerPosition: "bottom-left",
+    showMeridian: 1
+    });
+</script>
+{% endblock js %}

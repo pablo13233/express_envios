@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %} {% load tz %}
+{% block style %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>EXPRESS ENVIOS HN</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicons -->
+    <link href="{% static  'cliente/img/favicon.ico' %}" rel="icon">
+    <link href="{% static  'cliente/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/fontawesome-free/css/all.min.css' %}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css' %}">
+    <!-- Tempusdominus Bbootstrap 4  OJO-->
+    <link rel="stylesheet" href="{% static  'admin/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/jqvmap/jqvmap.min.css' %}">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/datatables-bs4/css/dataTables.bootstrap4.css' %}">
+    <!--NUEVO DT-->
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.material.min.css" rel="stylesheet"><!-- DataTables -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/datatables-bs4/css/dataTables.bootstrap4.css' %}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+    <!--END DT-->
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static  'admin/dist/css/adminlte.min.css' %}">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="{% static  'admin/plugins/daterangepicker/daterangepicker.css' %}">
+    <!-- summernote 
+    <link rel="stylesheet" href="{% static  'admin/plugins/summernote/summernote-bs4.css' %}">-->
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <!--SWEETALERT
+    <link href="{% static  'admin/sweetalert/dist/sweetalert.css' %}" type="text/css" rel="stylesheet">
+    -->
+    <link rel="stylesheet" href="{% static 'admin/css/pnotify.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/pnotify.buttons.css' %}">
+
+</head>
+{% endblock%}
+<body class="hold-transition sidebar-mini layout-fixed  layout-navbar-fixed">
+  <!-- Site wrapper -->
+    <div class="wrapper">
+
+    <!-- Navbar -->
+    <nav class=" navbar-fixed-top main-header navbar navbar-expand navbar-white navbar-light ">
+        <!-- Left navbar links -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+            </li>
+        </ul>
+        <!-- Right navbar links -->
+        <ul class="navbar-nav ml-auto">
+            <!-- Notifications Dropdown Menu -->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="fas fa-user-cog"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'editarpass' %}" class="dropdown-item">
+                        <i class="fas fa-lock-open mr-2"></i> Cambiar contraseña
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{% url 'cerrar_sesion' %}" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Salir
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-light-primary elevation-4 text-sm">
+        <!-- Brand Logo -->
+        <a href="{% url 'inicio_admin' %}" class="brand-link navbar-white">
+            <img src="{% static  'admin/dist/img/apple-touch-icon.ico' %}"  alt="EXPRESS ENVIOS LOGO" class="brand-image ">
+            <span class="brand-text font-weight-light"><strong>EXPRESS ENVIOS</strong></span>
+        </a>
+
+        <div class="sidebar">
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+                        with font-awesome or any other icon font library -->
+
+                {% if get_empleado.rol_empleado.pk == 1 %}
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Administración<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'inicio_admin' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Inicio</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'empresa' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Empresa</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'clientes' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Cliente</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'empleados' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Empleados</p>
+                                </a>
+                            </li>
+                             <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'camiones' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Lista de camiones</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'revendedor' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Revendedores</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'aprobar_envios' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Revendedor Recibos</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'buscar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Buscar Envios</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'tickets_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Imprimir tickets</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'envios_credito' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Creditos</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'gastos' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Gastos</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'cajas' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Compra cajas</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'top_clientes' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Ver mejores clientes</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'actividades' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Entregar/Recoger Caja</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'registrar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'recibo_vehiculo' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Vehiculo</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'recibo_contenedor' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Contenedor</p>
+                                </a>
+                            </li>
+                             <div class="dropdown-divider"></div>
+                           
+                            <li class="nav-item">
+                                <a href="{% url 'cargar_contenedor' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Enviar Contenedor</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            
+                            <li class="nav-item">
+                                <a href="{% url 'seleccionar_camion' %}" class="nav-link">
+                                    <i class="fas fa-car-alt nav-icon"></i><p>Distribuir cajas</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'buscar_caja_transito' %}" class="nav-link">
+                                    <i class="fas fa-check-double nav-icon"></i><p>Entrega cajas</p>
+                                </a>
+                            </li>
+
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'buscar_guia' %}" class="nav-link">
+                                    <i class="fas fa-search nav-icon"></i><p>Buscar guía</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Reportes<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'cierre' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre diario</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'cierre_mensual' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre mensual</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'prueba' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
+                                </a>
+                            </li>
+                             <li class="nav-item">
+                                <a href="{% url 'reporte_ventas' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Reporte de ventas</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{% url 'reporte_abonos' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Reporte de pagos</p>
+                                </a>
+                            </li>
+
+                            <!--<div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="pages/layout/fixed-topnav.html" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Control gastos</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="pages/layout/fixed-footer.html" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Control cajas</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Control creditos</p>
+                                </a>
+                            </li>-->
+                        </ul>
+                    </li>
+                {% elif get_empleado.rol_empleado.pk == 2 %}
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Administración<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'inicio_admin' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Inicio</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'clientes' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Cliente</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'buscar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Buscar Envios</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'tickets_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Imprimir tickets</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'envios_credito' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Creditos</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'gastos' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Gastos</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'cajas' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Compra cajas</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'actividades' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Entregar/Recoger Caja</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'registrar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'recibo_vehiculo' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Vehiculo</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'recibo_contenedor' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Contenedor</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                        </ul>¡
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Reportes<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'cierre' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre diario</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'cierre_mensual' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre mensual</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
+                                </a>
+                            </li>
+                            <!--<div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="pages/layout/fixed-topnav.html" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Control gastos</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="pages/layout/fixed-footer.html" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Control cajas</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Control creditos</p>
+                                </a>
+                            </li>-->
+                        </ul>
+                    </li>
+                {% elif get_empleado.rol_empleado.pk == 5 %}
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Administración<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'inicio_admin' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Inicio</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'buscar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Buscar Envios</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'tickets_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Imprimir tickets</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'registrar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                        </ul>
+                    </li>
+
+                    {% if request.user.pk == 15 %}
+                        
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-copy"></i>
+                                <p>Reportes<i class="fas fa-angle-left right"></i>
+                                <span class="badge badge-info right"></span></p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{% url 'cierre' %}" class="nav-link">
+                                        <i class="fas fa-file-alt nav-icon"></i><p>Cierre diario</p>
+                                    </a>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                                <li class="nav-item">
+                                    <a href="{% url 'cierre_mensual' %}" class="nav-link">
+                                        <i class="fas fa-file-alt nav-icon"></i><p>Cierre mensual</p>
+                                    </a>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                                <li class="nav-item">
+                                    <a href="" class="nav-link">
+                                        <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    
+                    {% endif %}
+
+                {% elif get_empleado.rol_empleado.pk == 3 %}
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Administración<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'inicio_admin' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Inicio</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'clientes' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Cliente</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'buscar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Buscar Envios</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'tickets_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Imprimir tickets</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'registrar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'recibo_vehiculo' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Vehiculo</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'recibo_contenedor' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Contenedor</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>Reportes<i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right"></span></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{% url 'cierre' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre diario</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'cierre_mensual' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre mensual</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <!--
+                            <li class="nav-item">
+                                <a href="pages/layout/fixed-sidebar.html" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
+                                </a>
+                            </li>
+                            -->
+                             <li class="nav-item">
+                                <a href="" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+
+
+
+
+
+
+                <!--<li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-copy"></i>
+                        <p>Administración<i class="fas fa-angle-left right"></i>
+                        <span class="badge badge-info right">6</span></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'inicio_admin' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Inicio</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'empresa' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Empresa</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'clientes' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Registrar Cliente</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'empleados' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Empleados</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'revendedor' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Revendedores</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'aprobar_envios' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Revendedor Recibos</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'buscar_envio' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Buscar Envios</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'tickets_envio' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Imprimir tickets</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'envios_credito' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Creditos</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'gastos' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Gastos</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'cajas' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Compra cajas</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                    </ul>
+                </li>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-copy"></i>
+                        <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                        <span class="badge badge-info right">6</span></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'actividades' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Entregar/Recoger Caja</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'registrar_envio' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'recibo_vehiculo' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Registrar Vehiculo</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'recibo_contenedor' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Registrar Contenedor</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                    </ul>
+                </li>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-copy"></i>
+                        <p>Reportes<i class="fas fa-angle-left right"></i>
+                        <span class="badge badge-info right">6</span></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'cierre' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Cierre diario</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="{% url 'cierre_mensual' %}" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Cierre mensual</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="pages/layout/fixed-sidebar.html" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="pages/layout/fixed-topnav.html" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Control gastos</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="pages/layout/fixed-footer.html" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Control cajas</p>
+                            </a>
+                        </li>
+                        <div class="dropdown-divider"></div>
+                        <li class="nav-item">
+                            <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
+                                <i class="fas fa-file-alt nav-icon"></i><p>Control creditos</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>-->
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+        </div>
+        <!-- /.sidebar -->
+    </aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        {% block contenido %}
+        {% endblock contenido %}
+    </div>
+    <footer class="main-footer">
+        <strong>Copyright &copy;2020 <a href="http://adminlte.io">Cargo Internacional</a>.</strong>
+        All rights reserved.
+    </footer>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+    </div>
+  <!-- ./wrapper -->
+  
+    
+        <!-- jQuery -->
+        <script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+        <!-- jQuery UI 1.11.4 -->
+        <script src="{% static  'admin/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+        <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+
+        <script src="{% static 'admin/js/notify.js' %}"></script>
+         <script src="{% static 'admin/js/pnotify.js' %}"></script>
+        <script src="{% static 'admin/js/pnotify.buttons.js' %}"></script>
+        <script>
+            $.widget.bridge('uibutton', $.ui.button)
+        </script>
+        <!-- Bootstrap 4 -->
+        <script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+        <!-- JQVMap -->
+        <script src="{% static  'admin/plugins/jqvmap/jquery.vmap.min.js' %}"></script>
+        <script src="{% static  'admin/plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+        <!-- moment -->
+        <script src="{% static  'admin/plugins/moment/moment.min.js' %}"></script>
+        <!-- AdminLTE App -->
+        <script src="{% static  'admin/dist/js/adminlte.js' %}"></script>
+        <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+        <script src="{% static  'admin/dist/js/pages/dashboard.js' %}"></script>
+        <!-- AdminLTE for demo purposes -->
+        <script src="{% static  'admin/dist/js/demo.js' %}"></script>
+        <!-- Select2 -->
+        <script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+        <!-- InputMask -->
+        <script src="{% static  'admin/plugins/inputmask/min/jquery.inputmask.bundle.min.js' %}"></script>
+        <!-- bootstrap color picker -->
+        <script src="{% static  'admin/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %}"></script>
+        <!-- Tempusdominus Bootstrap 4 OJO -->
+        <script src="{% static  'admin/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+        <!--DATATABLES-->
+        <script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+        <script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+        <!--SWEETALERT
+        <script type="text/javascript" src="{% static 'admin/sweetalert/dist/sweetalert.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'admin/sweetalert/extra-components-sweetalert.js' %}"></script>-->
+        <script>
+            $(function () {
+               //Initialize Select2 Elements
+                $('.select2').select2()
+                //Initialize Select2 Elements
+                $('.select2bs4').select2({
+                theme: 'bootstrap4'
+                })
+              //Datemask dd/mm/yyyy
+              $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+              //Datemask2 mm/dd/yyyy
+              $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
+              //Money Euro
+              $('[data-mask]').inputmask()
+          
+              //Timepicker
+              $('#timepicker').datetimepicker({
+                format: 'LT'
+              })
+          
+            })
+        </script>
+        
+    {% block js %}
+
+    {% endblock js %}
+
+</body>
+</html>

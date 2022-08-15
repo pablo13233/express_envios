@@ -1,0 +1,90 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            {% if error_fecha %}
+                            
+                            <div class="alert alert-danger">
+                              <h5><i class="icon fas fa-check-circle"></i> {{error_fecha}}</h5>
+                            </div>  
+                        {% endif %}
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Consultar abonos</h3>
+                </div>
+
+                <div class="card-body">
+                    <form class="form-horizontal" enctype='multipart/form-data' method="post" action="{% url 'reporte_abonos' %}" >
+                      {% csrf_token %}
+                        <div class="form-group row">
+                            <div class="col-md-5">
+                                <div class="col-md-12">
+                                    <label>Cliente:</label>
+                                        <select class="form-control select2" style="width: 100%;" name="cliente">
+                                            {% for cliente in clientes %}
+                                                <option value="{{cliente.pk}}">{{cliente}}</option>
+                                            {% endfor %}
+                                        </select>
+                                </div>
+                            </div>
+                             <div class="col-md-3">
+                                <div class="col-md-12">
+                                    <label>Inicio: 
+                                 </div>
+                                  <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                                    <input  type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" name="fecha_inicio" required/>
+                                    <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                             </div>
+
+                             <div class="col-md-3">
+                                <div class="col-md-12">
+                                    <label>Fin: 
+                                 </div>
+                                  <div class="input-group date" id="datetimepicker3" data-target-input="nearest" >
+                                    <input  type="text" class="form-control datetimepicker-input" data-target="#datetimepicker3" name="fecha_fin" required />
+                                    <div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker" >
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                             </div>
+
+                        </div>
+                        
+                        <div class="col-md-12" style="text-align: center; margin-top: 10px">
+                            <button style="margin-left: 5px" type="submit" id="id_buscar" class="btn btn-labeled btn-primary"><span class="btn-label"><i class="fas fa-search"></i></span>Buscar</button>
+                        </div>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<script>
+     $('#datetimepicker3,#datetimepicker2').datetimepicker({
+
+              format: 'DD/MM/YYYY',
+             
+          });
+</script>
+
+     
+</script>
+{% endblock js %}

@@ -1,0 +1,168 @@
+{% extends "base_cliente.html" %}
+{% load static %}
+{% load l10n %}
+{% block titulo %}CARGO INTERNACIONAL{% endblock titulo %}
+
+{% block contenido %}
+<section id="about">
+    <div class="container">
+        <header class="section-header">
+            <h3><strong>Su mejor opción de envios</strong></h3>
+        </header>
+        <div class="row about-container">
+            <div class="col-lg-6 content order-lg-1 order-2">
+                <p>Nuestra estrategia esta basada en la clara vocación de servicio al cliente,
+                    especialización de los servicios y una constante inversión en las más avanzadas tecnologías
+                    para brindar el mejor servicio de logistica a todos nuestros clientes, brindando asi la seguridad y
+                    rapidez que se merecen.</p>
+                <div class="icon-box wow fadeInUp">
+                    <div class="icon"><i class="fa fa-handshake-o "></i></div>
+                    <h4 class="title"><a href="">Confianza</a></h4>
+                    <p class="description">Trabajamos escuchando sus necesidades, respondiendo sus dudas,pero sobre todo siendo sinceros y honestos con nuestros clientes.</p>
+                </div>
+                <div class="icon-box wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="icon"><i class="fa fa-shield"></i></div>
+                    <h4 class="title"><a href="">Seguridad</a></h4>
+                    <p class="description">Asegurar la integridad de sus encomiendas es nuestra mayor responsabilidad para ellos contamos con el mejor
+                    equipo logistico y humano.
+                    </p>
+                </div>
+                <div class="icon-box wow fadeInUp" data-wow-delay="0.4s">
+                    <div class="icon"><i class="fa fa-clock-o"></i></div>
+                    <h4 class="title"><a href="">Rapidez</a></h4>
+                    <p class="description">Sabemos que su tiempo y el de sus familiares es lo mas importante por ello
+                    nos comprometemos a cumplir los tiempos de entrega.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6 background order-lg-2 order-1 wow fadeInUp">
+                <img src="{% static  'cliente/img/about-img.svg' %}" class="img-fluid" alt="">
+            </div>
+        </div>
+
+        <div class="row about-extra">
+            <div class="col-lg-6 wow fadeInUp">
+                <img src="{% static  'cliente/img/about-extra-1.svg' %}" class="img-fluid" alt="">
+            </div>
+            <div class="col-lg-6 wow fadeInUp pt-5 pt-lg-0">
+                <h4>Dudas? Nosotros tenemos las respuestas</h4>
+                <p>Nos encanta ayudarte, por eso no dudes en preguntarnos cualquier inquietud con respecto a tus
+                    envios o cualquiera de nuestros servicios, tenemos el mejor equipo humano para darle las respuestas
+                    que necesitas.</p>
+                <p><strong> <em> “Estar a la par en precio y calidad sólo te mete al juego, el servicio es lo que te
+                hace ganarlo”</em></strong>, Tony Alessandra.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--<section id="services" class="section-bg">
+    <div class="container">
+        <header class="section-header">
+            <h3>Servicios</h3>
+        </header>
+
+        <div class="row">
+            <div class="col-md-6 col-lg-5 offset-lg-1 wow bounceInUp" data-wow-duration="1.4s">
+                <div class="box">
+                    <div class="icon"><i class="ion-social-dropbox" style="color: #ff689b;"></i></div>
+                    <h4 class="title"><a href="">Envio de encomiendas</a></h4>
+                    <p class="description">HONDURAS</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-5 wow bounceInUp" data-wow-duration="1.4s">
+                <div class="box">
+                    <div class="icon"><i class="ion-cube" style="color: #e9bf06;"></i></div>
+                    <h4 class="title"><a href="">Carga Consolidada</a></h4>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-5 offset-lg-1 wow bounceInUp" data-wow-delay="0.1s" data-wow-duration="1.4s">
+                <div class="box">
+                    <div class="icon"><i class="ion-model-s" style="color: #3fcdc7;"></i></div>
+                    <h4 class="title"><a href="">Embarque de Vehiculos</a></h4>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-5 wow bounceInUp" data-wow-delay="0.1s" data-wow-duration="1.4s">
+                <div class="box">
+                    <div class="icon"><i class="ion-android-boat" style="color:#41cf2e;"></i></div>
+                    <h4 class="title"><a href="">Renta de Contenedores</a></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>-->
+<section id="why-us" class="wow fadeIn">
+    <div class="container">
+        <header class="section-header">
+            <h3>Servicios</h3>
+            <p>Estamos para brindarte el mejor servicio en:</p>
+        </header>
+        <div class="row row-eq-height justify-content-center">
+            <div class="col-lg-4 mb-4">
+                <div class="card wow bounceInUp">
+                    <i class="ion-social-dropbox"></i>
+                    <div class="card-body">
+                        <h5 class="card-title">Envio de Encomiendas</h5>
+                        <p class="card-text">Con nuestro sistema de seguimiento puedes revisar en cualquier momento la ubicación de tu encomienda y avisos programados de llegada.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card wow bounceInUp">
+                    <i class="ion-cube"></i>
+                    <div class="card-body">
+                        <h5 class="card-title">Carga Consolidada</h5>
+                        <p class="card-text">Tiene mucho que enviar y poco espacio? Con nuestro servicio de carga consolidad recogemos sus cajas y las almacenamos en nuestras bodegas y son enviadas al dar la confirmacion asi llegara al mismo tiempo todo.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card wow bounceInUp">
+                    <i class="ion-model-s"></i>
+                <div class="card-body">
+                    <h5 class="card-title">Embarque de Vehiculos</h5>
+                    <p class="card-text">Desea enviar un vehiculo a su pais? Ya sea en su direccion o comprado por subasta brindamos el mejor y más seguro servicio de envios.</p>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contact">
+    <div class="container-fluid">
+        <div class="section-header">
+            <h3>Contáctanos</h3>
+        </div>
+        <div class="row wow fadeInUp">
+            <div class="col-lg-6">
+                <div class="map mb-4 mb-lg-0">
+                    <iframe src="https://maps.google.com/maps?width=850&amp;height=400&amp;hl=en&amp;q=6004%20w%2034th%20St%20Houston+(Express%20Envios%20HN)&amp;t=&amp;z=12&amp;ie=UTF8&amp;iwloc=B&amp;output=embed" frameborder="0" style="border:0; width: 100%; height: 390px;" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-md-5 info">
+                        <i class="ion-ios-location-outline"></i>
+                        <p>6004 W 34th St, Houston, TX, 77092 Unidad H </p>
+                    </div>
+                    <div class="col-md-4 info">
+                        <i class="ion-ios-email-outline"></i>
+                        <p>expressenvioshn@gmail.com</p>
+                    </div>
+                    <div class="col-md-3 info">
+                        <i class="ion-ios-telephone-outline"></i>
+                        <p>(346) 228-1479 / (832) 538-1046</p>
+                    </div>
+                    <div class="col-md-12">
+                        <h3 class="text-center font-weight-bold">Horarios de atencion</h3>
+                        <h4 class="text-center">Lunes, Martes, Miércoles, Jueves, Viernes y Sábado<br>de 9:00 a.m - 6:00 p.m<br><br>Domingo 10:00 - 6:00</h4>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock contenido %}

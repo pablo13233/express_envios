@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %} {% load tz %}
+<head>
+    <meta charset="utf-8">
+    <title>EXPRESS ENVIOS HN| Empresa de Logistica</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+    <!-- Favicons -->
+    <link href="{% static  'cliente/img/favicon.ico' %}" rel="icon">
+    <link href="{% static  'cliente/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Montserrat:300,400,500,700" rel="stylesheet">
+    <!-- Bootstrap CSS File -->
+    <link href="{% static  'cliente/lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Libraries CSS Files -->
+    <link href="{% static  'cliente/lib/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static  'cliente/lib/animate/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static  'cliente/lib/ionicons/css/ionicons.min.css' %}" rel="stylesheet">
+    <link href="{% static  'cliente/lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="{% static  'cliente/lib/lightbox/css/lightbox.min.css' %}" rel="stylesheet">
+    <!-- Main Stylesheet File -->
+    <link href="{% static  'cliente/css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    <header id="header" class="fixed-top">
+        <div class="container">
+            <div class="logo float-left">
+                <!-- Uncomment below if you prefer to use an image logo -->
+                <!-- <h1 class="text-light"><a href="#header"><span>NewBiz</span></a></h1> -->
+                <a href="{% url 'inicio_cliente'%}"><img src="{% static  'cliente/img/logo2.png' %}" alt="" class="img-fluid"></a>
+            </div>
+            <nav class="main-nav float-right d-none d-lg-block">
+                <ul>
+                    <li class="active"><a href="#intro">Inicio</a></li>
+                    <li><a href="#about">Conócenos</a></li>
+                    <li><a href="#why-us">Servicios</a></li>
+                    <li><a href="#contact">Contáctanos</a></li>
+                    <li><a href="{% url 'buscar_envio_cliente'%}">Rastrear</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <section id="intro" class="clearfix">
+        <div class="container">
+            <div class="intro-img">
+                <img src="{% static  'cliente/img/intro-img.svg' %}" alt="" class="img-fluid">
+            </div>
+            <div class="intro-info">
+                <h2>Brindando<br><span>el mejor</span><br>servicio de logistica!</h2>
+                <div>
+                    <a href="#about" class="btn-get-started scrollto">Conócenos</a>
+                    <a href="{% url 'buscar_envio_cliente'%}" class="btn-services">Rastrear Encomienda</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <main id="main">
+        {% block contenido %}
+        {% endblock contenido %}
+    </main>
+    <footer id="footer">
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong>Cargo Internacional</strong>. Todos los derechos reservados
+                <div class="col-md-12" >
+                    <div class="social-links">
+                        Siguenos en <a style="color: white;" href="https://www.facebook.com/Cargo-Internacional-105342851037441/" class="facebook"><strong>Facebook</strong></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer><!-- #footer -->
+  
+    <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+    <!-- Uncomment below i you want to use a preloader -->
+    <!-- <div id="preloader"></div> -->
+    <!-- JavaScript Libraries -->
+    <script src="{% static  'cliente/lib/jquery/jquery.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/jquery/jquery-migrate.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/easing/easing.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/mobile-nav/mobile-nav.js' %}"></script>
+    <script src="{% static  'cliente/lib/wow/wow.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/isotope/isotope.pkgd.min.js' %}"></script>
+    <script src="{% static  'cliente/lib/lightbox/js/lightbox.min.js' %}"></script>
+    <!-- Template Main Javascript File -->
+    <script src="{% static  'cliente/js/main.js' %}"></script>
+
+  </body>
+  </html>
+  

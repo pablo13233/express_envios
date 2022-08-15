@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load humanize %} {% load static %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+<div class="container">       
+  <div class="section">
+    <div class="divider"></div>
+    <!--DataTables example-->
+  </div>
+</div>
+{% endblock contenido %}
+{% block js %}
+<script>
+    $(document).ready(function (){
+      
+       $("select").select2({
+         allowClear:true,
+         placeholder: 'Seleccione una opción'
+       });
+    });
+  </script>
+{% endblock js %}
+<div class="card">
+      
+      <div class="card-tabs">
+        <ul class="tabs tabs-fixed-width">
+          <li class="tab"><a class="active" href="#pendientes">Pendientes</a></li>
+          <li class="tab"><a href="#terminadas">Finalizadas</a></li>
+          <li class="tab"><a href="#nuevos">Nuevas</a></li>
+        </ul>
+      </div>
+
+      <div class="card-content grey lighten-4">
+        <div id="pendientes">
+          <input type="checkbox" id="test5" />
+          <label for="test5">pendientes</label>
+        </div>
+        <div id="terminadas">
+          <input type="checkbox" id="test6" />
+          <label for="test6">realizadas</label>
+        </div>
+        <div id="nuevos">
+          <form class="col-md-12"  enctype='multipart/form-data' method="POST" action="" >
+            {% csrf_token %}
+              <div class="row">
+                <div class="col m6 s12">
+                  <label class="bmd-label-floating has-primary"> REMITENTE</label>
+                  <select style="text-transform:uppercase;width: 100%;" id="id_quien_envia" name="quien_envia" class="form-control">
+                      {% for cliente in quien_envia %}
+                        {% ifequal cliente.pk ret_data.quien_envia  %}
+                            <option value="{{cliente.pk}}" >{{cliente.celular}} | {{cliente.nombre_completo}} </option>
+                        {% else %}
+                            <option value="{{cliente.pk}}">{{cliente.celular}} | {{cliente.nombre_completo}}</option>
+                        {% endifequal %}
+                    {% endfor %}
+                  </select>
+                </div><br>
+                {% for a in actividades %}
+                  <div class="col m2 s12">
+                    <input name="actividad" type="radio" id="{{a.pk}}" />
+                    <label for="{{a.pk}}">{{a.actividad}}</label>
+                  </div>
+                {% endfor %}
+                
+                <div class="input-field col  m12 s12">
+                  <button class="btn cyan waves-effect waves-light right" type="submit" name="action">Guardar
+                    <i class="material-icons right">send</i>
+                  </button>
+                </div>
+              </div>
+             
+        </div>
+        
+         
+         </form>
+        </div>
+      </div>
+    </div>
+
+
+      <div class="row"><br>
+        <div class="col s12"><a href="{% url 'crear_tarea' %}" class="btn waves-effect waves-light">Agregar nueva</a></div>
+        <input type="text" class="datepicker">
+      </div>  
+    <div id="time-picker" class="section scrollspy">
+        <h2 class="header">Time Picker</h2>
+        <label for="lunchtime">Lunchtime</label>
+        <input id="lunchtime" type="text" class="timepicker">
+        <pre><code class="language-markup">
+  &lt;input type="text" class="timepicker">
+        </code></pre>
+
+        <h4>Initialization</h4>
+        <pre><code class="language-javascript">
+  
+        </code></pre>
+      </div>

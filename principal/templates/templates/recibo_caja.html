@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+<div class="row">
+    <div class="col s12 m12 l12">
+        <div class="card-panel">
+            <h4 class="header2">Registrar Entrega Caja</h4>
+            <div class="row">
+                {% if errores.extra %}
+                    <div id="card-alert" class="card red">
+                        <div class="card-content white-text">
+                            <p>{{errores.extra}}}</p>
+                        </div>
+                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                {% endif %}
+                <form class="col s12"  enctype='multipart/form-data' method="POST" action="{% url 'recibo_caja' %}" >
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col m12 s12">
+                            <div class="col m6 s12">
+                                <label class="bmd-label-floating has-primary"> Envia</label>
+                                <select style="text-transform:uppercase;width: 100%;" id="id_quien_envia" name="quien_envia" class="">
+                                    <option value="0" >SELECCIONE</option>
+                                    {% for cliente in quien_envia %}
+                                        {% ifequal cliente.pk ret_data.quien_envia  %}
+                                            <option value="{{cliente.pk}}" >{{cliente.celular}} | {{cliente.nombre_completo}} </option>
+                                        {% else %}
+                                            <option value="{{cliente.pk}}">{{cliente.celular}} | {{cliente.nombre_completo}}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                                    {% if errores.quien_envia %}
+                                    <div id="card-alert" class="card red">
+                                        <div class="card-content white-text">
+                                        <p>{{errores.quien_envia}}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="id_size_caja" type="text" value="{% if ret_data.size_caja != None %}{{ret_data.size_caja}}{% endif %}" name="size_caja" required="">
+                                <label for="size_caja">Tamaño contenedor</label>
+                                {% if errores.size_caja %}
+                                    <div id="card-alert" class="card red">
+                                        <div class="card-content white-text">
+                                        <p>{{errores.size_caja}}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="id_valor_caja" type="text" value="{% if ret_data.valor_caja != None %}{{ret_data.valor_caja}}{% endif %}" name="valor_caja" required="">
+                                <label for="valor_caja">Valor caja</label>
+                                {% if errores.valor_caja %}
+                                    <div id="card-alert" class="card red">
+                                        <div class="card-content white-text">
+                                        <p>{{errores.valor_caja}}</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                    </div>
+
+                    <div class="row"> <br>
+                        <div class="input-field col  m12 s12 align-self-end">
+                        <button class="btn cyan waves-effect waves-light right" type="submit" name="action">Guardar
+                            <i class="material-icons right">send</i>
+                        </button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <br><br>
+                    <div class="col m12 s12">
+                        <table id="dtBasicExample" class="table table-striped" cellspacing="0" width="100%">
+                          <thead>
+                            <tr>
+                              <th>Recibo Nº</th>
+                              <th>Cliente</th>
+                              <th>Pago</th>
+                              <th>Descripcion</th>
+                              <th>Recibo</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for a in cajas  %}
+                              <tr >
+                                <td>{{a.recibo_no}}</td>
+                                <td>{{a.cliente.nombre_completo}} | {{a.num_pasaporte}}</td>
+                                <td>{{a.valor_caja}}</td>
+                                <td>{{a.size_caja}}</td>
+                                <td><a type='button' class="btn button btn-primary " href=" {% url 'recibo_caja_pdf' a.pk %}" target="_blank"> Ver</a></td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock contenido %}
+{% block js %}
+<script>
+    $(document).ready(function () {
+    var table = $('#dtBasicExample').DataTable({
+        "oLanguage": {
+                                "sProcessing":     "Procesando...",
+                                "sLengthMenu":     "Mostrando _MENU_ registros",
+                                "sZeroRecords":    "No se encontraron resultados",
+                                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                                "sInfo":           "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
+                                "sInfoEmpty":      "Mostrando 0 - 0 de un total de 0 registros",
+                                "sInfoFiltered":   "<br>(filtrado de un total de _MAX_ registros)",
+                                "sInfoPostFix":    "",
+                                "sSearch":         "Buscar:",
+                                "sUrl":            "",
+                                "sInfoThousands":  ",",
+                                "sLoadingRecords": "Cargando...",
+                                "oPaginate": {
+                                    "sFirst":    "Primero",
+                                    "sLast":     "Último",
+                                    "sNext":     "Sig.",
+                                    "sPrevious": "Ant."
+                                },
+                        },
+                    responsive: true
+    });
+    $('.dataTables_length').addClass('bs-select');
+    });
+</script>
+<script>
+    $(document).ready(function (){
+        $('#dtBasicExample_length').remove();
+        $('select').material_select('destroy');
+        $("select").select2({
+            allowClear:true,
+            placeholder: 'Seleccione una opción'
+        });
+    });
+  </script>
+{% endblock js %}

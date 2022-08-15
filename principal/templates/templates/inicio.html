@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+  <div class="container">       
+    <div id="card-stats">
+     <!--{% if user.is_superuser %}
+        <div class="row">
+          <div class="col s12 m6 l3 text-center"><a href="{% url 'registrar_envio' %}" class="waves-effect waves-light btn-large ">Registrar envio</a></div>
+          <div class="col s12 m6 l3 text-center"><a href="{% url 'clientes' %}" class="waves-effect waves-light btn-large ">Clientes</a></div>
+          <div class="col s12 m6 l3 text-center"><a href="{% url 'envios_credito' %}" class="waves-effect waves-light btn-large ">Creditos</a></div>
+        </div>
+     {% endif %}-->
+
+      <div class="row">
+        {% if user.is_superuser %}
+          <div class="col s12 m6 l3">
+            <a href="{% url 'ver_paquetes' 1 %}" >
+              <div class="card gradient-45deg-light-blue-cyan gradient-shadow min-height-100 white-text">  
+                  <div class="padding-4">
+                    <div class="col s7 m7">
+                      <i class="material-icons background-round mt-5">add_shopping_cart</i>
+                      <p>Bodega Houston</p>
+                    </div>
+                    <div class="col s5 m5 right-align">
+                      <h5 class="mb-0">{{bodega}}</h5>
+                      <p class="no-margin">Cantidad</p>
+                    </div>
+                  </div>
+              </div>
+             </a>
+          </div>
+          <div class="col s12 m6 l3">
+            <a href="{% url 'ver_paquetes' 2 %}" >
+              <div class="card gradient-45deg-red-pink gradient-shadow min-height-100 white-text">
+                  <div class="padding-4">
+                    <div class="col s7 m7">
+                      <i class="material-icons background-round mt-5">edit_location</i>
+                      <p>Puerto Houston</p>
+                    </div>
+                    <div class="col s5 m5 right-align">
+                      <h5 class="mb-0">{{puerto}}</h5>
+                      <p class="no-margin">Cantidad</p>
+                    </div>
+                  </div>  
+              </div>
+            </a>
+          </div>
+        {% endif %}
+        <div class="col s12 m6 l3">
+          <a href="{% url 'ver_paquetes' 3 %}" >
+            <div class="card gradient-45deg-amber-amber gradient-shadow min-height-100 white-text">
+                <div class="padding-4">
+                  <div class="col s7 m7">
+                    <i class="material-icons background-round mt-5">directions_boat</i>
+                    <p>Tránsito Maritimo</p>
+                  </div>
+                  <div class="col s5 m5 right-align">
+                    <h5 class="mb-0">{{transito}}</h5>
+                    <p class="no-margin">Cantidad</p>
+                  </div>
+                </div>
+            </div>
+          </a>
+        </div>
+        <div class="col s12 m6 l3">
+          <a href="{% url 'ver_paquetes' 4 %}" >
+            <div class="card gradient-45deg-green-teal gradient-shadow min-height-100 white-text">
+                <div class="padding-4">
+                  <div class="col s7 m7">
+                    <i class="material-icons background-round mt-5">done_all</i>
+                    <p>Puerto Honduras</p>
+                  </div>
+                  <div class="col s5 m5 right-align">
+                    <h5 class="mb-0">{{destino}}</h5>
+                    <p class="no-margin">Cantidad</p>
+                  </div>
+                </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col s12 m6 l3">
+          <a href="{% url 'ver_paquetes' 5 %}" >
+            <div class="card gradient-45deg-brown-brown gradient-shadow min-height-100 white-text">
+                <div class="padding-4">
+                  <div class="col s7 m7">
+                    <i class="material-icons background-round mt-5">directions_car</i>
+                    <p>Bodega Honduras</p>
+                  </div>
+                  <div class="col s5 m5 right-align">
+                    <h5 class="mb-0">{{honduras}}</h5>
+                    <p class="no-margin">Cantidad</p>
+                  </div>
+                </div>
+            </div>
+          </a>
+        </div>
+        <div class="col s12 m6 l3">
+          <a href="{% url 'ver_paquetes' 6 %}">
+            <div class="card gradient-45deg-brown-brown gradient-shadow min-height-100 white-text">
+                <div class="padding-4">
+                  <div class="col s7 m7">
+                    <i class="material-icons background-round mt-5">directions_car</i>
+                    <p>Transito entrega</p>
+                  </div>
+                  <div class="col s5 m5 right-align">
+                    <h5 class="mb-0">{{transito_pais_destino}}</h5>
+                    <p class="no-margin">Cantidad</p>
+                  </div>
+                </div>
+            </div>
+          </a>
+        </div>
+        <div class="col s12 m6 l3">
+          <a href="{% url 'ver_paquetes' 7 %}">
+            <div class="card gradient-45deg-brown-brown gradient-shadow min-height-100 white-text">
+                <div class="padding-4">
+                  <div class="col s7 m7">
+                    <i class="material-icons background-round mt-5">directions_car</i>
+                    <p>Entregados</p>
+                  </div>
+                  <div class="col s5 m5 right-align">
+                    <h5 class="mb-0">{{entregados}}</h5>
+                    <p class="no-margin">Cantidad</p>
+                  </div>
+                </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+            <!--<img src="data:image/png;base64,{{imagen}}">-->
+  </div>
+{% endblock contenido %}
+{% block js %}
+<script>
+    $(document).ready(function (){
+      
+       $("select").select2({
+         allowClear:true,
+         placeholder: 'Seleccione una opción'
+       });
+    });
+  </script>
+  <script>
+   $(document).ready(function (){
+      $('.datepicker').pickadate({
+        selectMonths: true, // Creates a dropdown to control month
+        selectYears: 15, // Creates a dropdown of 15 years to control year,
+        today: 'Today',
+        clear: 'Clear',
+        close: 'Ok',
+        closeOnSelect: false, // Close upon selecting a date,
+        container: undefined, // ex. 'body' will append picker to body
+      });   
+    });
+  </script>
+{% endblock js %}

@@ -1,0 +1,100 @@
+{% extends "base_admin.html" %}
+{% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4  OJO-->
+<link rel="stylesheet" href="{% static  'admin/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+          <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-edit"></i>Cierres Mensuales</h3>
+            </div>
+            <div class="card-body">
+              <form class="col s12"  enctype='multipart/form-data' method="POST" action="{% url 'cierre_mensual_print' %}">
+                {% csrf_token %}
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <div class="input-group date" id="datetimepicker11" data-target-input="nearest">
+                      <input id="id_mes" name="mes" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker11"/>
+                      <div class="input-group-append" data-target="#datetimepicker11" data-toggle="datetimepicker">
+                          <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <button type="submit" class="btn btn-primary" formtarget="_blank">Imprimir <i class="material-icons right">send</i></button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+<!-- jQuery -->
+<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static  'admin/dist/js/demo.js' %}"></script>
+<!-- Select2 -->
+<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
+<!-- InputMask OJO -->
+<script src="{% static  'admin/plugins/moment/moment.min.js' %}"></script>
+<!-- Tempusdominus Bootstrap 4 OJO -->
+<script src="{% static  'admin/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+  
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  
+    });
+
+    
+</script>
+<!-- DATATABLES-->
+<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            format: 'L'
+        });
+        //Timepicker
+        $('#timepicker').datetimepicker({
+            format:'LT'
+        });
+        $('#datetimepicker11').datetimepicker({
+            viewMode: 'years',
+            format: 'YYYY-MM'
+        });
+    });
+</script>
+
+
+
+{% endblock js %}

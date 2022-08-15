@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+{% load static %} {% load tz %} {% load humanize %} {% load l10n %}
+<html lang="es">
+ 
+<head>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
+  <title>CIERRE {{mes}} {{year}}</title>
+  <link rel="icon" href="{% static  'plantilla/images/favicon/favicon-32x32.png' %}" sizes="32x32">
+  <!-- Favicons-->
+  <link rel="apple-touch-icon-precomposed" href="{% static  'plantilla/images/favicon/apple-touch-icon-152x152.png' %}">
+  <!-- For iPhone -->
+  <meta name="msapplication-TileColor" content="#00bcd4">
+  <meta name="msapplication-TileImage" content="{% static  'plantilla/images/favicon/mstile-144x144.png' %}">
+  <style>
+    * {
+      font-size: 14px;
+      font-family: 'Times New Roman';
+      font-weight: bold;
+    }
+     
+    .centrado {
+      text-align: center;
+      align-content: center;
+    }
+    img {
+      max-width: inherit;
+    }
+    @page 
+    {
+        size:  auto;   /* auto es el valor inicial */
+        margin: 10mm;  /* afecta el margen en la configuración de impresión */
+    }
+  </style>
+<script>
+    function imprimir(){
+      window.print();
+    }
+</script>
+</head>
+ 
+<body onload="imprimir()">
+  <div class="ticket">
+    <table width="100%">
+      <tbody>
+        <tr>
+          <td width="25%" >
+              <img width="175 px" src="http://forithn.com/media/portafolio/eehn.png">
+          </td>
+          <td width="75%">
+            <center>
+              <span style="font-size: 30px;">EXPRESS */98S HN</span><br><br>
+              <span style="font-size: 18px;">6004 W 34TH ST HOUSTON, TX 77092 UNIDAD 6004-H<br>TELÉFONO: 346-228-1479 / 832-538-1046</span>
+            </center>  
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <table class="centrado" width="100%">
+      <tbody>
+        <tr>
+          <center><td style="font-size: 20px;text-transform: uppercase;">CIERRE DEL DIA {{fecha}} DEL USUARIO: {{request.user}}</td></center>
+        </tr>
+      </tbody>
+    </table><br>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL FACTURAS: ${{saldo}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Fact N°</th>
+          <!--<th>Encomiendas</th>-->
+          <th>Descripcion</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for envio in datos  %}
+            <tr>
+              <td>{{envio.codigo}} | {{envio.cliente}}</td>         
+              <td>{{envio.embarque}}</td>
+              <td class="text-right" >{{envio.pago}}</td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table><br>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL CAJAS: ${{saldo_cajas}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Codigo</th>
+          <th>Cliente</th>
+          <th>Descripcion</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in dic_cajas  %}
+          <tr>
+            <td>{{t.codigo}}</td>
+            <td>{{t.cliente}}</td> 
+            <td>{{t.size_caja}}</td>            
+            <td class="text-right" >{{t.valor_caja}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table><br>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL VEHICULOS: ${{saldo_vehiculos}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Codigo</th>
+          <th>Cliente</th>
+          <th>Vehiculo</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in dic_vehiculos  %}
+          <tr>
+            <td>{{t.codigo}}</td>
+            <td>{{t.cliente}}</td> 
+            <td>{{t.marca_vehiculo}} | {{t.modelo_vehiculo}}</td>            
+            <td class="text-right" >{{t.valor_vehiculo}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table><br>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL CONTENEDORES: ${{saldo_contenedores}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Codigo</th>
+          <th>Cliente</th>
+          <th>Contenedor</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in dic_contenedores  %}
+          <tr>
+            <td>{{t.codigo}}</td>
+            <td>{{t.cliente}}</td> 
+            <td>{{t.pais_destino}} | {{t.tamano_contenedor}} </td>            
+            <td class="text-right" >{{t.valor_contenedor}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table><br>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL PAGOS EFECTIVO: ${{saldo_pagos_efectivo}}  <strong>|</strong>  TOTAL NETO PAGOS: ${{saldo_pagos}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Factura N°</th>
+          <!--<th>Encomiendas</th>-->
+          <th>Tipo Pago</th>
+          <th>Pago Recibido</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pagos  %}
+            <tr>
+              <td>{{p.codigo}} | {{p.factura}}</td>
+              <td>{% if p.tipo == True %}EFECTIVO{% else %}DEPOSITO{% endif %}</td>            
+              <td class="text-right" >{{p.pago}}</td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table><br>
+  </div>
+</body>
+</html>

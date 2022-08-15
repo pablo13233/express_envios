@@ -1,0 +1,8 @@
+express_envios/principal/migrations/*
+express_envios/settings.py
+
+*.pyc
+
+*.jpg
+
+*.jpeg

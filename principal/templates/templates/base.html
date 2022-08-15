@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %} {% load tz %}
+{% load humanize %}
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="description" content="Express Envios HN, es una empresa dedicada al envío de paquetes desde Estado Unidos a Honduras ">
+  <meta name="keywords" content="Envio Honduras, Envio Estados Unidos, paquetes Honduras, caja Honduras">
+  <title>{% block titulo %}{% endblock titulo %}</title>
+  <!-- Favicons-->
+  <link rel="icon" href="{% static  'plantilla/images/favicon/favicon-32x32.png' %}" sizes="32x32">
+  <!-- Favicons-->
+  <link rel="apple-touch-icon-precomposed" href="{% static  'plantilla/images/favicon/apple-touch-icon-152x152.png' %}">
+  <!-- For iPhone -->
+  <meta name="msapplication-TileColor" content="#00bcd4">
+  <meta name="msapplication-TileImage" content="{% static  'plantilla/images/favicon/mstile-144x144.png' %}">
+  <!-- For Windows Phone -->
+  <!-- CORE CSS-->
+    <!--<link href="{% static 'materialize-v1.0.0/materialize/css/materialize.min.css' %}" rel="stylesheet">-->
+  <link href="{% static  'plantilla/css/materialize.css' %}" type="text/css" rel="stylesheet">
+  <link href="{% static  'plantilla/css/style.css' %}" type="text/css" rel="stylesheet">
+  <!-- Custome CSS-->
+  <link href="{% static  'plantilla/css/custom/custom.css' %}" type="text/css" rel="stylesheet">
+  <!-- INCLUDED PLUGIN CSS ON THIS PAGE -->
+  <link href="{% static  'plantilla/vendors/perfect-scrollbar/perfect-scrollbar.css' %}" type="text/css" rel="stylesheet">
+  <link href="{% static  'plantilla/vendors/jvectormap/jquery-jvectormap.css' %}" type="text/css" rel="stylesheet">
+  <link href="{% static  'plantilla/vendors/flag-icon/css/flag-icon.min.css' %}" type="text/css" rel="stylesheet">
+  
+   <link href="{% static  'plantilla/vendors/sweetalert/dist/sweetalert.css' %}" type="text/css" rel="stylesheet">
+   <!-- jQuery Library -->
+  <script type="text/javascript" src="{% static 'plantilla/vendors/jquery-3.2.1.min.js' %}"></script>
+  <!--materialize js-->
+  <script type="text/javascript" src="{% static 'plantilla/js/materialize.min.js' %}"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> <!--para cargar los icons en cel-->
+  <link href="{% static  'plantilla/fonts/material-design-icons/MaterialIcons-Regular.ttf' %}" type="text/css" rel="stylesheet">
+  <link href="{% static  'plantilla/fonts/material-design-icons/MaterialIcons-Regular.woff2' %}" type="text/css" rel="stylesheet">
+  <link href="{% static  'plantilla/fonts/material-design-icons/MaterialIcons-Regular.woff' %}" type="text/css" rel="stylesheet">
+  <!--SELECT2-->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css">
+
+  <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.19/js/dataTables.material.min.js" charset="utf-8"></script>
+  <link href="https://cdn.datatables.net/1.10.19/css/dataTables.material.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+  <!--datetimepicker-->
+  <script type="text/javascript" src="{% static 'datetimepicker/picker.date.js' %}"></script>
+  <script type="text/javascript" src="{% static 'datetimepicker/picker.js' %}"></script>
+  <script type="text/javascript" src="{% static 'datetimepicker/picker.time.js' %}"></script>
+</head>
+<body class="layout-semi-dark">
+	 <!-- Start Page Loading -->
+    <div id="loader-wrapper">
+      <div id="loader"></div>
+      <div class="loader-section section-left"></div>
+      <div class="loader-section section-right"></div>
+    </div>
+       <!-- Start Page Loading -->
+    <div id="loader-wrapper">
+      <div id="loader"></div>
+      <div class="loader-section section-left"></div>
+      <div class="loader-section section-right"></div>
+    </div>
+    <!-- End Page Loading -->
+    <!-- //////////////////////////////////////////////////////////////////////////// -->
+    <!-- START HEADER -->
+    <header id="header" class="page-topbar">
+      <!-- start header nav-->
+      <div class="navbar-fixed">
+        <nav class="navbar-color">
+          <div class="nav-wrapper">
+           
+            <ul class="right hide-on-med-and-down">
+              <li>
+                <a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen">
+                  <i class="material-icons">settings_overscan</i>
+                </a>
+              </li>
+              <li>
+                <a href="javascript:void(0);" class="waves-effect waves-block waves-light profile-button" data-activates="profile-dropdown">
+                  <span class="avatar-status avatar-online">
+                    <img src="{% static  'plantilla/images/avatar/avatar-7.png' %}" alt="avatar">
+                    <i></i>
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- END HEADER -->
+   
+    <!-- START MAIN -->
+    <div id="main">
+      <!-- START WRAPPER -->
+      <div class="wrapper">
+        <!-- START LEFT SIDEBAR NAV-->
+        <aside id="left-sidebar-nav" class="nav-expanded nav-lock nav-collapsible">
+          <div class="brand-sidebar">
+            <h1 class="logo-wrapper">
+              <a href="{% url 'inicio_admin' %}" class="brand-logo darken-1">
+                <img src="{% static  'plantilla/images/logo/eehn.png' %}" alt="materialize logo">
+                <span class="logo-text hide-on-med-and-down">Express</span>
+              </a>
+              <a href="#" class="navbar-toggler">
+                <i class="material-icons">radio_button_checked</i>
+              </a>
+            </h1>
+          </div>
+          <ul id="slide-out" class="side-nav fixed leftside-navigation">
+            <li class="no-padding">
+              {% if es_revendedor %}
+                <li>
+                  <a href="{% url 'registrar_envio' %}">
+                    <i class="material-icons">keyboard_arrow_right</i>
+                    <span>Registrar envio</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'clientes' %}">
+                    <i class="material-icons">person</i>
+                    <p>Clientes</p>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'buscar_envio' %}">
+                    <i class="material-icons">search</i>
+                    <span>Buscar</span>
+                  </a>
+                </li>
+                 <li>
+                      <a href="{% url 'tickets_envio' %}">
+                        <i class="material-icons">person</i>
+                        <p>Imprimir tickets</p>
+                      </a>
+                    </li>
+                <li>
+                  <a href="{% url 'cerrar_sesion'%}">
+                    <i class="material-icons">person</i>
+                    <p>Salir</p>
+                  </a>
+                </li> 
+              {% else %}
+                <ul class="collapsible" data-collapsible="accordion">
+                  <li>
+                    <a href="{% url 'inicio_admin' %}">
+                      <i class="material-icons">library_books</i>
+                      <p>Inicio</p>
+                    </a>
+                  </li>
+                  {% if user.is_superuser %}
+                    <li>
+                      <a href="{% url 'registrar_envio' %}">
+                        <i class="material-icons">keyboard_arrow_right</i>
+                        <span>Registrar envio</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'recibo_caja' %}">
+                        <i class="material-icons">keyboard_arrow_right</i>
+                        <span>Recibo caja</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'recibo_vehiculo' %}">
+                        <i class="material-icons">keyboard_arrow_right</i>
+                        <span>Recibo automovil</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'recibo_contenedor' %}">
+                        <i class="material-icons">keyboard_arrow_right</i>
+                        <span>Recibo contenedor</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'agregar_revendedor' %}">
+                        <i class="material-icons">keyboard_arrow_right</i>
+                        <span>Agregar revendedor</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'aprobar_envios' %}">
+                        <i class="material-icons">keyboard_arrow_right</i>
+                        <span>Envios revendedor</span>
+                      </a>
+                    </li>
+                    <!--<li>
+                      <a href="{% url 'tareas' %}">
+                        <i class="material-icons">keyboard_arrow_right</i>
+                        <span>Tareas</span>
+                      </a>
+                    </li>-->
+                    <li>
+                      <a href="{% url 'cierre' %}">
+                        <i class="material-icons">library_books</i>
+                        <p>Cierre dia</p>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'tickets_envio' %}">
+                        <i class="material-icons">person</i>
+                        <p>Imprimir tickets</p>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'buscar_envio' %}">
+                        <i class="material-icons">search</i>
+                        <span>Buscar</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'envios_credito' %}">
+                        <i class="material-icons">account_balance_wallet</i>
+                        <span>Creditos</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'clientes' %}">
+                        <i class="material-icons">person</i>
+                        <p>Clientes</p>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'cierre_mensual' %}">
+                        <i class="material-icons">keyboard_arrow_right</i>
+                        <span>Reportes Cierres</span>
+                      </a>
+                    </li>
+                  {% else %}
+                    {% if user.pk != 4 %}
+                      <li>
+                        <a href="{% url 'registrar_envio' %}">
+                          <i class="material-icons">keyboard_arrow_right</i>
+                          <span>Registrar envio</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'recibo_caja' %}">
+                          <i class="material-icons">keyboard_arrow_right</i>
+                          <span>Recibo caja</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'recibo_vehiculo' %}">
+                          <i class="material-icons">keyboard_arrow_right</i>
+                          <span>Recibo automovil</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'recibo_contenedor' %}">
+                          <i class="material-icons">keyboard_arrow_right</i>
+                          <span>Recibo contenedor</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'clientes' %}">
+                          <i class="material-icons">person</i>
+                          <p>Clientes</p>
+                        </a>
+                      </li>
+                      <li>
+                        <a href="{% url 'cierre' %}">
+                          <i class="material-icons">library_books</i>
+                          <p>Cierre dia</p>
+                        </a>
+                      </li>
+                    {% endif %}
+                  {% endif %}
+                  <li>
+                    <a href="{% url 'cerrar_sesion'%}">
+                      <i class="material-icons">person</i>
+                      <p>Salir</p>
+                    </a>
+                  </li>                
+                </ul>
+              {%endif%}
+            </li>
+          </ul>
+          <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only gradient-45deg-light-blue-cyan gradient-shadow">
+            <i class="material-icons">menu</i>
+          </a>
+        </aside>
+        <!-- END LEFT SIDEBAR NAV-->
+        <!-- //////////////////////////////////////////////////////////////////////////// -->
+        <!-- START CONTENT -->
+        <section id="content">
+          <!--start container-->
+         
+            <!--end container-->
+            {% block contenido %}
+
+            {% endblock contenido %}
+        </section>
+        <!-- END CONTENT -->
+        <!-- Floating Action Button -->
+        
+        <!-- Floating Action Button -->
+        <!-- //////////////////////////////////////////////////////////////////////////// -->
+        <!-- START RIGHT SIDEBAR NAV-->
+       
+        <!-- END RIGHT SIDEBAR NAV-->
+        </div>
+        <!-- END WRAPPER -->
+      </div>
+      <!-- END MAIN -->
+      <!-- //////////////////////////////////////////////////////////////////////////// -->
+      <!-- START FOOTER -->
+      <footer class="page-footer">
+        <div class="footer-copyright">
+          <div class="container">
+            <span>Copyright ©
+              <script type="text/javascript">
+                document.write(new Date().getFullYear());
+              </script> <a class="grey-text text-darken-2" href="http://expressenvioshn.com/" target="_blank">EXPRESS ENVIOS</a> All rights reserved.</span>
+            <span class="right hide-on-small-only"> Design and Developed by <a class="grey-text text-darken-2" href="http://forit-hn.com/">FOR-IT HN</a></span>
+          </div>
+        </div>
+      </footer>
+      <!-- END FOOTER -->
+      <!--prism-->
+      <script type="text/javascript" src="{% static 'plantilla/vendors/prism/prism.js' %}"></script>
+      <!--scrollbar-->
+      <script type="text/javascript" src="{% static 'plantilla/vendors/perfect-scrollbar/perfect-scrollbar.min.js' %}"></script>
+      <!-- chartjs -->
+      <script type="text/javascript" src="{% static 'plantilla/vendors/chartjs/chart.min.js' %}"></script>
+      <!--plugins.js - Some Specific JS codes for Plugin Settings-->
+      <script type="text/javascript" src="{% static 'plantilla/js/plugins.js' %}"></script>
+      <!--custom-script.js - Add your own theme custom JS-->
+      <script type="text/javascript" src="{% static 'plantilla/js/custom-script.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/vendors/sweetalert/dist/sweetalert.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/scripts/extra-components-sweetalert.js' %}"></script>
+      <!--SELECT2
+      <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+      <!-- DATATABLES-->
+      <script type="text/javascript" src="{% static 'datatables/js/jquery.dataTables.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'datatables/js/dataTables.buttons.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'datatables/js/dataTables.responsive.min.js' %}"></script>
+       <!-- DATATABLES-->
+      <script type="text/javascript" src="{% static 'datatables/js/dataTables.buttons.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'datatables/js/dataTables.responsive.min.js' %}"></script>
+      <!--NUEVOS PLUGINS
+      <script type="text/javascript" src="{% static 'plantilla/js/animation.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/buttons.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/cards.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/carousel.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/character_counter.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/chips.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/collapsible.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/dropdown.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/forms.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/global.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/hammer.min.js' %}"></script>
+      
+      <script type="text/javascript" src="{% static 'plantilla/js/materialbox.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/parallax.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/prism.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/pushpin.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/scrollFire.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/scrollspy.js' %}"></script>-->
+      <script type="text/javascript" src="{% static 'plantilla/js/init.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/modal.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/date_picker/picker.date.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/date_picker/picker.js' %}"></script>
+      <script type="text/javascript" src="{% static 'plantilla/js/date_picker/picker.time.js' %}"></script>
+      
+	{% block js %}
+	<script>
+    $(document).ready(function (){
+       $("select").select2({
+         allowClear:true,
+         placeholder: 'Seleccione una opción'
+       });
+
+       $('.datepicker').pickadate({
+        selectMonths: true, // Creates a dropdown to control month
+        selectYears: 15, // Creates a dropdown of 15 years to control year,
+        today: 'Today',
+        clear: 'Clear',
+        close: 'Ok',
+        closeOnSelect: false // Close upon selecting a date,
+        container: undefined, // ex. 'body' will append picker to body
+      });
+      $('.timepicker').pickatime({
+        default: 'now', // Set default time: 'now', '1:30AM', '16:30'
+        fromnow: 0,       // set default time to * milliseconds from now (using with default = 'now')
+        twelvehour: false, // Use AM/PM or 24-hour format
+        donetext: 'OK', // text for done-button
+        cleartext: 'Clear', // text for clear-button
+        canceltext: 'Cancel', // Text for cancel-button,
+        container: undefined, // ex. 'body' will append picker to body
+        autoclose: false, // automatic close timepicker
+        ampmclickable: true, // make AM PM clickable
+        aftershow: function(){} //Function for after opening timepicker
+      });
+    });
+  </script>
+	{% endblock js %}
+</body>
+</html>

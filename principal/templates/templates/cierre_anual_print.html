@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+{% load static %} {% load tz %} {% load humanize %} {% load l10n %}
+<html lang="es">
+ 
+<head>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
+  <title>CIERRE {{mes}} {{year}}</title>
+  <link rel="icon" href="{% static  'plantilla/images/favicon/favicon-32x32.png' %}" sizes="32x32">
+  <!-- Favicons-->
+  <link rel="apple-touch-icon-precomposed" href="{% static  'plantilla/images/favicon/apple-touch-icon-152x152.png' %}">
+  <!-- For iPhone -->
+  <meta name="msapplication-TileColor" content="#00bcd4">
+  <meta name="msapplication-TileImage" content="{% static  'plantilla/images/favicon/mstile-144x144.png' %}">
+  <style>
+    * {
+      font-size: 14px;
+      font-family: 'Times New Roman';
+      font-weight: bold;
+    }
+     
+    .centrado {
+      text-align: center;
+      align-content: center;
+    }
+    img {
+      max-width: inherit;
+    }
+    @page 
+    {
+        size:  auto;   /* auto es el valor inicial */
+        margin: 10mm;  /* afecta el margen en la configuración de impresión */
+    }
+  </style>
+<script>
+    function imprimir(){
+      window.print();
+    }
+</script>
+</head>
+ 
+<body onload="imprimir()">
+  <div class="ticket">
+      <table>
+        <tbody>
+          <tr>
+            <td width="200" >
+                <img width="190px" src="http://forit-hn.com/media/portafolio/eehn.png">
+            </td>
+            <td>
+              <center>
+                <span style="font-size: 40px;">EXPRESS ENVIOS HN</span><br><br>
+                <span style="font-size: 15px;">6004 W 34TH ST HOUSTON, TX 77092 UNIDAD 6004-H<br>TELÉFONO: 346-228-1479 / 832-538-1046</span>
+              </center>  
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="centrado" width="100%">
+        <tbody>
+          <tr>
+            <center><td style="font-size: 25px;">CIERRE DEL AÑO {{year}}</td></center>
+          </tr>
+          <tr>
+            <center><td style="font-size: 40px;">${{total|unlocalize|intcomma}}</td></center>
+          </tr>
+        </tbody>
+      </table>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL FACTURAS: ${{total_envios|unlocalize|intcomma}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Fact N°</th>
+          <!--<th>Encomiendas</th>-->
+          <th>Descripcion</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for envio in envios  %}
+            <tr>
+              <td>{{envio.codigo}} | {{envio.quien_envia.nombre_completo}}</td>         
+              <td>{% if envio.cajas != 'None' %}{{envio.cajas}}{% else %}SIN DESCRIPCION{% endif %}</td>
+              <td class="text-right" >{{envio.total|unlocalize|intcomma}}</td>
+            </tr>
+          {% endfor %}
+      </tbody>
+    </table><br>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL CAJAS: ${{total_cajas|unlocalize|intcomma}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Codigo</th>
+          <th>Cliente</th>
+          <th>Descripcion</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in cajas  %}
+          <tr>
+            <td>{{t.recibo_no}}</td>
+            <td>{{t.cliente}}</td> 
+            <td>{{t.size_caja}}</td>            
+            <td class="text-right" >{{t.valor_caja|unlocalize|intcomma}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table><br>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL VEHICULOS: ${{total_vehiculos|unlocalize|intcomma}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Codigo</th>
+          <th>Cliente</th>
+          <th>Vehiculo</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in vehiculos  %}
+          <tr>
+            <td>{{t.recibo_no}}</td>
+            <td>{{t.cliente}}</td> 
+            <td>{{t.marca_vehiculo}} | {{t.modelo_vehiculo}}</td>            
+            <td class="text-right" >{{t.valor_vehiculo|unlocalize|intcomma}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table><br>
+    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL CONTENEDORES: ${{total_contenedores}}</h2>
+    <table width="100%" border="1" cellspacing="3" cellpadding="3">
+      <thead>
+        <tr>
+          <th>Codigo</th>
+          <th>Cliente</th>
+          <th>Contenedor</th>
+          <th>Pago</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in contenedores  %}
+          <tr>
+            <td>{{t.recibo_no}}</td>
+            <td>{{t.cliente}}</td> 
+            <td>{{t.pais_destino}} | {{t.tamano_contenedor}} </td>            
+            <td class="text-right" >{{t.valor_contenedor|unlocalize|intcomma}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table><br>
+  </div>
+</body>
+</html>

@@ -1,0 +1,87 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <br>
+        <h1>Detalle de camion</h1>
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <th scope="row">DESCRIPCIÓN:</th>
+                <td>{{camion.descripcion}}</td>
+              </tr>
+              
+              <tr>
+                <th scope="row">PLACA:</th>
+                <td>{{camion.placa}}</td>
+              </tr>
+
+             
+            </tbody>
+          </table>
+            <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Envia</th>
+                        <th>Recibe</th>
+                        <th>Caja</th>
+                        <th>Cantidad</th>
+                        <th>Guía padre</th>
+                        <th>Guía hija</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in detalle_camion  %}
+                        <tr >
+                            <td>{{detalle.envio.quien_envia}}</td>
+                            <td>{{detalle.envio.quien_recibe}}</td>
+                            <td>{{detalle.tipo_caja}}</td>
+                            <td>{{detalle.cantidad}}</td>
+                            <td>{{detalle.envio.codigo}}</td>
+                            <td>{{detalle.codigo}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                
+            </table>
+    </div>
+
+
+</section>
+ 
+	
+
+{% endblock contenido %}
+{% block js %}
+<script type="text/javascript">
+	var table = $('#example1').DataTable({
+		  "oLanguage": {
+                            "sProcessing":     "Procesando...",
+                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                            "sZeroRecords":    "No se encontraron resultados",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                            "sInfo":           "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty":      "Mostrando 0 - 0 de un total de 0 registros",
+                            "sInfoFiltered":   "<br>(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix":    "",
+                            "sSearch":         "Buscar:",
+                            "sUrl":            "",
+                            "sInfoThousands":  ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst":    "Primero",
+                                "sLast":     "Último",
+                                "sNext":     "Sig.",
+                                "sPrevious": "Ant."
+                            },
+                      },
+                responsive: true
+	});
+
+</script>
+{% endblock js %}

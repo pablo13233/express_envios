@@ -1,0 +1,218 @@
+{% extends "base_admin.html" %}
+ {% load static %}
+{% load l10n %}
+<!-- Select2 -->
+<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
+<!-- Tempusdominus Bbootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+{% block contenido %}
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Gestion de Camión</h3>
+                </div>
+
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="custom-content-below-home-tab" data-toggle="pill" href="#custom-content-below-home" role="tab" aria-controls="custom-content-below-home" aria-selected="true"><strong>Ver Ingresados</strong></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-content-below-profile-tab" data-toggle="pill" href="#custom-content-below-profile" role="tab" aria-controls="custom-content-below-profile" aria-selected="false"><strong>Agregar Nuevo</strong></a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="custom-content-below-tabContent">
+                        <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+                            <br>
+                            {% if user.is_superuser %}
+                                <table id="example1" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Descripción</th>
+                                            <th>Placa</th>
+                                            <th>Estado</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for c in camiones  %}
+                                            <tr >
+                                                <td>{{c.descripcion}}</td>
+                                                 <td>{{c.placa}}</td>
+                                                {% if c.estado %}
+                                                    <td><a type='button' class="btn btn-success" href="{% url 'desactivar_camion' c.pk %}">Desactivar</a></td>
+                                                {% else %}
+                                                    <td><a type='button' class="btn btn-danger" href="{% url 'activar_camion' c.pk %}">Activar</a></td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Descripción</th>
+                                            <th>Placa</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            
+                            {% endif %}
+                            
+                        </div>
+                        <div class="tab-pane fade" id="custom-content-below-profile" role="tabpanel" aria-labelledby="custom-content-below-profile-tab">
+                            <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'camiones' %}">
+                                {% csrf_token %}
+                                <div class="form-group row">
+                                    <div class="col-md-6">
+                                        <div class="col-md-12">
+                                            <label for="id_nombres_empleado" class="col-form-label">Descripción:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" name="descripcion" id="id_descripcion" placeholder="Descripción" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="col-md-12">
+                                            <label for="id_apellidos_empleado" class="col-form-label">Placa:</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <input type="text" class="form-control" name="placa" id="id_placa" placeholder="Placa" required>
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                                <button type="submit" class="btn float-right btn-info">Agregar</button>
+                            </form>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock contenido %}
+
+{% block js%}
+
+<script>
+    $(function () {
+      //Initialize Select2 Elements
+      $('.select2').select2()
+  
+      //Initialize Select2 Elements
+      $('.select2bs4').select2({
+        theme: 'bootstrap4'
+      })
+  
+    });
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker4').datetimepicker({
+            format: 'L'
+        });
+    });
+</script>
+<script>
+  $(function () {
+    $("#example1").DataTable({
+        responsive: true
+    });
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      responsive: true
+    });
+  });
+</script>
+
+<script>
+    {% if 'ok' in request.GET %} 
+      $.notify('Camión guardado!',{
+        className: 'success',
+        globalPosition:"right bottom", 
+        clickToHide: true,
+        autoHide: true,
+        autoHideDelay: 5000,
+        arrowShow: true,
+        arrowSize: 5,
+        style: 'bootstrap',
+        showAnimation: 'slideDown',
+        showDuration: 400,
+        hideAnimation: 'slideUp',
+        hideDuration: 200,
+        gap: 2
+      });
+      
+    {% endif %}
+
+    {% if 'activar' in request.GET %} 
+      $.notify('Camión activado!',{
+        className: 'success',
+        globalPosition:"right bottom", 
+        clickToHide: true,
+        autoHide: true,
+        autoHideDelay: 5000,
+        arrowShow: true,
+        arrowSize: 5,
+        style: 'bootstrap',
+        showAnimation: 'slideDown',
+        showDuration: 400,
+        hideAnimation: 'slideUp',
+        hideDuration: 200,
+        gap: 2
+      });
+      
+    {% endif %}
+
+    {% if 'desactivar' in request.GET %} 
+      $.notify('Camión desactivado!',{
+        className: 'error',
+        globalPosition:"right bottom", 
+        clickToHide: true,
+        autoHide: true,
+        autoHideDelay: 5000,
+        arrowShow: true,
+        arrowSize: 5,
+        style: 'bootstrap',
+        showAnimation: 'slideDown',
+        showDuration: 400,
+        hideAnimation: 'slideUp',
+        hideDuration: 200,
+        gap: 2
+      });
+      
+    {% endif %}
+
+    {% if 'error' in request.GET %} 
+      $.notify('Error al guardar, verifique todos los campos!',{
+        className: 'error',
+        globalPosition:"right bottom", 
+        clickToHide: true,
+        autoHide: true,
+        autoHideDelay: 5000,
+        arrowShow: true,
+        arrowSize: 5,
+        style: 'bootstrap',
+        showAnimation: 'slideDown',
+        showDuration: 400,
+        hideAnimation: 'slideUp',
+        hideDuration: 200,
+        gap: 2
+      });
+      
+    {% endif %}
+</script>
+{% endblock js %}

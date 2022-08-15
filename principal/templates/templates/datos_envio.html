@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+	 <div class="container">
+            <div class="section">
+              <div class="divider"></div>
+              <!--DataTables example-->
+              <div id="table-datatables">
+                <h4 class="header">Información completa envio <strong>{{envio.codigo}}</strong></h4>
+                <div class="row">
+                  <div class="col m6 s12">
+                    <div class="col m6 s12">
+                      <div class="form-group">
+                        <label class="bmd-label-floating"> Envia</label>
+                        <input style="text-transform: uppercase;" type="text" value="{{envio.quien_envia.nombre_completo}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col m6 s12">
+                      <div class="form-group">
+                        <label class="bmd-label-floating"> Teléfono</label>
+                        <input style="text-transform: uppercase;" type="text" value="{{envio.quien_envia.celular}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col m6 s12">
+                      <div class="form-group">
+                        <label class="bmd-label-floating"> Recibe</label>
+                        <input style="text-transform: uppercase;" type="text" value="{{envio.quien_recibe}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col m6 s12">
+                      <div class="form-group">
+                        <label class="bmd-label-floating"> Teléfono</label>
+                        <input style="text-transform: uppercase;" type="text" value="{{envio.telefonos}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col m12 s12">
+                      <div class="form-group">
+                        <label class="bmd-label-floating"> Dirección</label>
+                        <textarea id="direccion" style="text-transform: uppercase;" name="direccion" class="materialize-textarea"maxlength="300">{{envio.departamento_destino}}, {{envio.direccion}}</textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col m6 s12">
+                    <div class="col m12 s12">
+                      <div class="form-group">
+                        <label class="bmd-label-floating"> Contenido embarque</label>
+                        <textarea id="direccion" style="text-transform: uppercase;" name="direccion" class="materialize-textarea"maxlength="300">{{envio.cajas}}</textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <br>
+              <div class="divider"></div>
+              
+            </div>
+          
+          </div>
+{% endblock contenido %}
+{% block js %}
+<script type="text/javascript">
+	var table = $('#data-table-simple').DataTable({
+		  "oLanguage": {
+                            "sProcessing":     "Procesando...",
+                            "sLengthMenu":     "Mostrar _MENU_ registros",
+                            "sZeroRecords":    "No se encontraron resultados",
+                            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                            "sInfo":           "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
+                            "sInfoEmpty":      "Mostrando 0 - 0 de un total de 0 registros",
+                            "sInfoFiltered":   "<br>(filtrado de un total de _MAX_ registros)",
+                            "sInfoPostFix":    "",
+                            "sSearch":         "Buscar:",
+                            "sUrl":            "",
+                            "sInfoThousands":  ",",
+                            "sLoadingRecords": "Cargando...",
+                            "oPaginate": {
+                                "sFirst":    "Primero",
+                                "sLast":     "Último",
+                                "sNext":     "Sig.",
+                                "sPrevious": "Ant."
+                            },
+                      },
+                responsive: true
+	});
+</script>
+{% endblock js %}
