@@ -11,8 +11,9 @@ from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404,FileResponse
 from django.template.loader import render_to_string, get_template
-from django.shortcuts import render,render_to_response,redirect,get_object_or_404
-from django.core.urlresolvers import reverse
+from django.shortcuts import render,redirect
+from django.urls import reverse
+#from django.core.urlresolvers import //reverse esta ya no en la version 1.11.17
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.template import RequestContext
@@ -25,10 +26,11 @@ from django.core.files.images import get_image_dimensions
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.db import transaction,connections
-import cStringIO as StringIO
+#import cStringIO as StringIO // ya no es valido en python 3.X 
+from io import StringIO
 from xhtml2pdf import pisa
 from django.template import Context
-from cgi import escape
+from cgi import *
 import re
 import json as simplejson
 ##para generar barcode
@@ -37,24 +39,24 @@ from reportlab.lib import units
 from reportlab.graphics import renderPM
 from reportlab.graphics.barcode import createBarcodeDrawing
 from reportlab.graphics.shapes import Drawing
-from barcode import Code128
+#from barcode import Code128   //Revisar esta importacion
 ##barcode##
 from django.db.models import Sum
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 # ##MENSAJE DE TEXTO
 #from twilio.rest import Client
 #from htmlmin.decorators import minified_response
 ###############################################################################
 def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, humanReadable = True):
-    barcode = createBarcodeDrawing('Code128', value = value, barWidth = barWidth, fontSize = fontSize, humanReadable = humanReadable)
-    drawing_width = width
-    barcode_scale = drawing_width / barcode.width
-    drawing_height = barcode.height * barcode_scale
-    drawing = Drawing(drawing_width, drawing_height)
-    drawing.scale(barcode_scale, barcode_scale)
-    drawing.add(barcode, name='barcode')
-    return drawing
+	barcode = createBarcodeDrawing('Code128', value = value, barWidth = barWidth, fontSize = fontSize, humanReadable = humanReadable)
+	drawing_width = width
+	barcode_scale = drawing_width / barcode.width
+	drawing_height = barcode.height * barcode_scale
+	drawing = Drawing(drawing_width, drawing_height)
+	drawing.scale(barcode_scale, barcode_scale)
+	drawing.add(barcode, name='barcode')
+	return drawing
 
 @login_required
 def prueba(request):
@@ -70,20 +72,20 @@ def buscar_envio_cliente(request):
 
 def resultado_busqueda(request):
 	if request.is_ajax():
-	    try:
-	        codigo = request.GET['codigo']
-	        try:
-	            resultado_list = HistorialEnvio.objects.filter(codigo_envio__codigo=codigo).order_by('-pk')
-	            print resultado_list
-	            ctx = {'resultado':resultado_list}
-	            return render(request,'resultado_busqueda.html',ctx)
-	        except Exception, e:
-	            print e,'error aqui es'
-	            raise e
-	            return render(request,'resultado_busqueda.html')
-	    except Exception, e:
-	        print e
-	        return render(request,'resultado_busqueda.html')
+		try:
+			codigo = request.GET['codigo']
+			try:
+				resultado_list = HistorialEnvio.objects.filter(codigo_envio__codigo=codigo).order_by('-pk')
+				
+				ctx = {'resultado':resultado_list}
+				return render(request,'resultado_busqueda.html',ctx)
+			except Exception (e):
+				print (e,'error aqui es')
+				raise e
+				return render(request,'resultado_busqueda.html')
+		except Exception (e):
+			print (e)
+			return render(request,'resultado_busqueda.html')
 
 @login_required
 def buscar_envio(request):
@@ -127,7 +129,7 @@ def inicio_admin(request):
 		estado['cantidad'] = Envio.objects.filter(empresa = e.empresa, estado_envio = e.pk).count()
 		#estado['estado'] = HistorialEnvio.objects.filter(codigo_envio=e.pk).latest('estado')
 		dic_datos_seguimiento.append(estado)
-	print dic_datos_seguimiento
+
 	ctx = {'estado_envio':estado_envio, 'dic_datos_seguimiento':dic_datos_seguimiento,'empleado':empleado}
 	return render(request,'inicio_admin.html',ctx)
 
@@ -294,7 +296,7 @@ def trasladar_post(request):
 					mensaje = EmpresaMensaje.objects.create(tipo_mensaje=TipoMensajes.objects.get(pk=1),envio=envio_cliente,texto = message.body)
 			return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
 		except Exception as e:
-			print e, 'error'
+			#print e, 'error'
 			return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
 	elif request.method == 'GET':
 		return datos_envio
@@ -345,39 +347,39 @@ def validar_empresa(request):
 
 @login_required
 def empresa(request):
-    empresas = Empresa.objects.all()
-    print(empresas)
-    if request.method == 'POST':
-        ret_data,errores,query_empresa,recibo,ingreso_correcto = {},{},{},{},{}
-        recibo = validar_empresa(request)
-        ret_data.update(recibo['ret_data'])
-        errores.update(recibo['errores'])
-        query_empresa.update(recibo['query_empresa'])		
-        if not errores:
-            print('entra sin errores')
-            try:
-				print('entra try')
+	empresas = Empresa.objects.all()
+	print(empresas)
+	if request.method == 'POST':
+		ret_data,errores,query_empresa,recibo,ingreso_correcto = {},{},{},{},{}
+		recibo = validar_empresa(request)
+		ret_data.update(recibo['ret_data'])
+		errores.update(recibo['errores'])
+		query_empresa.update(recibo['query_empresa'])		
+		if not errores:
+			print('entra sin errores')
+			try:
+				#print('entra try')
 				query_empresa.update({'usuario_registro':request.user})
 				query_empresa.update({'celular_empresa':request.POST.get('celular_empresa')})
 				empresa = Empresa(**query_empresa)
 				empresa.save()
-            except Exception as e:
-                errores['extra'] = e
-                transaction.rollback()
-                ctx = {'empresas':empresas,'ret_data':ret_data,'errores':errores}
-                return render(request,'empresa.html',ctx)
-            else:
-                transaction.commit()
-                ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
-                ctx = {'ingreso_correcto':ingreso_correcto,'empresas':empresas}
-                return HttpResponseRedirect(reverse('empresa'))
-        else:
-            print errores,'erroresdentro de errores'
-            ctx = {'ret_data':ret_data,'errores':errores,'empresas':empresas}
-            return render(request,'empresa.html',ctx)
-    elif request.method == 'GET':
-        ctx = {'empresas':empresas}
-        return render(request,'empresa.html', ctx)
+			except Exception as e:
+				errores['extra'] = e
+				transaction.rollback()
+				ctx = {'empresas':empresas,'ret_data':ret_data,'errores':errores}
+				return render(request,'empresa.html',ctx)
+			else:
+				transaction.commit()
+				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
+				ctx = {'ingreso_correcto':ingreso_correcto,'empresas':empresas}
+				return HttpResponseRedirect(reverse('empresa'))
+		else:
+			#print errores,'erroresdentro de errores'
+			ctx = {'ret_data':ret_data,'errores':errores,'empresas':empresas}
+			return render(request,'empresa.html',ctx)
+	elif request.method == 'GET':
+		ctx = {'empresas':empresas}
+		return render(request,'empresa.html', ctx)
 
 @login_required
 def validar_empleado(request,rol_empleado):
@@ -467,28 +469,28 @@ def empleados(request):
 				query_empleado.update({'usuario':nusuario})
 				empleado = Empleado(**query_empleado)
 				empleado.save()
-				print('guardo empleado')
+				#print('guardo empleado')
 				if request.user.is_superuser:
-					print('entro crear empresaempleado superuser')
+					#print('entro crear empresaempleado superuser')
 					empresa_empleado = EmpresaEmpleado.objects.create(
 						empresa = Empresa.objects.get(pk = request.POST.get('empresa_empleado')),
 						empleado = empleado,
 						usuario_registro = request.user
 					)
-					print('creo empresaempleado superuser')
+					#print('creo empresaempleado superuser')
 				else:
-					print('entro crear empresaempleado')
+					#print('entro crear empresaempleado')
 					empresa_empleado = EmpresaEmpleado.objects.create(
 						empresa = empresa,
 						empleado = empleado,
 						usuario_registro = request.user
 					)
-					print('creo empresaempleado')
+					#print('creo empresaempleado')
 			except Exception as e:
 				errores['extra'] = e
-				print(errores)
+				#print(errores)
 				# borrar_usuario = User.objects.filter(pk=nusuario.pk)
-				# print(borrar_usuario, 'usuario creado')
+				# #print(borrar_usuario, 'usuario creado')
 				transaction.rollback()
 				ctx = {'empleados':empleados,'empresas':empresas,'rol_empleado':rol_empleado,'rol_empleado_actual':rol_empleado_actual,'ret_data':ret_data,'errores':errores}
 				return render(request,'empleados.html',ctx)
@@ -514,7 +516,7 @@ def empleados(request):
 				return render(request,'empleados.html',ctx)
                 #return HttpResponseRedirect(reverse('empleados')+"?ok")
 		else:
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'ret_data':ret_data,'errores':errores,'empleados':empleados,'empresas':empresas,'rol_empleado':rol_empleado,'rol_empleado_actual':rol_empleado_actual}
 			return render(request,'empleados.html',ctx)
 	elif request.method == 'GET':
@@ -627,13 +629,13 @@ def tipo_gasto(request):
 	empresa = EmpresaEmpleado.objects.get(empleado = es_sadmin)
 	
 	if request.user.is_superuser == True:
-		print('entro a superuser')
+		#print('entro a superuser')
 		empresas = Empresa.objects.all()
 		gastos = EmpresaGasto.objects.all()
 		tipo_gasto = EmpresaTipoGasto.objects.all()
 	else:
 		if es_sadmin.rol_empleado.pk == 1:
-			print('entro a rol empleado')
+			#print('entro a rol empleado')
 			gastos = EmpresaGasto.objects.filter(empresa=empresa)
 			tipo_gasto = EmpresaTipoGasto.filter(empresa=empresa)
 
@@ -641,9 +643,9 @@ def tipo_gasto(request):
 		ret_data,errores_tipo_gasto,ingreso_correcto_tipo_gasto = {},{},{}
 
 		if not errores_tipo_gasto:
-			print('entra sin errores_tipo_gasto')
+			#print('entra sin errores_tipo_gasto')
 			try:
-				print('entra try')
+				#print('entra try')
 				tipo = request.POST.get('tipo_gasto').upper()
 				if request.user.is_superuser == True or es_sadmin.rol_empleado.pk == 1:
 					eingresar = Empresa.objects.get(pk=request.POST.get('empresa'))
@@ -654,9 +656,9 @@ def tipo_gasto(request):
 					tipo_gastos = EmpresaTipoGasto.objects.create(
 						tipo_gasto = tipo,
 						empresa = empresa)
-				print('guardo')
+				#print('guardo')
 			except Exception as e:
-				print(e, 'errores_tipo_gasto extras')
+				#print(e, 'errores_tipo_gasto extras')
 				errores_tipo_gasto['extra'] = e
 				transaction.rollback()
 				ctx = {'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin,'ret_data':ret_data,'errores_tipo_gasto':errores_tipo_gasto}
@@ -667,7 +669,7 @@ def tipo_gasto(request):
 				ctx = {'ingreso_correcto_tipo_gasto':ingreso_correcto_tipo_gasto,'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin}
 				return HttpResponseRedirect(reverse('gastos')+"?okt")
 		else:
-			print errores_tipo_gasto,'errores_tipo_gastodentro de errores_tipo_gasto'
+			#print (errores_tipo_gasto,'errores_tipo_gastodentro de errores_tipo_gasto')
 			ctx = {'ret_data':ret_data,'errores_tipo_gasto':errores_tipo_gasto,'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin}
 			return render(request,'gastos.html',ctx)
 	elif request.method == 'GET':
@@ -725,13 +727,13 @@ def gastos(request):
 	empresa = EmpresaEmpleado.objects.get(empleado = es_sadmin)
 	
 	if request.user.is_superuser == True:
-		print('entro a superuser')
+		#print('entro a superuser')
 		empresas = Empresa.objects.all()
 		gastos = EmpresaGasto.objects.all()
 		tipo_gasto = EmpresaTipoGasto.objects.all()
 	else:
 		if es_sadmin.rol_empleado.pk == 1:
-			print('entro a rol empleado')
+			#print('entro a rol empleado')
 			gastos = EmpresaGasto.objects.filter(empresa=empresa)
 			tipo_gasto = EmpresaTipoGasto.filter(empresa=empresa)
 
@@ -741,20 +743,20 @@ def gastos(request):
 		ret_data.update(recibo['ret_data'])
 		errores.update(recibo['errores'])
 		query_gastos.update(recibo['query_gastos'])
-		print request.POST.get('tipo_gasto_ingresar'), 'tipo_gasto'
+		#print request.POST.get('tipo_gasto_ingresar'), 'tipo_gasto'
 		if not errores:
-			print('entra sin errores')
+			#print('entra sin errores')
 			try:
-				print('entra try')
+				#print('entra try')
 				gasto_empresa =  EmpresaTipoGasto.objects.get(pk=request.POST.get('tipo_gasto_ingresar'))
 				query_gastos.update({'empresa':gasto_empresa.empresa})
 				query_gastos.update({'usuario_registro':request.user})
 
 				gasto = EmpresaGasto(**query_gastos)
 				gasto.save()
-				print('guardo')
+				#print('guardo')
 			except Exception as e:
-				print(e, 'errores extras')
+				#print(e, 'errores extras')
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'empresas':empresas, 'es_sadmin':es_sadmin,'ret_data':ret_data,'errores':errores,'tipo_gasto':tipo_gasto,'gastos':gastos}
@@ -765,7 +767,7 @@ def gastos(request):
 				ctx = {'ingreso_correcto':ingreso_correcto,'empresas':empresas, 'es_sadmin':es_sadmin,'tipo_gasto':tipo_gasto,'gastos':gastos}
 				return HttpResponseRedirect(reverse('gastos')+"?ok")
 		else:
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'ret_data':ret_data,'errores':errores,'empresas':empresas, 'es_sadmin':es_sadmin,'tipo_gasto':tipo_gasto,'gastos':gastos}
 			return render(request,'gastos.html',ctx)
 	elif request.method == 'GET':
@@ -869,17 +871,17 @@ def detalle_cajas(request):
 		errores.update(recibo['errores'])
 		query_caja.update(recibo['query_caja'])
 		if not errores:
-			print('entra sin errores')
+			#print('entra sin errores')
 			try:
 				query_caja.update({'usuario_registro':request.user})
 				query_caja.update({'accion':False})
 				query_caja.update({'fecha':request.POST.get('fecha_detalle')})
-				print request.POST.get('fecha_detalle'), 'fecha'
+				#print request.POST.get('fecha_detalle'), 'fecha'
 				caja = EmpresaDetalleCaja(**query_caja)
 				caja.save()
-				print('guardo')
+				#print('guardo')
 			except Exception as e:
-				print(e, 'errores extras')
+				#print(e, 'errores extras')
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin,'ret_data':ret_data,'errores':errores}
@@ -887,14 +889,14 @@ def detalle_cajas(request):
 			else:
 				transaction.commit()
 				existencia = EmpresaControlCaja.objects.get(pk = caja.caja.pk)
-				print existencia.existencia, 'existencia'
+				#print existencia.existencia, 'existencia'
 				control_caja = EmpresaControlCaja.objects.filter(pk = caja.caja.pk).update(existencia = int(existencia.existencia) + int(caja.cantidad))
-				print 'actualizo control caja'
+				#print 'actualizo control caja'
 				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
 				ctx = {'ingreso_correcto':ingreso_correcto,'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin}
 				return HttpResponseRedirect(reverse('cajas'))
 		else:
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'ret_data':ret_data,'errores':errores,'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin}
 			return render(request,'cajas.html',ctx)
 	elif request.method == 'GET':
@@ -988,21 +990,21 @@ def actividades(request):
 		errores.update(recibo['errores'])
 		query_actividades.update(recibo['query_actividades'])
 		if not errores:
-			print('entra sin errores')
+			#print('entra sin errores')
 			try:
 				fecha = request.POST.get('fecha')
-				print fecha, 'fecha obtenida'
+				#print fecha, 'fecha obtenida'
 				fecha_ = fecha.split('/')
 				fechafinal = fecha_[2] + '-' + fecha_[0] + '-' + fecha_[1]
-				print fechafinal, 'fecha convertirda'
+				#print fechafinal, 'fecha convertirda'
 				query_actividades.update({'fecha':fechafinal})
 				query_actividades.update({'empresa':empresa.empresa})
 				query_actividades.update({'usuario_registro':request.user})
 				caja = EmpresaActividades(**query_actividades)
 				caja.save()
-				print('guardo')
+				#print('guardo')
 			except Exception as e:
-				print(e, 'errores extras')
+				#print(e, 'errores extras')
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin,'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'actividades':actividades,'cajas':cajas,'actividades_terminadas':actividades_terminadas}
@@ -1013,7 +1015,7 @@ def actividades(request):
 				ctx = {'ingreso_correcto':ingreso_correcto,'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin,'quien_envia':quien_envia,'actividades':actividades,'cajas':cajas,'actividades_terminadas':actividades_terminadas}
 				return HttpResponseRedirect(reverse('actividades'))
 		else:
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'ret_data':ret_data,'errores':errores,'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin,'quien_envia':quien_envia,'actividades':actividades,'actividades_terminadas':actividades_terminadas}
 			return render(request,'actividades.html',ctx)
 	elif request.method == 'GET':
@@ -1040,8 +1042,8 @@ def finalizar_actividad(request):
 			try:
 				for p in cajas_post:
 					separar = p.split("|")
-					print separar[0],'separar0'
-					print separar[1],'separar1'
+					#print separar[0],'separar0'
+					#print separar[1],'separar1'
 					caja = EmpresaControlCaja.objects.get(pk = separar[0])
 					if int(separar[1] > 1):
 						texto = 'CAJAS'
@@ -1066,7 +1068,7 @@ def finalizar_actividad(request):
 				nactividad = EmpresaActividades.objects.filter(pk=actividad).update(estado = True, deposito =deposito, fecha_realizo = datetime.now(), descripcion_entrega = descripcion_entrega, recibo_entrega= new_recibo_caja.pk)
 				recibo_entrega = new_recibo_caja.pk
 			except Exception as e:
-				print 'hay errores',e
+				#print 'hay errores',e
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'ret_data':ret_data,'cajas_post':cajas_post,'error':error}
@@ -1076,12 +1078,12 @@ def finalizar_actividad(request):
 				empresa = ''
 				for p in cajas_post:
 					separar = p.split("|")
-					print separar[0],'separar0 commit'
-					print separar[1],'separar1 commit'
+					#print separar[0],'separar0 commit'
+					#print separar[1],'separar1 commit'
 					caja = EmpresaControlCaja.objects.get(pk = separar[0])
 					empresa= caja
 					update_caja = EmpresaDetalleCaja.objects.create(caja = caja,cantidad = separar[1],recibo_caja = ReciboCaja.objects.get(pk=recibo_entrega),usuario_registro = request.user)
-					print 'creo empresa detalle caja al entregar una caja'
+					#print 'creo empresa detalle caja al entregar una caja'
 					update_control_caja = EmpresaControlCaja.objects.filter(pk=separar[0]).update(existencia = caja.existencia - int(separar[1]))
 				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
 				ctx = {'ingreso_correcto':ingreso_correcto,}
@@ -1125,30 +1127,30 @@ def reactivar_tarea(request):
 
 @login_required
 def validar_clientes(request):
-    query_clientes,errores,ret_data,retorno = {},{},{},{}
-    if request.POST.get('nombre_completo') != '':
-        ret_data.update({'nombre_completo':request.POST.get('nombre_completo')})
-        query_clientes.update({'nombre_completo':request.POST.get('nombre_completo')})
-    else:
-        errores['nombre_completo'] = u'Falta ingresar el nombre del cliente'
+	query_clientes,errores,ret_data,retorno = {},{},{},{}
+	if request.POST.get('nombre_completo') != '':
+		ret_data.update({'nombre_completo':request.POST.get('nombre_completo')})
+		query_clientes.update({'nombre_completo':request.POST.get('nombre_completo')})
+	else:
+		errores['nombre_completo'] = u'Falta ingresar el nombre del cliente'
 
-    if request.POST.get('celular') != '':
-        ret_data.update({'celular':request.POST.get('celular')})
-        query_clientes.update({'celular':request.POST.get('celular')})
-    else:
-        errores['direccion'] = u'Falta ingresar la direccion'
-	
+	if request.POST.get('celular') != '':
+		ret_data.update({'celular':request.POST.get('celular')})
+		query_clientes.update({'celular':request.POST.get('celular')})
+	else:
+		errores['direccion'] = u'Falta ingresar la direccion'
+
 	if request.POST.get('direccion') != '':
 		ret_data.update({'direccion':request.POST.get('direccion')})
 		query_clientes.update({'direccion':request.POST.get('direccion')})
 	else:
 		errores['direccion'] = u'Falta ingresar la direccion'
-    
-    retorno['query_clientes'] = query_clientes
-    retorno['errores'] = errores
-    retorno['ret_data'] = ret_data
 
-    return retorno
+	retorno['query_clientes'] = query_clientes
+	retorno['errores'] = errores
+	retorno['ret_data'] = ret_data
+
+	return retorno
 
 @login_required
 def clientes(request):
@@ -1166,7 +1168,7 @@ def clientes(request):
 		if not errores:
 			# if codigo.count() == 1:
 			# 	duplicado = 'Ya existe un Cliente con ese numero telefonico'
-			# 	print('error duplicado')
+			# 	#print('error duplicado')
 			# 	ctx = {'ret_data':ret_data,'duplicado':duplicado, 'clientes':clientes}
 			# 	return render(request, 'clientes.html',ctx)
 			try:
@@ -1179,7 +1181,7 @@ def clientes(request):
 				cliente = Cliente.objects.create(nombre_completo = nombre_completo.upper(),celular = celular,direccion = direccion.upper(),usuario_registro = usuario_registro, empresa = empresa.empresa)				
 
 			except Exception as e:
-				print e,'aqui esta reventando'
+				#print e,'aqui esta reventando'
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'ret_data':ret_data,'errores':errores, 'clientes':clientes,'empleado':empleado}
@@ -1190,7 +1192,7 @@ def clientes(request):
 				ctx = {'ingreso_correcto':ingreso_correcto, 'clientes':clientes,'empleado':empleado}
 				return HttpResponseRedirect(reverse('clientes'))
 		else:
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'ret_data':ret_data,'errores':errores, 'clientes':clientes,'empleado':empleado}
 			return render(request,'clientes.html',ctx)
 	else:
@@ -1213,7 +1215,7 @@ def recibe(request):
 				usuario_registro = request.user
 			)
 		except Exception as e:
-			print e,'error recibe'
+			#print e,'error recibe'
 			data = {'valor':1}
 			return HttpResponse(simplejson.dumps(data), content_type='application/json')
 		else:
@@ -1237,12 +1239,12 @@ def datos_recibe(request):
 
 @login_required
 def datos_caja_edit(request):
-	print request.GET.get('pk_caja')
+	#print request.GET.get('pk_caja')
 	caja = request.GET.get('pk_caja').split('|')
 	pk_caja_pais = caja[3]
 	
 	caja = list(CajaPais.objects.filter(pk=pk_caja_pais).values('pk','precio','tipo_caja__descripcion','tipo_caja__alto','tipo_caja__ancho','tipo_caja__largo'))
-	print caja
+	#print caja
 	return HttpResponse(simplejson.dumps(caja), content_type='application/javascript')
 	connection.close()
 
@@ -1304,7 +1306,7 @@ def revendedor(request):
 	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
 	revendedores = Revendedor.objects.all()
 	nusuario_pk = ''
-	print(empresa.empresa.pk,'pk empresa')
+	#print(empresa.empresa.pk,'pk empresa')
 	if request.method == 'POST':
 		ret_data,errores,query_revendedor,recibo,ingreso_correcto = {},{},{},{},{}
 		recibo = validar_revendedor(request)
@@ -1315,9 +1317,9 @@ def revendedor(request):
 			query_revendedor.update({'logo':request.FILES.get('logo')})
 		
 		if not errores:
-			print('entra sin errores')
+			#print('entra sin errores')
 			logo = request.FILES.get('logo')
-			print(logo, 'logo')
+			#print(logo, 'logo')
 			try:
 				random_pass = User.objects.make_random_password(length=8, allowed_chars='abcdefghjkmnpqrstuvwxyz01234567889')
 				contrasena = make_password(random_pass)
@@ -1360,15 +1362,15 @@ def revendedor(request):
 					usuario_registro = request.user,
 					revendedor = True,
 					revenedor_creo = new_revendedor)
-				print('paso recibo')
+				#print('paso recibo')
 			except Exception as e:
-				print(e, 'error')
+				#print(e, 'error')
 				errores['extra'] = e
 				transaction.rollback()
 				
 				ctx = {'revendedores':revendedores,'ret_data':ret_data,'errores':errores}
 				return render(request,'revendedor.html',ctx)
-			else:
+			else:	
 				transaction.commit()
 				name = 'Bienvenido al sistema de ' + empresa.empresa.nombre_empresa
 				subject = 'Nota de registro'
@@ -1381,14 +1383,14 @@ def revendedor(request):
 					from_='+13473345592',
 					to='+1' + new_revendedor.telefono
                           )
-				#print(message.sid)
+				##print(message.sid)
 				#send_message('Bienvenido al sistema de ' + empresa.empresa.nombre_empresa + 'Estimado Sr./Sra. '+new_revendedor.nombre_completo.upper()  + ' las credenciales para ingreso del sistema son las siguientes: '+'\n'+'Usuario: '+ nusuario.username +'\n'+'Contraseña: '+random_pass , '+1' + new_revendedor.telefono)
 				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
 				ctx = {'ingreso_correcto':ingreso_correcto,'revendedores':revendedores}
 				return HttpResponseRedirect(reverse('revendedor'))
 		else:
 			borrar = User.objects.get(pk=nusuario_pk).delete()
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'ret_data':ret_data,'errores':errores,'revendedores':revendedores}
 			return render(request,'revendedor.html',ctx)
 	elif request.method == 'GET':
@@ -1427,19 +1429,19 @@ def aprobar_post(request):
 		envios = request.POST.getlist('mover')
 		try:
 			for e in envios:
-				print e,'error arriba'
+				#print e,'error arriba'
 				envio = Envio.objects.filter(pk=e).update(aprobado=True, usuario_aprobo=request.user)
-				print 'va hacer la redireccion'
+				#print 'va hacer la redireccion'
 			return HttpResponseRedirect(reverse('aprobar_envios')+"?ok")
 		except Exception as e:
-			print e, 'error'
+			print (e, 'error')
 	elif request.method == 'GET':
 		return datos_envio
 ####MODULO REVENDEDOR END
 
 @login_required
 def departamento(request):
-	print "mando pais"
+	#print "mando pais"
 	departamentos = list(Departamento.objects.filter(pais=request.GET.get('idpais')).values('id','nombre'))
 	return HttpResponse(simplejson.dumps(departamentos), content_type='application/javascript')
 	connection.close()
@@ -1527,7 +1529,7 @@ def registrar_envio(request):
 	quien_recibe = ClienteRecibe.objects.all()
 	es_revendedor = False
 	correlativo = Envio.objects.filter(empresa=empresa.empresa)
-	print correlativo.count(), 'correlativo'
+	#print correlativo.count(), 'correlativo'
 	tipo_contenido = TipoContenido.objects.all()
 	tipo_envio = TipoEnvio.objects.all()
 	if r.count() >= 1:
@@ -1650,10 +1652,10 @@ def registrar_envio(request):
 															  codigo=codigo_detalle,
 															  total=total)
 						except Exception as e:
-							print 'ERROR EN DETALLE', e
-					
+							#print 'ERROR EN DETALLE', e
+							return 0
 			except Exception as e:
-				print (e,'errores')
+				#print (e,'errores')
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'es_revendedor':es_revendedor,'pais':pais,'ret_data':ret_data,'errores':errores}
@@ -1672,7 +1674,7 @@ def registrar_envio(request):
 				#return HttpResponseRedirect(reverse('registrar_envio')+"?ok" +"&envio="+ str(envio.pk))
 				return HttpResponseRedirect(reverse('envio_pdf',kwargs={ 'id': envio.pk }))
 		else:
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'es_revendedor':es_revendedor,'pais':pais,'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio}
 			return render(request,'registrar_envio.html',ctx)
 	elif request.method == 'GET':
@@ -1711,7 +1713,7 @@ def envio_pdf(request, id):
 		nada = ''
 	elif separar[1].lower() == 'jpg' or separar[1].lower() == 'jpeg' or separar[1].lower() == 'png':
 		width, height = get_image_dimensions(envio.empresa.logo_empresa)
-	print width, height
+	#print width, height
 	barcode = get_barcode(value = envio.codigo, width = 600)
 	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
 	return generar_pdf('envio_pdf.html',
@@ -1735,84 +1737,85 @@ def generar_pdf(template_src, context_dict={}):
 
 	pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), result)
 	if not pdf.err:
-	    return HttpResponse(result.getvalue(), content_type='application/pdf')
+		return HttpResponse(result.getvalue(), content_type='application/pdf')
 	return HttpResponse('Error al generar el PDF<pre>%s</pre>'% escape(html))
 
 def login(request):
-    mensaje = ''
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('inicio_admin'))
+	mensaje = ''
+	if request.user.is_authenticated:
+		print
+		return HttpResponseRedirect(reverse('inicio_admin'))
 
-    if request.method == 'POST':
-        username = request.POST.get('usuario')
-        password = request.POST.get('pass')
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            if user.is_active:
-                auth_login(request, user)
-                #if user.is_superuser:
-                return redirect('inicio_admin') #aqui se debe crear la vista de la parte administrativa d               
-                #else:
-                #    return redirect('index_cuadrilla') #esto es para los operardoes
-            else:
-                mensaje = 'Usuario inactivo'
-        else:
-            mensaje = 'Nombre de usuario o contraseña no válido.'
+	if request.method == 'POST':
+		username = request.POST.get('usuario')
+		password = request.POST.get('pass')
+		user = authenticate(username=username, password=password)
+		if user is not None:
+			if user.is_active:
+				auth_login(request, user)
+				#if user.is_superuser:
+				return redirect('inicio_admin') #aqui se debe crear la vista de la parte administrativa d               
+				#else:
+				#    return redirect('index_cuadrilla') #esto es para los operardoes
+			else:
+				mensaje = 'Usuario inactivo'
+		else:
+			mensaje = 'Nombre de usuario o contraseña no válido.'
 
-    return render(request, 'login.html', {'mensaje': mensaje})
+	return render(request, 'login.html', {'mensaje': mensaje})
 
 
 def cerrar_sesion(request): 
-    logout(request)
-    return HttpResponseRedirect(reverse('login'))
+	logout(request)
+	return HttpResponseRedirect(reverse('login'))
 
 @login_required
 def editarpass(request):
-    user = User.objects.get(pk=request.user.id)
-    mensaje = ''
-    if request.method == 'POST':
-        user.password = make_password(request.POST.get('password'))
-        contrasena1 = request.POST.get('password')
-        contrasena2 = request.POST.get('password2')
-        if contrasena1 == contrasena2:
-            contrasena =  User.objects.filter(pk=request.user.id).update(password= make_password(contrasena1))
-            logout(request)
-            return HttpResponseRedirect(reverse('login'))
-        else:
-            mensaje = 'Las contraseñas no coinciden'
-            ctx = {'mensaje':mensaje}
-            return render(request,'cambiar_pass.html', ctx)
-    else:
-        return render(request, 'cambiar_pass.html')
+	user = User.objects.get(pk=request.user.id)
+	mensaje = ''
+	if request.method == 'POST':
+		user.password = make_password(request.POST.get('password'))
+		contrasena1 = request.POST.get('password')
+		contrasena2 = request.POST.get('password2')
+		if contrasena1 == contrasena2:
+			contrasena =  User.objects.filter(pk=request.user.id).update(password= make_password(contrasena1))
+			logout(request)
+			return HttpResponseRedirect(reverse('login'))
+		else:
+			mensaje = 'Las contraseñas no coinciden'
+			ctx = {'mensaje':mensaje}
+			return render(request,'cambiar_pass.html', ctx)
+	else:
+		return render(request, 'cambiar_pass.html')
 
 ##ultimo
 @login_required
 def envios_credito(request):
-    credito = Envio.objects.filter(credito=True,cancelado=False).order_by('-pk')
-    saldo = 0
-    dic_creditos = []
-    for c in credito:
-    	print c.quien_envia.nombre_completo
-    	creditos = {}
-    	creditos['pk'] = c.pk
-    	creditos['codigo'] = c.codigo
-    	creditos['cliente'] = c.quien_envia.nombre_completo
-    	creditos['pais'] = c.pais_destino
-    	creditos['depto'] = c.departamento_destino
-    	creditos['fecha'] = c.fecha_cierre
-    	estado = HistorialEnvio.objects.filter(codigo_envio = c.pk).values('estado')
-    	lon = estado.count()
-    	creditos['estado']  = lon
-    	creditos['embarque']  = c.descripcion_embarque
-    	creditos['comentario']  = c.comentario
-    	creditos['celular'] = c.quien_envia.celular
-    	creditos['recibe'] = c.quien_recibe
-    	creditos['saldo'] = c.saldo_pendiente
-    	saldo += c.saldo_pendiente
-    	dic_creditos.append(creditos)
-    print dic_creditos
-    ctx = {'creditos':dic_creditos,'saldo':saldo}
-    return render(request, 'envios_credito.html', ctx)
+	credito = Envio.objects.filter(credito=True,cancelado=False).order_by('-pk')
+	saldo = 0
+	dic_creditos = []
+	for c in credito:
+		#print c.quien_envia.nombre_completo
+		creditos = {}
+		creditos['pk'] = c.pk
+		creditos['codigo'] = c.codigo
+		creditos['cliente'] = c.quien_envia.nombre_completo
+		creditos['pais'] = c.pais_destino
+		creditos['depto'] = c.departamento_destino
+		creditos['fecha'] = c.fecha_cierre
+		estado = HistorialEnvio.objects.filter(codigo_envio = c.pk).values('estado')
+		lon = estado.count()
+		creditos['estado']  = lon
+		creditos['embarque']  = c.descripcion_embarque
+		creditos['comentario']  = c.comentario
+		creditos['celular'] = c.quien_envia.celular
+		creditos['recibe'] = c.quien_recibe
+		creditos['saldo'] = c.saldo_pendiente
+		saldo += c.saldo_pendiente
+		dic_creditos.append(creditos)
+	#print dic_creditos
+	ctx = {'creditos':dic_creditos,'saldo':saldo}
+	return render(request, 'envios_credito.html', ctx)
 
 @login_required
 def tickets_envio(request):
@@ -1854,20 +1857,20 @@ def imprimir_ticket (request, id = None):
 	detalle = DetalleEnvio.objects.filter(envio=envio)
 	dic = []
 	for d in detalle:
-	   	lista = {}
-   		lista['guia_padre'] = d.envio.codigo
-	   	lista['guia'] = d.codigo
-	   	lista['producto'] = d.tipo_caja.tipo_caja.descripcion
-	   	lista['destinatario'] = d.envio.quien_recibe
+		lista = {}
+		lista['guia_padre'] = d.envio.codigo
+		lista['guia'] = d.codigo
+		lista['producto'] = d.tipo_caja.tipo_caja.descripcion
+		lista['destinatario'] = d.envio.quien_recibe
 		lista['departamento'] = d.envio.departamento_destino.nombre
-	   	lista['direccion'] = d.envio.direccion_registrar
-	   	lista['telefono'] = d.envio.quien_recibe.celular
-	   	barcode = get_barcode(value = d.codigo, width = 600)
+		lista['direccion'] = d.envio.direccion_registrar
+		lista['telefono'] = d.envio.quien_recibe.celular
+		barcode = get_barcode(value = d.codigo, width = 600)
 		codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
-	   	lista['codigo'] = codigo
-	   	dic.append(lista)
-   	ctx = {'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic}
-   	return render(request,'imprimir_ticket.html',ctx)
+		lista['codigo'] = codigo
+		dic.append(lista)
+	ctx = {'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic}
+	return render(request,'imprimir_ticket.html',ctx)
 
 @login_required
 def cerrar_ticket(request):
@@ -1918,34 +1921,34 @@ def pago_envio(request,id=None):
 
 @login_required
 def imprimir_credito(request):
-    credito = Envio.objects.filter(credito=True)#.values('pk','codigo','fecha_recoleccion','fecha_envio','valor_envio','valor_adicional','quien_envia','cajas','total','departamento_destino','pais_destino','pago_recibido')
-    saldo = 0
-    estado = HistorialEnvio.objects.filter(codigo_envio = 25).values('estado')
-    lon = estado.count()
-    print lon, 'numero'
-    print estado[lon-1], 'estado'
-    dic_creditos = []
-    for c in credito:
-    	print c.quien_envia.nombre_completo
-    	creditos = {}
-    	creditos['pk'] = c.pk,
-    	creditos['codigo'] = c.codigo,
-    	creditos['cliente'] = c.quien_envia.nombre_completo,
-    	creditos['pais'] = c.pais_destino,
-    	creditos['depto'] = c.departamento_destino,
-    	estado = HistorialEnvio.objects.filter(codigo_envio = c.pk).values('estado')
-    	lon = estado.count()
-    	creditos['estado']  = lon,
-    	creditos['embarque']  = c.cajas,
-    	creditos['comentario']  = c.comentario,
-    	creditos['celular'] = c.quien_envia.celular,
-    	creditos['recibe'] = c.quien_recibe,
-    	creditos['saldo'] = c.saldo_pendiente
-    	saldo += c.saldo_pendiente
-    	dic_creditos.append(creditos)
-    print dic_creditos
-    ctx = {'creditos':dic_creditos,'saldo':saldo}
-    return render(request, 'imprimir_creditos.html', ctx)
+	credito = Envio.objects.filter(credito=True)#.values('pk','codigo','fecha_recoleccion','fecha_envio','valor_envio','valor_adicional','quien_envia','cajas','total','departamento_destino','pais_destino','pago_recibido')
+	saldo = 0
+	estado = HistorialEnvio.objects.filter(codigo_envio = 25).values('estado')
+	lon = estado.count()
+	#print lon, 'numero'
+	#print estado[lon-1], 'estado'
+	dic_creditos = []
+	for c in credito:
+		#print c.quien_envia.nombre_completo
+		creditos = {}
+		creditos['pk'] = c.pk,
+		creditos['codigo'] = c.codigo,
+		creditos['cliente'] = c.quien_envia.nombre_completo,
+		creditos['pais'] = c.pais_destino,
+		creditos['depto'] = c.departamento_destino,
+		estado = HistorialEnvio.objects.filter(codigo_envio = c.pk).values('estado')
+		lon = estado.count()
+		creditos['estado']  = lon,
+		creditos['embarque']  = c.cajas,
+		creditos['comentario']  = c.comentario,
+		creditos['celular'] = c.quien_envia.celular,
+		creditos['recibe'] = c.quien_recibe,
+		creditos['saldo'] = c.saldo_pendiente
+		saldo += c.saldo_pendiente
+		dic_creditos.append(creditos)
+	#print dic_creditos
+	ctx = {'creditos':dic_creditos,'saldo':saldo}
+	return render(request, 'imprimir_creditos.html', ctx)
 
 @login_required
 def cierre(request):
@@ -2417,7 +2420,7 @@ def recibo_contenedor(request):
 			query_contenedor.update({'pdf':request.FILES.get('pdf')})
 		
 		if not errores:
-			print('entra sin errores')
+			#print('entra sin errores')
 			correo = request.POST.get('correo')
 			pasaporte = request.POST.get('pasaporte').upper()
 			quien_recibe = request.POST.get('quien_recibe')
@@ -2441,9 +2444,9 @@ def recibo_contenedor(request):
 			recibo_no += 1
 			codigo_final = 'EECT0' + str(recibo_no)
 			try:
-				print('entro try')
+				#print('entro try')
 				if cliente != '':
-					print('if try')
+					#print('if try')
 					new_recibo_contenedor = ReciboContenedor.objects.create(
 						recibo_no=codigo_final,
 						cliente=cliente,
@@ -2458,15 +2461,15 @@ def recibo_contenedor(request):
 						valor_contenedor=precio,pdf=pdf,
 						usuario_registro=request.user )
 				else:
-					print('else try')
+					#print('else try')
 					nuevo_cliente = Cliente.objects.create(nombre_completo=nuevo_cliente,celular=telefono1,direccion=cliente_direccion,usuario_registro=request.user)
-					print('paso nuevo cliente')
+					#print('paso nuevo cliente')
 					ultimo_cliente = Cliente.objects.last()
-					print('paso ultimo cliente')
+					#print('paso ultimo cliente')
 					new_recibo_contenedor = ReciboContenedor.objects.create(recibo_no=codigo_final,cliente=Cliente.objects.get(pk=ultimo_cliente.pk),num_pasaporte=pasaporte,correo=correo,telefono_adicional=telefono2,pais_destino=pais_destino,puerto_destino=puerto_destino,nombre_recibe=quien_recibe,telefono_recibe=telefono_recibe,nip_rtn=rtn,tamano_contenedor=tamano_contenedor,valor_contenedor=precio,pdf=pdf,usuario_registro=request.user )
-					print('paso recibo')
+					#print('paso recibo')
 			except Exception as e:
-				print (e,'error')
+				#print (e,'error')
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'quien_envia':quien_envia,'ret_data':ret_data,'errores':errores, 'contenedores':contenedores}
@@ -2477,7 +2480,7 @@ def recibo_contenedor(request):
 				ctx = {'ingreso_correcto':ingreso_correcto,'quien_envia':quien_envia,'contenedores':contenedores}
 				return HttpResponseRedirect(reverse('recibo_contenedor_pdf',kwargs={ 'id': new_recibo_contenedor.pk }))
 		else:
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'contenedores':contenedores}
 			return render(request,'recibo_contenedor.html',ctx)
 	elif request.method == 'GET':
@@ -2492,21 +2495,21 @@ def recibo_contenedor_pdf(request, id):
 	return generar_pdf('recibo_contenedor_pdf.html',{'pagesize':'A4','orientation':'landscape','envio':envio,'codigo':codigo, 'fecha':hoy})
 
 def ver_pdf_contenedor_pdf(request, id):
-    envio = ReciboContenedor.objects.get(pk = id)
-    filename = envio.pdf.name.split('/')[-1]
-    separar = filename.split('.')
-    if separar[1] == 'pdf':
-        filepath = os.path.join(settings.MEDIA_ROOT, "archivos_pdf_contenedores", filename)
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+	envio = ReciboContenedor.objects.get(pk = id)
+	filename = envio.pdf.name.split('/')[-1]
+	separar = filename.split('.')
+	if separar[1] == 'pdf':
+		filepath = os.path.join(settings.MEDIA_ROOT, "archivos_pdf_contenedores", filename)
+		return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
 	##caso ser imagen
-    elif separar[1].lower() == 'jpg' or separar[1].lower() == 'jpeg' or separar[1].lower() == 'png':
-        width, height = get_image_dimensions(envio.pdf)
-        return render(request, 'imagen_envio.html', {'envio': envio,'opc': 1})
-    else:
+	elif separar[1].lower() == 'jpg' or separar[1].lower() == 'jpeg' or separar[1].lower() == 'png':
+		width, height = get_image_dimensions(envio.pdf)
+		return render(request, 'imagen_envio.html', {'envio': envio,'opc': 1})
+	else:
 		###DESCARGAR AL MOMENTO DE SER OTRO ARCHIVO NO PDF
-        response = HttpResponse(envio.pdf, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename=%s' % filename
-        return response
+		response = HttpResponse(envio.pdf, content_type='text/plain')
+		response['Content-Disposition'] = 'attachment; filename=%s' % filename
+		return response
 
 def validar_vehiculo(request,quien_envia):
 	query_contenedor,errores,ret_data,retorno = {},{},{},{}
@@ -2627,7 +2630,7 @@ def recibo_vehiculo(request):
 			query_contenedor.update({'pdf':request.FILES.get('pdf')})
 		
 		if not errores:
-			print('entra sin errores')
+			#print('entra sin errores')
 			correo = request.POST.get('correo')
 			pasaporte = request.POST.get('pasaporte').upper()
 			quien_recibe = request.POST.get('quien_recibe')
@@ -2640,7 +2643,7 @@ def recibo_vehiculo(request):
 			pais_destino = request.POST.get('pais_destino').upper()
 			puerto_destino = request.POST.get('puerto_destino').upper()
 			pdf = request.FILES.get('pdf')
-			print(pdf, 'pdf')
+			#print(pdf, 'pdf')
 			telefono2 = request.POST.get('telefono2')
 			####NUEVO CLIENTE
 			nuevo_cliente = request.POST.get('nuevo_cliente')
@@ -2654,18 +2657,18 @@ def recibo_vehiculo(request):
 			recibo_no += 1
 			codigo_final = 'EECR0' + str(recibo_no)
 			try:
-				print('entro try')
+				#print('entro try')
 				if cliente != '':
-					print('if try')
+					#print('if try')
 					new_recibo_vehiculo = ReciboVehiculos.objects.create(recibo_no=codigo_final,cliente=cliente,num_pasaporte=pasaporte,correo=correo,telefono_adicional=telefono2,pais_destino=pais_destino,puerto_destino=puerto_destino,nombre_recibe=quien_recibe,telefono_recibe=telefono_recibe,nip_rtn=rtn,marca_vehiculo=marca_vehiculo,modelo_vehiculo=modelo_vehiculo,vin_vehiculo=vin_vehiculo,valor_vehiculo=valor_vehiculo,pdf=pdf,usuario_registro=request.user )
 				else:
-					print('else try')
+					#print('else try')
 					nuevo_cliente = Cliente.objects.create(nombre_completo=nuevo_cliente,celular=telefono1,direccion=cliente_direccion,usuario_registro=request.user)
-					print('paso nuevo cliente')
+					#print('paso nuevo cliente')
 					ultimo_cliente = Cliente.objects.last()
-					print('paso ultimo cliente')
+					#print('paso ultimo cliente')
 					new_recibo_vehiculo = ReciboVehiculos.objects.create(recibo_no=codigo_final,cliente=Cliente.objects.get(pk=ultimo_cliente.pk),num_pasaporte=pasaporte,correo=correo,telefono_adicional=telefono2,pais_destino=pais_destino,puerto_destino=puerto_destino,nombre_recibe=quien_recibe,telefono_recibe=telefono_recibe,nip_rtn=rtn,marca_vehiculo=marca_vehiculo,modelo_vehiculo=modelo_vehiculo,vin_vehiculo=vin_vehiculo,valor_vehiculo=valor_vehiculo,pdf=pdf,usuario_registro=request.user )
-					print('paso recibo')
+					#print('paso recibo')
 			except Exception as e:
 				errores['extra'] = e
 				transaction.rollback()
@@ -2677,7 +2680,7 @@ def recibo_vehiculo(request):
 				ctx = {'ingreso_correcto':ingreso_correcto,'quien_envia':quien_envia,'vehiculos':vehiculos}
 				return HttpResponseRedirect(reverse('recibo_vehiculo_pdf',kwargs={ 'id': new_recibo_vehiculo.pk }))
 		else:
-			print errores,'erroresdentro de errores'
+			#print errores,'erroresdentro de errores'
 			ctx = {'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'vehiculos':vehiculos}
 			return render(request,'recibo_vehiculo.html',ctx)
 	elif request.method == 'GET':
@@ -2692,21 +2695,21 @@ def recibo_vehiculo_pdf(request, id):
 	return generar_pdf('recibo_vehiculo_pdf.html',{'pagesize':'A4','orientation':'landscape','envio':envio,'codigo':codigo,'fecha':hoy})
 
 def ver_pdf_vehiculo_pdf(request, id):
-    envio = ReciboVehiculos.objects.get(pk = id)
-    filename = envio.pdf.name.split('/')[-1]
-    separar = filename.split('.')
-    if separar[1] == 'pdf':
-        filepath = os.path.join(settings.MEDIA_ROOT, "archivos_pdf_vehiculos", filename)
-        return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
+	envio = ReciboVehiculos.objects.get(pk = id)
+	filename = envio.pdf.name.split('/')[-1]
+	separar = filename.split('.')
+	if separar[1] == 'pdf':
+		filepath = os.path.join(settings.MEDIA_ROOT, "archivos_pdf_vehiculos", filename)
+		return FileResponse(open(filepath, 'rb'), content_type='application/pdf')
 	##caso ser imagen
-    elif separar[1].lower() == 'jpg' or separar[1].lower() == 'jpeg' or separar[1].lower() == 'png':
-        width, height = get_image_dimensions(envio.pdf)
-        return render(request, 'imagen_envio.html', {'envio': envio,'opc': 1})
-    else:
+	elif separar[1].lower() == 'jpg' or separar[1].lower() == 'jpeg' or separar[1].lower() == 'png':
+		width, height = get_image_dimensions(envio.pdf)
+		return render(request, 'imagen_envio.html', {'envio': envio,'opc': 1})
+	else:
 		###DESCARGAR AL MOMENTO DE SER OTRO ARCHIVO NO PDF
-        response = HttpResponse(envio.pdf, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename=%s' % filename
-        return response
+		response = HttpResponse(envio.pdf, content_type='text/plain')
+		response['Content-Disposition'] = 'attachment; filename=%s' % filename
+		return response
 
 @login_required
 def top_clientes(request):
@@ -2729,17 +2732,17 @@ def top_clientes(request):
 def cajas_tipo(request):
 	cajas_pais = list(CajaPais.objects.filter(pais=request.GET.get('idpais')).values('tipo_caja__pk','tipo_caja__descripcion','precio','pk'))
 	#cajas_pais = CajaPais.objects.filter(pais=request.GET.get('idpais'))
-	print cajas_pais
+	#print cajas_pais
 	return JsonResponse(cajas_pais, safe = False)
 	connection.close()
 
 @login_required()
 def modal_agregar_recibe(request):
 	if request.method == 'POST':
-		print "lol es recibe pk",request.POST['envia_pk']
+		#print "lol es recibe pk",request.POST['envia_pk']
 
 		if int(request.POST['envia_pk']) == 0:
-			print "es 0"
+			#print "es 0"
 			return JsonResponse({'option': 'error','detalle_error':'DEBES ELEGIR QUIEN ENVIA'})
 		else:
 			if request.POST['nombre_recibe'] == '' or request.POST['telefono_recibe'] == '' or request.POST['direccion_recibe'] == '':
@@ -2758,7 +2761,7 @@ def modal_agregar_recibe(request):
 				'''.format(recibe.pk, recibe.nombre_completo+'|'+recibe.celular)
 				return JsonResponse({'option': option})
 	else:
-		print "no post"
+		#print "no post"
 		return render(request, '404.html')
 
 
@@ -2771,7 +2774,7 @@ def modal_editar_recibe(request):
 			if request.POST['nombre_recibe_edit'] == '' or request.POST['telefono_recibe_edit'] == '' or request.POST['direccion_recibe_edit'] == '':
 				return JsonResponse({'option': 'error','detalle_error':'INGRESA TODOS LOS DATOS SOLICITADOS DE QUIEN RECIBE'})
 			else:
-				print request.POST['recibe_pk_modal_Edit'],'recibe_pk_modal_Edit'
+				#print request.POST['recibe_pk_modal_Edit'],'recibe_pk_modal_Edit'
 				recibe = ClienteRecibe.objects.filter(pk=request.POST['recibe_pk_modal_Edit']).update(
 													   nombre_completo = request.POST['nombre_recibe_edit'],
 														celular = request.POST['telefono_recibe_edit'],
@@ -2837,7 +2840,7 @@ def modal_editar_tipo_caja(request):
 				option = '''
 					<option value="{}|{}|{}|{}" selected>{} | Precio => {}</option>
 				'''.format(caja_pais.tipo_caja.pk, caja_pais.tipo_caja.descripcion,caja_pais.precio,caja_pais.pk,caja_pais.tipo_caja.descripcion,caja_pais.precio,)
-				print option,"aqui fran"
+				#print option,"aqui fran"
 				return JsonResponse({'option': option})
 	else:
 		return render(request, '404.html')
@@ -2875,28 +2878,29 @@ def trasladar_guia(request,id_envio,guia_hija):
 		envio = Envio.objects.get(pk=id_envio)
 		contenedor = envio.contenedor.pk
 		empresa = Empresa.objects.get(pk=envio.empresa.pk)
-		print request.POST['estado_envio_guia']
+		#print request.POST['estado_envio_guia']
 		if int(request.POST['estado_envio_guia'])==1:
-			print 'opcion 1'
+			#print 'opcion 1'
 			try:
 				estado = EstadoEnvio.objects.get(pk=int(request.POST['estado_envio_guia']))
-				print estado,'estado'
+				#print estado,'estado'
 				update = Envio.objects.filter(pk=id_envio).update(contenedor='',estado_envio=estado)
 				detalle = DetalleEnvio.objects.filter(codigo=guia_hija).update(fue_enviada=False)
 				historial = HistorialEnvio.objects.create(codigo_envio=envio,
 											          estado=estado,
 													  usuario_registro=request.user)
 				seguimiento = SeguimientoEnvio.objects.create(codigo_envio=envio,estado=estado,empresa=empresa,comentario='REVERSION',usuario_registro=request.user)
-				print 'guardo todo'
+				#print 'guardo todo'
 			except Exception as e:
-				print 'error todo'
+				#print 'error todo'
+				return 0
 		else:
-			print 'opcion 2'
+			#print 'opcion 2'
 			estado = EstadoEnvio.objects.get(pk=int(request.POST['estado_envio_guia']))
 			detalle = DetalleEnvio.objects.filter(codigo=guia_hija).update(fue_enviada=True)
 			historial = HistorialEnvio.objects.create(codigo_envio=envio,
-										          estado=estado,
-												  usuario_registro=request.user)
+													estado=estado,
+													usuario_registro=request.user)
 			update = Envio.objects.filter(pk=id_envio).update(contenedor=Contenedor.objects.get(pk=contenedor),estado_envio=estado)
 			seguimiento = SeguimientoEnvio.objects.create(codigo_envio=envio,estado=estado,empresa=empresa,comentario='REVERSION',usuario_registro=request.user)
 		
@@ -2906,7 +2910,7 @@ def trasladar_guia(request,id_envio,guia_hija):
 		#OBTENER ENVIO EN kraken_cargo
 		es_kraken = False
 		kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor)
-		print kraken_envio.count(),'kraken_envio'
+		#print kraken_envio.count(),'kraken_envio'
 		if kraken_envio.count() >= 1:
 			es_kraken = True
 		
@@ -2990,7 +2994,7 @@ def ver_contenedor_enviar(request,id):
 				detalle_save.fue_enviada = True 
 				detalle_save.save()
 				modificar_envio = Envio.objects.filter(pk=detalle_save.envio.pk).update(contenedor=contenedor)
-				#print reverse('ver_contenedor_enviar', args = (id, ))
+				##print reverse('ver_contenedor_enviar', args = (id, ))
 				return HttpResponseRedirect(reverse('ver_contenedor_enviar',args = (id, ))+"?ok")
 				#return JsonResponse({'save':'save','recargar': reverse('ver_contenedor_enviar',kwargs={ 'id': id }),})
 			except Exception as e:
@@ -3020,7 +3024,7 @@ def ver_camion_enviar(request,id):
 	detalle = DetalleEnvio.objects.filter(envio__camion=camion,fue_subida_camion=True,envio__estado_envio__in=(5,6))
 	estados = EstadoEnvio.objects.filter(pk__in=(5,6))
 	error = ''
-	print detalle
+	#print detalle
 	if request.method == 'POST':
 		guia_hija = request.POST['guia']
 		if request.POST['guia'] == '':
@@ -3087,7 +3091,7 @@ def trasladar_contenedor(request):
 			contenedor.estado =estado_db
 			contenedor.save()
 		except Exception as e:
-			print e, "error al crear historial de contenedor"
+			#print e, "error al crear historial de contenedor"
 			return JsonResponse({'option': 'error','detalle_error':'ERROR DE SISTEMA','tipo_error':0}) 
 
 		for e in Envio.objects.filter(contenedor=contenedor):
@@ -3103,21 +3107,21 @@ def trasladar_contenedor(request):
 														   usuario_registro=request.user)
 				
 			except Exception as e:
-				print e,"ERROR AL CREAR SEGUIMIENTO DE ENVIO"
-			
+				#print e,"ERROR AL CREAR SEGUIMIENTO DE ENVIO"
+				return 0
 			envio_cliente.estado_envio = EstadoEnvio.objects.get(pk=estado)
 			envio_cliente.save()
 			###UPDATE KRAKEN
 			#OBTENER ENVIO EN kraken_cargo
 			es_kraken = False
 			kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor)
-			print kraken_envio.count(),'kraken_envio'
+			#print kraken_envio.count(),'kraken_envio'
 			if kraken_envio.count() >= 1:
 				es_kraken = True
 			
 			if es_kraken:
 				estadoeehn = EstadoEnvio.objects.get(pk=estado)
-				print estadoeehn.estado, 'estadoeehn'
+				#print estadoeehn.estado, 'estadoeehn'
 				estado_kraken = ''
 				pk = 0
 				if estadoeehn.pk == 1:
@@ -3142,8 +3146,8 @@ def trasladar_contenedor(request):
 					estado_kraken = 'ENTREGADO'
 					pk = 14
 				estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
-				print estadokraken.estado, 'estadokraken'
-				print envio_cliente.guia_revendedor,'guia revendedor'
+				#print estadokraken.estado, 'estadokraken'
+				#print envio_cliente.guia_revendedor,'guia revendedor'
 				seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
 				historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
 				envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
@@ -3192,8 +3196,8 @@ def trasladar_camion(request):
 														   usuario_registro=request.user)
 
 			except Exception as e:
-				print e,"ERROR AL CREAR SEGUIMIENTO DE ENVIO"
-			
+				#print e,"ERROR AL CREAR SEGUIMIENTO DE ENVIO"
+				return 0
 			envio_cliente.estado_envio = EstadoEnvio.objects.get(pk=estado)
 			envio_cliente.save()
 			
@@ -3201,13 +3205,13 @@ def trasladar_camion(request):
 			#OBTENER ENVIO EN kraken_cargo
 			es_kraken = False
 			kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor)
-			print kraken_envio.count(),'kraken_envio'
+			#print kraken_envio.count(),'kraken_envio'
 			if kraken_envio.count() >= 1:
 				es_kraken = True
 			
 			if es_kraken:
 				estadoeehn = EstadoEnvio.objects.get(pk=estado)
-				print estadoeehn.estado, 'estadoeehn'
+				#print estadoeehn.estado, 'estadoeehn'
 				estado_kraken = ''
 				pk = 0
 				if estadoeehn.pk == 1:
@@ -3232,8 +3236,8 @@ def trasladar_camion(request):
 					estado_kraken = 'ENTREGADO'
 					pk = 14
 				estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
-				print estadokraken.estado, 'estadokraken'
-				print envio_cliente.guia_revendedor,'guia revendedor'
+				#print estadokraken.estado, 'estadokraken'
+				#print envio_cliente.guia_revendedor,'guia revendedor'
 				seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
 				historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
 				envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
@@ -3252,9 +3256,9 @@ def lista_guias_faltante(request,id_contenedor):
 @login_required
 def lista_guias_faltante_camion(request,id_camion):
 	camion = Camion.objects.get(pk=id_camion)
-	print camion
+	#print camion
 	detalle_camion = DetalleEnvio.objects.filter(envio__camion=camion,fue_subida_camion=False)
-	print detalle_camion
+	#print detalle_camion
 	data = {'detalle_camion':detalle_camion,'camion':camion}
 	return render(request, 'lista_guias_faltante_camion.html',data)
 
@@ -3265,7 +3269,7 @@ def buscar_guia(request):
 	data = []
 	if request.is_ajax():
 		seguimiento = SeguimientoEnvio.objects.filter(codigo_envio__codigo= request.GET.get('guia')).order_by('-id')[0]
-		print seguimiento
+		#print seguimiento
 		detalle = DetalleEnvio.objects.filter(envio__codigo=request.GET.get('guia'))
 		lista_detalle = []
 		if detalle:
@@ -3356,7 +3360,7 @@ def enviar_transito(request):
 					'url' : reverse('trasladar_a_transito', kwargs={'envio':request.GET.get('guia')})}
 		except Exception as e:
 			data = {'tiene_datos':0}
-			print 'errores', e
+			#print 'errores', e
 		
 		return HttpResponse(simplejson.dumps(data), content_type='application/javascript')
 	return render(request, 'enviar_transito.html')
@@ -3500,7 +3504,7 @@ def buscar_caja_transito(request):
 					'url' : reverse('entregar_caja', kwargs={'envio':request.GET.get('guia')})}
 		except Exception as e:
 			data = {'tiene_datos':0}
-			print 'errores', e
+			#print 'errores', e
 		
 		return HttpResponse(simplejson.dumps(data), content_type='application/javascript')
 	return render(request, 'buscar_caja_transito.html')
@@ -3688,15 +3692,15 @@ def activar_camion(request,id):
 
 @login_required
 def reporte_abonos(request):
-	print 'reporte_abonos'
+	
 	if request.method == 'POST':
-		print 'ingreso al post'
+		
 		if request.POST.get('fecha_inicio') !='' and request.POST.get('fecha_fin') != '':
 			dic_datos = []
 			dic_pagos = []
 			inicio = datetime.strptime(request.POST.get('fecha_inicio'), '%d/%m/%Y')
 			fin = datetime.strptime(request.POST.get('fecha_fin'), '%d/%m/%Y')
-			print request.POST.get('cliente')
+			
 			cliente_q = Cliente.objects.get(pk=request.POST.get('cliente'))
 			envios = Envio.objects.filter(quien_envia=cliente_q,aprobado = True,fecha_envio__range=(inicio,fin))
 			pagos = PagosCredito.objects.filter(envio__quien_envia=cliente_q,fecha__range=(inicio,fin))
@@ -3720,13 +3724,13 @@ def reporte_abonos(request):
 				datos['descripcion'] = 'ABONO'
 				dic_pagos.append(datos)
 
-			print dic_pagos
+			
 			ctx = {'abonos':dic_datos,'datos':dic_pagos,'comentario':'ABONOS DEL '+str(inicio)+'AL '+str(fin)}
 			return render(request,'resultados_abonos.html', ctx)
 		else:
 			ctx = {'clientes':Cliente.objects.all(),'error_fecha':'DEBE SELECCIONAR FECHAS'}
 			return render(request,'reporte_abonos.html', ctx)
 	else:
-		print 'get'
+		
 		ctx = {'clientes':Cliente.objects.all()}
 		return render(request,'reporte_abonos.html', ctx)
