@@ -111,7 +111,10 @@ def buscar_envio(request):
 		envio['pais_destino'] = e.pais_destino.nombre
 		envio['departamento_destino'] = e.departamento_destino.nombre
 		envio['direccion'] = e.direccion_registrar
-		envio['estado'] = HistorialEnvio.objects.filter(codigo_envio=e.pk).latest('estado')
+		try:
+			envio['estado'] = HistorialEnvio.objects.filter(codigo_envio=e.pk).latest('estado')
+		except Exception as exe:
+			envio['estado'] = e.pk
 		dic_envios.append(envio)
 	ctx = {'es_revendedor':es_revendedor,'envios':dic_envios,'empleado':empleado}
 	return render(request,'buscar_envio.html',ctx)
