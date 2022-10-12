@@ -27,7 +27,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.db import transaction,connections
 #import cStringIO as StringIO // ya no es valido en python 3.X 
-from io import StringIO
+from io import StringIO, BytesIO
 from xhtml2pdf import pisa
 from django.template import Context
 from cgi import *
@@ -1736,9 +1736,9 @@ def generar_pdf(template_src, context_dict={}):
 	template = get_template(template_src)
 	#context = Context(context_dict)
 	html = template.render(context_dict)
-	result = StringIO.StringIO()
+	result = BytesIO()
 
-	pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), result)
+	pdf = pisa.pisaDocument(BytesIO(html.encode("utf-8")), result)
 	if not pdf.err:
 		return HttpResponse(result.getvalue(), content_type='application/pdf')
 	return HttpResponse('Error al generar el PDF<pre>%s</pre>'% escape(html))
