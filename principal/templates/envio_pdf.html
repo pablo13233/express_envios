@@ -99,13 +99,13 @@ var getCanvas; // global variable
       {% if envio.revendedor %}
         <table style="position: fixed;bottom: 0;right: 0;" width="50%" border="1" cellspacing="3" cellpadding="3">
           <tbody >
-            <tr ><td bgcolor="#0099CC" width="100%" style="font-size:15px;font-weight: bold;" align="middle">GUIA REVENDEDOR: {{envio.guia_revendedor}}</td></tr>
+            <tr ><td bgcolor="#0099CC" width="100%" style="font-size:15px;font-weight: bold;" align="center">GUIA REVENDEDOR: {{envio.guia_revendedor}}</td></tr>
           </tbody>
         </table><!--REVENDEDOR FIN-->
       {% endif %}
       <table width="100%" border="1" cellspacing="3" cellpadding="3">
         <tbody >
-          <tr ><td bgcolor="#0099CC" width="50%" style="font-size:15px;font-weight: bold;" align="middle">NOMBRE DEL CONSIGNATARIO:</td><td width="50%" style="font-size:15px;font-weight: bold;">REMITENTE:</td></tr>
+          <tr ><td bgcolor="#0099CC" width="50%" style="font-size:15px;font-weight: bold;" align="center">NOMBRE DEL CONSIGNATARIO:</td><td width="50%" style="font-size:15px;font-weight: bold;">REMITENTE:</td></tr>
         </tbody>
       </table>
       <table width="100%" border="1" cellspacing="3" cellpadding="3">
@@ -161,13 +161,13 @@ var getCanvas; // global variable
     <br>
     <table width="100%" cellspacing="0" cellpadding="0">
       <tbody >
-        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right;">PRECIO EMBARQUE:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right;">${{envio.valor_envio|unlocalize|intcomma}}</td></tr>
-        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;text-align:left" align="middle">RECIBIDO POR: {{envio.usuario_registro}}</td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">EMPLASTICADO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">{% if envio.valor_emplasticado != None %}${{envio.valor_emplasticado|unlocalize|intcomma}}{% endif %}{% if envio.valor_emplasticado == None %}$0.00{% endif %}</td></tr>
-        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;text-align:left" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">VALOR ADICIONAL:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">{% if envio.valor_adicional != None %}${{envio.valor_adicional|unlocalize|intcomma}}{% endif %}{% if envio.valor_adicional == None %}$0.00{% endif %}</td></tr>
-         <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;text-align:left" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">SEGURO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">{% if envio.valor_seguro != None %}${{envio.valor_seguro|unlocalize|intcomma}}{% endif %}{% if envio.valor_adicional == None %}$0.00{% endif %}</td></tr>
-        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left" align="middle">¡GRACIAS POR PREFERIRNOS!</td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">PAGO INICIAL:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">${{envio.pago_recibido|unlocalize|intcomma}}</td></tr>
-         <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">ABONOS:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">${{abonos|unlocalize|intcomma}}</td></tr>
-        <tr><td width="50%" style="font-size:20px;font-weight: bold;" align="middle"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">SALDO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right;border-bottom: 3px solid black;">${{saldo|unlocalize|intcomma}}</td></tr>
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;" align="center"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right;">PRECIO EMBARQUE:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right;">${{envio.valor_envio|unlocalize|intcomma}}</td></tr>
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;text-align:left" align="center">RECIBIDO POR: {{envio.usuario_registro}}</td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">EMPLASTICADO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">{% if envio.valor_emplasticado != None %}${{envio.valor_emplasticado|unlocalize|intcomma}}{% endif %}{% if envio.valor_emplasticado == None %}$0.00{% endif %}</td></tr>
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;text-align:left" align="center"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">VALOR ADICIONAL:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">{% if envio.valor_adicional != None %}${{envio.valor_adicional|unlocalize|intcomma}}{% endif %}{% if envio.valor_adicional == None %}$0.00{% endif %}</td></tr>
+         <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left;text-align:left" align="center"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">SEGURO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">{% if envio.valor_seguro != None %}${{envio.valor_seguro|unlocalize|intcomma}}{% endif %}{% if envio.valor_adicional == None %}$0.00{% endif %}</td></tr>
+        <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left" align="center">¡GRACIAS POR PREFERIRNOS!</td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">PAGO INICIAL:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">${{envio.pago_recibido|unlocalize|intcomma}}</td></tr>
+         <tr><td width="50%" style="font-size:16px;font-weight: bold;text-align:left" align="center"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">ABONOS:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right">${{abonos|unlocalize|intcomma}}</td></tr>
+        <tr><td width="50%" style="font-size:20px;font-weight: bold;" align="center"></td><td width="30%" style="font-size:15px;font-weight: bold;text-align:right">SALDO:</td><td width="10%" style="font-size:15px;font-weight: bold;text-align:right;border-bottom: 3px solid black;">${{saldo|unlocalize|intcomma}}</td></tr>
       </tbody>
     </table>
     {% if envio.comentario %}
