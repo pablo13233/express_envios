@@ -156,13 +156,14 @@ def ver_paquetes(request,id_estado):
 		#envios = SeguimientoEnvio.objects.filter(estado=estado_final)
 		envios = Envio.objects.filter(estado_envio=estado)
 		ctx = {'envios':envios,'estado':estado,'estado_final':estado_final}
-		return render(request,'ver_paquetes.html',ctx)
+		return render(request,'ver_paquetes.html',ctx) 
 
 @login_required
 def trasladar_post(request):
 	if request.method == 'POST':
 		envios = request.POST.getlist('mover')
 		estado = request.POST.get('estado_siguiente')
+		print(envios)
 		try:
 			
 			for e in envios:
@@ -172,19 +173,21 @@ def trasladar_post(request):
 				envio_cliente.save()
 				empresa = Envio.objects.get(pk=e)
 				estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
-				
+				print(empresa.guia_revendedor)
 
 				###UPDATE EEHN
 				envio = SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e)).update(estado=estado)
 				historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
-				
+				print('no va')
 				###UPDATE KRAKEN
 				#OBTENER ENVIO EN kraken_cargo
 				es_kraken = False
-				kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor)
-				if kraken_envio.count() >= 1:
+				kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor).count()
+				print('no va2 ', kraken_envio)
+				if kraken_envio >= 1:
 					es_kraken = True
-			
+				
+				print('no va3')
 				if es_kraken:
 					estado_kraken = ''
 					pk = 0
@@ -297,11 +300,14 @@ def trasladar_post(request):
 					)
 					#print(message.sid)
 					mensaje = EmpresaMensaje.objects.create(tipo_mensaje=TipoMensajes.objects.get(pk=1),envio=envio_cliente,texto = message.body)
+			print('no va4')
 			return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
 		except Exception as e:
 			#print e, 'error'
+			print('error --> ', e)
 			return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
 	elif request.method == 'GET':
+		print(datos_envio)
 		return datos_envio
 
 @login_required
@@ -1675,7 +1681,7 @@ def registrar_envio(request):
 				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
 				ctx = {'es_revendedor':es_revendedor,'ingreso_correcto':ingreso_correcto, 'envio':envio,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio}
 				#return HttpResponseRedirect(reverse('registrar_envio')+"?ok" +"&envio="+ str(envio.pk))
-				return HttpResponseRedirect(reverse('envio_pdf',kwargs={ 'id': envio.pk }))
+				return redirect(reverse('envio_pdf', kwargs={ 'id': envio.pk }))
 		else:
 			#print errores,'erroresdentro de errores'
 			ctx = {'es_revendedor':es_revendedor,'pais':pais,'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio}

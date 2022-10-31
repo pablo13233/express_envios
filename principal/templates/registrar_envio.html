@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         {% endif %}                      
-                        <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'registrar_envio' %}">
+                        <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'registrar_envio' %}" id="form_registro_envio" target="_blank">
                             {% csrf_token %}
                             <div class="form-group row">
                                 <div class="col-md-5">
@@ -325,7 +325,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn float-right btn-info">Agregar</button>
+                            <button type="submit" class="btn float-right btn-info" id="btn_add_envio" onClick="reset_form();">Agregar</button>
                         </form>
                     </div>
                 </div>
@@ -1023,7 +1023,7 @@ function Registrar()
                 'correo': correo,
                 "credentials": 'include',
                 'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
-                'direccion': direccion
+                'direccion': direccion,
             },
             success: function(data){
                 valor = data.valor;
@@ -1420,12 +1420,25 @@ $('#id_quien_recibe').on('change',datos);
             document.getElementById("enviopk").value = id;  
         }
     }
-    </script>
+</script>
 <script>
 function ver() {
     id = $('#enviopk').val();
     window.open("/envio/pdf/"+id +"/",'_blank');
 }
+</script>
+<script>
+    function reset_form(){
+        $.ajax({
+            url: window.location.pathname,
+            success: function(){
+                $("#form_registro_envio")[0].reset();
+            },
+            error: function(){
+                $("#form_registro_envio")[0].reset();
+            }
+        });
+    }
 </script>
 
 
