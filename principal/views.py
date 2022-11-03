@@ -91,7 +91,7 @@ def resultado_busqueda(request):
 def buscar_envio(request):
 	empleado = Empleado.objects.get(usuario=request.user)
 	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
-	envios = Envio.objects.filter(empresa=empresa.empresa)
+	envios = Envio.objects.filter(empresa=empresa.empresa, fecha_envio__range=["2022-08-01","2023-02-28"])
 	er = Revendedor.objects.count()
 	if er >0:
 		r = Revendedor.objects.filter(usuario=request.user)
@@ -114,7 +114,7 @@ def buscar_envio(request):
 		try:
 			envio['estado'] = HistorialEnvio.objects.filter(codigo_envio=e.pk).latest('estado')
 		except Exception as exe:
-			envio['estado'] = e.pk
+			envio['estado'] = e.pk 
 		dic_envios.append(envio)
 	ctx = {'es_revendedor':es_revendedor,'envios':dic_envios,'empleado':empleado}
 	return render(request,'buscar_envio.html',ctx)
