@@ -142,19 +142,26 @@ def ver_paquetes(request,id_estado):
 	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
 	estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
 	estado = EstadoEnvio.objects.get(pk = id_estado)
-	
-	if int(id_estado) != int(estado_final.pk):
+	print(id_estado)
+	if int(id_estado) != int(estado_final.pk): 
 		estado_sigui = int(id_estado)+1
 		estado = EstadoEnvio.objects.get(pk=id_estado)
 		estado_siguiente = EstadoEnvio.objects.get(pk=estado_sigui)
-		envios = Envio.objects.filter(estado_envio=estado)
+		
+		if(int(id_estado) == 7):
+			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=["2022-08-01","2023-02-28"])
+		else:
+			envios = Envio.objects.filter(estado_envio=estado)
 		#envios = SeguimientoEnvio.objects.filter(estado=id_estado)
 		ctx = {'envios':envios,'estado':estado,'estado_siguiente':estado_siguiente,'estado_final':estado_final}
 		return render(request,'ver_paquetes.html',ctx)
 	else:
 		estado = EstadoEnvio.objects.get(pk=id_estado)
 		#envios = SeguimientoEnvio.objects.filter(estado=estado_final)
-		envios = Envio.objects.filter(estado_envio=estado)
+		if(int(id_estado) == 7):
+			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=["2022-08-01","2023-02-28"])
+		else:
+			envios = Envio.objects.filter(estado_envio=estado)
 		ctx = {'envios':envios,'estado':estado,'estado_final':estado_final}
 		return render(request,'ver_paquetes.html',ctx) 
 
