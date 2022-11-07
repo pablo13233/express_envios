@@ -45,7 +45,7 @@ from django.db.models import Sum
 #reload(sys)
 #sys.setdefaultencoding('utf-8')
 # ##MENSAJE DE TEXTO
-#from twilio.rest import Client
+from twilio.rest import Client
 #from htmlmin.decorators import minified_response
 ###############################################################################
 def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, humanReadable = True):
