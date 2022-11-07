@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         {% endif %}                      
-                        <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'registrar_envio' %}" id="form_registro_envio" target="_blank">
+                        <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'registrar_envio' %}" id="form_registro_envio">
                             {% csrf_token %}
                             <div class="form-group row">
                                 <div class="col-md-5">
@@ -1433,6 +1433,7 @@ function ver() {
             url: window.location.pathname,
             success: function(){
                 $("#form_registro_envio")[0].reset();
+                
             },
             error: function(){
                 $("#form_registro_envio")[0].reset();
