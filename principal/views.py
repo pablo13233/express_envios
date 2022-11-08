@@ -79,11 +79,11 @@ def resultado_busqueda(request):
 				
 				ctx = {'resultado':resultado_list}
 				return render(request,'resultado_busqueda.html',ctx)
-			except Exception (e):
+			except Exception as e:
 				print (e,'error aqui es')
 				raise e
 				return render(request,'resultado_busqueda.html')
-		except Exception (e):
+		except Exception as e:
 			print (e)
 			return render(request,'resultado_busqueda.html')
 
@@ -1868,7 +1868,7 @@ def imprimir_ticket (request, id = None):
 	else:
 		revendedor = ''
 	barcode = get_barcode(value = envio.codigo, width = 600)
-	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
+	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))
 	cantTicket = 0
 	detalle = DetalleEnvio.objects.filter(envio=envio)
 	dic = []
