@@ -1742,7 +1742,7 @@ def envio_pdf(request, id):
 						'detalle':detalle,
 						'detalle_guia':detalle_guia,
 						'abonos':abonos_totales,
-						'saldo':saldo})
+						'saldo':saldo}) 
 
 ###########GENERAR PDF##############
 def generar_pdf(template_src, context_dict={}):
@@ -1867,8 +1867,8 @@ def imprimir_ticket (request, id = None):
 		revendedor = Revendedor.objects.get(usuario=envio.usuario_registro)
 	else:
 		revendedor = ''
-	barcode = get_barcode(value = envio.codigo, width = 600)
-	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))
+	# barcode = get_barcode(value = envio.codigo, width = 600)
+	# codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))
 	cantTicket = 0
 	detalle = DetalleEnvio.objects.filter(envio=envio)
 	dic = []
@@ -1886,8 +1886,14 @@ def imprimir_ticket (request, id = None):
 		lista['codigo'] = codigo
 		dic.append(lista)
 		cantTicket += 1
-	ctx = {'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket}
-	return render(request,'imprimir_ticket.html',ctx)
+	# ctx = {'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket}
+	# return render(request,'imprimir_ticket.html',ctx)
+	return generar_pdf('imprimir_ticket.html',
+						{'pagesize':'A4',
+						'orientation':'landscape',
+						'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket
+						}
+	)
 
 @login_required
 def cerrar_ticket(request):

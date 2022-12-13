@@ -43,12 +43,12 @@
     }
     
   </style>
-  <script>
+  <!-- <script>
     function imprimir() {
       window.print();
 
     }
-  </script>
+  </script> -->
 </head>
 
 <body onload="imprimir()">
@@ -161,7 +161,7 @@
           <div class="row page1"></div>
           <div class="container tpage">
             <center>
-              <div style="text-align:center;"><img width="125px" src="/media/{{envio.empresa.logo_empresa.path}}"></div>
+              <div style="text-align:center;"><img width="125px" src="{{envio.empresa.logo_empresa.path}}"></div>
 
               <p style="font-size: 20px;">DIRECCIÓN: {{envio.empresa.direccion_empresa}}<br>TELÉFONO:
                 {{envio.empresa.telefono_empresa}} {% if envio.empresa.celular_empresa %} |
