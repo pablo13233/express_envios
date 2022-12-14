@@ -142,7 +142,6 @@ def ver_paquetes(request,id_estado):
 	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
 	estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
 	estado = EstadoEnvio.objects.get(pk = id_estado)
-	print(id_estado)
 	if int(id_estado) != int(estado_final.pk): 
 		estado_sigui = int(id_estado)+1
 		estado = EstadoEnvio.objects.get(pk=id_estado)
