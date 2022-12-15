@@ -1109,7 +1109,7 @@ def finalizar_actividad(request):
 	else:
 		return HttpResponseRedirect(reverse('actividades'))
 
-def recibo_caja_pdf(request, id):
+def recibo_caja_pdf(request, id): 
 	caja = ReciboCaja.objects.get(pk = id)
 	hoy = datetime.now().date()
 	barcode = get_barcode(value = id, width = 600)
