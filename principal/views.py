@@ -148,7 +148,7 @@ def ver_paquetes(request,id_estado):
 		estado_siguiente = EstadoEnvio.objects.get(pk=estado_sigui)
 		
 		if(int(id_estado) == 7):
-			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=["2022-08-01","2023-02-28"])
+			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=["2022-08-01","2023-02-28"]) 
 		else:
 			envios = Envio.objects.filter(estado_envio=estado)
 		#envios = SeguimientoEnvio.objects.filter(estado=id_estado)
@@ -984,18 +984,22 @@ def validad_actividades(request,quien_envia):
 def actividades(request):
 	es_sadmin = Empleado.objects.get(usuario=request.user)
 	empresa = EmpresaEmpleado.objects.get(empleado = es_sadmin)
+	hoy = datetime.now() 
+	fecha_hoy = hoy.strftime("%Y-%m-%d")
+	fecha_inicio = "2022-08-01"
+	print(fecha_hoy)
 	cajas = EmpresaControlCaja.objects.filter(empresa=empresa.empresa)
 	if request.user.is_superuser == True:
 		empresas = Empresa.objects.all()
 		cajas = EmpresaControlCaja.objects.all()
-		actividades = EmpresaActividades.objects.filter(estado=False)
-		actividades_terminadas = EmpresaActividades.objects.filter(estado=True)
+		actividades = EmpresaActividades.objects.filter(estado=False,fecha__range=[fecha_inicio,fecha_hoy]).order_by('-fecha')
+		actividades_terminadas = EmpresaActividades.objects.filter(estado=True,fecha__range=[fecha_inicio,fecha_hoy]).order_by('-fecha')
 		quien_envia = Cliente.objects.all()
 	else:
 		if es_sadmin.rol_empleado.pk == 1:
 			cajas = EmpresaControlCaja.objects.filter(empresa=empresa)
-			actividades = EmpresaActividades.objects.filter(estado=False,empresa=empresa)
-			actividades_terminadas = EmpresaActividades.objects.filter(estado=True,empresa=empresa)
+			actividades = EmpresaActividades.objects.filter(estado=False,empresa=empresa,fecha__range=[fecha_inicio,fecha_hoy]).order_by('-fecha')
+			actividades_terminadas = EmpresaActividades.objects.filter(estado=True,empresa=empresa,fecha__range=[fecha_inicio,fecha_hoy]).order_by('-fecha')
 			quien_envia = Cliente.objects.filter(empresa= empresa)
 
 	if request.method == 'POST':
