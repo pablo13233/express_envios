@@ -145,7 +145,7 @@
                                 </table>
                             {% endif %}
                         </div>
-                        <!---------->
+                        <!-- Agregar actividades -->
                         <div class="tab-pane fade" id="nuevas" role="tabpanel" aria-labelledby="nuevas-tab">
                             <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'actividades' %}">
                                 {% csrf_token %}
@@ -362,7 +362,7 @@
 <script type="text/javascript">
     $(function () {
         $('#datetimepicker1').datetimepicker({
-            format: 'L'
+            format: 'l'
         });
         //Timepicker
         $('#timepicker').datetimepicker({

@@ -1019,7 +1019,7 @@ def actividades(request):
 				caja.save()
 				#print('guardo')
 			except Exception as e:
-				#print(e, 'errores extras')
+				print('errores: ', e)
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'empresas':empresas,'cajas':cajas,'es_sadmin':es_sadmin,'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'actividades':actividades,'cajas':cajas,'actividades_terminadas':actividades_terminadas}
