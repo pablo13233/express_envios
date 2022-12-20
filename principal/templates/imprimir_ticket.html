@@ -220,23 +220,26 @@
                 </tr>
               </tbody>
             </table>
-            <table width="100%" border="1" cellspacing="3" cellpadding="3">
-              <tbody>
-                <tr>
-                  <td style="font-size:15px;font-weight: bold;">DATOS CONSIGNATARIO:</td>
-                </tr>
-                <tr>
-                  <td style="font-size:25px;font-weight: bold;">{{envio.quien_recibe}} {{envio.quien_recibe}}</td>
-                </tr>
-                <tr>
-                  <td style="font-size:20px;font-weight: bold;">{{envio.departamento_destino}},
-                    {{envio.direccion_registrar}}</td>
-                </tr>
-                <tr>
-                  <td style="font-size:30px;font-weight: bold;">{{envio.quien_recibe.celular}}</td>
-                </tr>
-              </tbody>
-            </table><br>
+            <div>
+              <table width="100%" border="1" cellspacing="3" cellpadding="3">
+                <tbody>
+                  <tr>
+                    <td style="font-size:15px;font-weight: bold;">DATOS CONSIGNATARIO:</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size:25px;font-weight: bold;">{{envio.quien_recibe}} {{envio.quien_recibe}}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size:20px;font-weight: bold;">{{envio.departamento_destino}},
+                      {{envio.direccion_registrar}}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size:30px;font-weight: bold;">{{envio.quien_recibe.celular}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <br>
 
             <center><img src="data:image/png;base64,{{codigo}}" height="60" width="250"></center>
             <center>

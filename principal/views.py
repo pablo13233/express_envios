@@ -180,15 +180,16 @@ def trasladar_post(request):
 				empresa = Envio.objects.get(pk=e)
 				estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
 				print(empresa.guia_revendedor)
-
-				###UPDATE EEHN
+				### UPDATE EEHN
 				envio = SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e)).update(estado=estado)
 				historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
 				print('no va')
 				###UPDATE KRAKEN
 				#OBTENER ENVIO EN kraken_cargo
 				es_kraken = False
-				kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor).count()
+				print('es la consulta')
+				# kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor).count()
+				kraken_envio = 0
 				print('no va2 ', kraken_envio)
 				if kraken_envio >= 1:
 					es_kraken = True
@@ -310,7 +311,7 @@ def trasladar_post(request):
 			return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
 		except Exception as e:
 			#print e, 'error'
-			print('error --> ', e)
+			print("error --> ", e)
 			return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
 	elif request.method == 'GET':
 		print(datos_envio)
