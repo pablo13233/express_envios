@@ -183,18 +183,17 @@ def trasladar_post(request):
 				### UPDATE EEHN
 				envio = SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e)).update(estado=estado)
 				historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
-				print('no va')
+				# print('no va')
 				###UPDATE KRAKEN
 				#OBTENER ENVIO EN kraken_cargo
 				es_kraken = False
-				print('es la consulta')
+
 				# kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor).count()
 				kraken_envio = 0
-				print('no va2 ', kraken_envio)
+				# print('no va2 ', kraken_envio)
 				if kraken_envio >= 1:
 					es_kraken = True
 				
-				print('no va3')
 				if es_kraken:
 					estado_kraken = ''
 					pk = 0
