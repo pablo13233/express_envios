@@ -86,7 +86,33 @@
             </tr>
           </thead>
           <tbody>
-            
+            {% for detalle in detalle_camion  %}
+            <tr>
+              <td>{{detalle.envio.quien_envia}}</td>
+              <td>{{detalle.envio.quien_recibe}}</td>
+              <td>{{detalle.tipo_caja}}</td>
+              <td>{{detalle.cantidad}}</td>
+              <td>{{detalle.envio.codigo}}</td>
+              <td>{{detalle.codigo}}</td>
+              <td>
+                <form id="TrasladarFormGuia" method="POST"
+                  action="{% url 'trasladar_guia' detalle.envio.pk detalle.codigo %}">
+                  {% csrf_token %}
+                  <label>Trasladar a:</label>
+                  <select class="select2" style="width: 100%;" id="id_estado_envio_guia" name="estado_envio_guia">
+                    {% for estado_ in estados %}
+                    <option value="{{estado_.pk}}">{{estado_.estado}} </option>
+                    {% endfor %}
+                  </select>
+
+                  <input type="hidden" value="{{contenedor.pk}}" id="id_contenedor" name="contenedor_pk_guia">
+
+                  <br>
+                  <button type="submit" class="btn float-left btn-info">Aplicar traslado</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
           </tbody>
 
         </table>
@@ -125,6 +151,13 @@
     },
     responsive: true
   });
+
+  function runScript(e) {
+    //See notes about 'which' and 'key'
+    if (e.keyCode == 13) {
+      document.getElementById("addFormCajaContenedor").submit();
+    }
+  }
 
   {% if error %}
         $.notify("Error 54, {{error}}",{
@@ -251,61 +284,5 @@
       }
     }, 'json');
   });
-
-  // <tr>
-  //             <td>{{detalle.envio.quien_envia}}</td>
-  //             <td>{{detalle.envio.quien_recibe}}</td>
-  //             <td>{{detalle.tipo_caja}}</td>
-  //             <td>{{detalle.cantidad}}</td>
-  //             <td>{{detalle.envio.codigo}}</td>
-  //             <td>{{detalle.codigo}}</td>
-  //             <td>
-  //               <button class="btn btn-secondary btn-sm btn-flat m-1"><i class="fa-solid fa-key"></i></button>
-  //             </td>
-  //           </tr>
-  function runScript(e) {
-    //See notes about 'which' and 'key'
-    if (e.keyCode == 13) {
-      document.getElementById("addFormCajaContenedor").submit();
-      $.ajax({
-        url: window.location.pathname,
-        type: 'POST',
-        dataType: 'json',
-        success: function(caja){
-          var row = '<tr>';
-            row += '<td>' + caja.envio.quien_envia + '</td>';
-            row += '<td>' + caja.envio.quien_recibe + '</td>';
-            row += '<td>' + caja.tipo_caja + '</td>';
-            row += '<td>' + caja.cantidad + '</td>';
-            row += '<td>' + caja.envio.codigo + '</td>';
-            row += '<td>' + caja.codigo + '</td>';
-            row += '<td>' + '<button class="btn btn-secondary btn-sm btn-flat m-1"><i class="fa-solid fa-key"></i></button>' + '</td>';
-        },
-          error: function(xhr, status, error) {
-            console.log(error);
-          }
-      }); //ajax end
-    }
-  };
-    // $(document).ready(function() {
-    //   $.ajax({
-    //     url:window.location.pathname,
-    //     type: 'GET',
-    //     dataType: 'json',
-    //     success: function(caja){
-    //       $.each(caja, function(index,item){
-    //         var row = '<tr>';
-    //           row += '<td>' + caja.emvio.quien_envia + '</td>';
-    //           row += '<td>' + caja.envio.quien_recibe + '</td>';
-    //           row += '<td>' + caja.tipo_caja + '</td>';
-    //           row += '<td>' + caja.cantidad + '</td>';
-    //           row += '<td>' + caja.envio.codigo + '</td>';
-    //           row += '<td>' + caja.codigo + '</td>';
-    //           row += '<td>' + '<button class="btn btn-secondary btn-sm btn-flat m-1"><i class="fa-solid fa-key"></i></button>' + '</td>';
-    //       });
-    //     }
-    //   });
-    // });
-
 </script>
 {% endblock js %}
