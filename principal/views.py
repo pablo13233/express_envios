@@ -46,6 +46,7 @@ from django.db.models import Sum
 #sys.setdefaultencoding('utf-8')
 # ##MENSAJE DE TEXTO
 from twilio.rest import Client
+from django.db import transaction
 #from htmlmin.decorators import minified_response
 ###############################################################################
 def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, humanReadable = True):
@@ -169,148 +170,155 @@ def trasladar_post(request):
 	if request.method == 'POST':
 		envios = request.POST.getlist('mover')
 		estado = request.POST.get('estado_siguiente')
-		print(envios)
+		# print(envios)
 		try:
-			
-			for e in envios:
-				envio_cliente = Envio.objects.get(pk=e)
-				estado_envio_q = EstadoEnvio.objects.get(pk=estado)
-				envio_cliente.estado_envio =estado_envio_q
-				envio_cliente.save()
-				empresa = Envio.objects.get(pk=e)
-				estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
-				print(empresa.guia_revendedor)
-				### UPDATE EEHN
-				envio = SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e)).update(estado=estado)
-				historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
-				# print('no va')
-				###UPDATE KRAKEN
-				#OBTENER ENVIO EN kraken_cargo
-				es_kraken = False
+			with transaction.atomic():
+				for e in envios:
+					envio_cliente = Envio.objects.get(pk=e)
+					estado_envio_q = EstadoEnvio.objects.get(pk=estado)
+					envio_cliente.estado_envio =estado_envio_q
+					envio_cliente.save()
+					empresa = Envio.objects.get(pk=e)
+					estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
+					# print(empresa.guia_revendedor)
+					### UPDATE EEHN
+					envio = SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e)).update(estado=estado)
+					historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
+					# print('no va')
+					###UPDATE KRAKEN
+					#OBTENER ENVIO EN kraken_cargo
+					es_kraken = False
 
-				# kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor).count()
-				kraken_envio = 0
-				# print('no va2 ', kraken_envio)
-				if kraken_envio >= 1:
-					es_kraken = True
-				
-				if es_kraken:
-					estado_kraken = ''
-					pk = 0
-					if estado_envio_q.pk == 1:
-						estado_kraken = 'BODEGA EEUU'
-						pk = 8
-					elif estado_envio_q.pk == 2:
-						estado_kraken = 'PUERTO EEUU'
-						pk = 9
-					elif estado_envio_q.pk == 3:
-						estado_kraken = 'TRANSITO MARITIMO'
-						pk = 10
-					elif estado_envio_q.pk == 4:
-						estado_kraken = 'PUERTO HONDURAS'
-						pk = 11
-					elif estado_envio_q.pk == 5:
-						estado_kraken = 'BODEGA HONDURAS'
-						pk = 12
-					elif estado_envio_q.pk == 6:
-						estado_kraken = 'EN TRANSITO PARA ENTREGA'
-						pk = 13
-					elif estado_envio_q.pk == 7:
-						estado_kraken = 'ENTREGADO'
-						pk = 14
-					estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
-					seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
-					historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
-					envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
-					hoy = timezone.now()
-				###UPDATE KRAKEN
-				#OBTENER ENVIO EN kraken_cargo
-				#es_kraken = False
-				#kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor)
-				#print kraken_envio.count(),'kraken_envio'
-				# if kraken_envio.count() >= 1:
-				# 	es_kraken = True
-				# #print es_kraken,'es_kraken'
-				# if es_kraken:
-				# 	estadoeehn = EstadoEnvio.objects.get(pk=estado)
-				# 	#print estadoeehn.estado, 'estadoeehn'
-				# 	estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(estado=estadoeehn.estado)
-				# 	#print estadokraken.estado, 'estadokraken'
-				# 	seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  empresa.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(estado=estadoeehn.estado))
-				# 	historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  empresa.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(estado=estadoeehn.estado),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
+					# kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor).count()
+					kraken_envio = 0
+					# print('no va2 ', kraken_envio)
+					if kraken_envio >= 1:
+						es_kraken = True
 					
+					if es_kraken:
+						estado_kraken = ''
+						pk = 0
+						if estado_envio_q.pk == 1:
+							estado_kraken = 'BODEGA EEUU'
+							pk = 8
+						elif estado_envio_q.pk == 2:
+							estado_kraken = 'PUERTO EEUU'
+							pk = 9
+						elif estado_envio_q.pk == 3:
+							estado_kraken = 'TRANSITO MARITIMO'
+							pk = 10
+						elif estado_envio_q.pk == 4:
+							estado_kraken = 'PUERTO HONDURAS'
+							pk = 11
+						elif estado_envio_q.pk == 5:
+							estado_kraken = 'BODEGA HONDURAS'
+							pk = 12
+						elif estado_envio_q.pk == 6:
+							estado_kraken = 'EN TRANSITO PARA ENTREGA'
+							pk = 13
+						elif estado_envio_q.pk == 7:
+							estado_kraken = 'ENTREGADO'
+							pk = 14
+						estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
+						seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
+						historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
+						envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
+						hoy = timezone.now()
+					###UPDATE KRAKEN
+					#OBTENER ENVIO EN kraken_cargo
+					#es_kraken = False
+					#kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor)
+					#print kraken_envio.count(),'kraken_envio'
+					# if kraken_envio.count() >= 1:
+					# 	es_kraken = True
+					# #print es_kraken,'es_kraken'
+					# if es_kraken:
+					# 	estadoeehn = EstadoEnvio.objects.get(pk=estado)
+					# 	#print estadoeehn.estado, 'estadoeehn'
+					# 	estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(estado=estadoeehn.estado)
+					# 	#print estadokraken.estado, 'estadokraken'
+					# 	seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  empresa.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(estado=estadoeehn.estado))
+					# 	historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  empresa.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(estado=estadoeehn.estado),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
+						
 
-				# 	envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  empresa.guia_revendedor)
-				# 	hoy = timezone.now()
-					
+					# 	envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  empresa.guia_revendedor)
+					# 	hoy = timezone.now()
+						
 
-				# 	###PUERTO HONDURAS CREDITO
-				# 	if envio_kraken.credito:
-				# 		if int(estado) == 4:
-				# 			account_sid = 'AC17aec886df904438ae784475a29acd60'
-				# 			auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
-				# 			twilio_client= Client(account_sid, auth_token)
-				# 			message = twilio_client.messages.create(
-				# 			body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' + 'Saludos ' + envio_kraken.quien_envia.nombre_completo + envio_kraken.quien_envia.apellidos +'\n\n' +envio_kraken.empresa.nombre_empresa+' le informa que su envio '+envio_kraken.codigo + ' para ' + envio_kraken.quien_recibe.nombre_completo+ ', se encuentra en el Puerto de Honduras esperando el desembarque. Para evitar atrasos con su entrega favor realizar el pago pendiente de $'+ str(envio_kraken.saldo_pendiente) + '. Para más información contáctarse al número ' + envio_kraken.empresa.telefono_empresa ,
-				# 			from_='+13473345592',
-				# 			to='+1' + envio_kraken.quien_envia.celular
-				# 			)
-				# 			mensaje = SistemaEmpresamensaje.objects.db_manager('kraken_cargo').create(tipo_mensaje=SistemaTipomensajes.objects.using('kraken_cargo').get(pk=2),envio=envio_kraken,texto = message.body,fecha= hoy.date(),precio=0.25,pagado=False,fecha_pago = hoy.date())
-				# 			#print(message.sid)
-				# 	#### PUERTO HONDURAS INFO
-				# 	if int(estado) == 4:
-				# 		account_sid = 'AC17aec886df904438ae784475a29acd60'
-				# 		auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
-				# 		twilio_client= Client(account_sid, auth_token)
-				# 		message = twilio_client.messages.create(
-				# 		body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' + 'Saludos ' + envio_kraken.quien_envia.nombre_completo + envio_kraken.quien_envia.apellidos +'\n\n' +envio_kraken.empresa.nombre_empresa+' le informa que su envio '+envio_kraken.codigo + ' para ' + envio_kraken.quien_recibe.nombre_completo+ ', se encuentra en el Puerto de Honduras esperando el desembarque. Muchas gracias por preferirnos. Para más información contáctarse al número ' + envio_kraken.empresa.telefono_empresa ,
-				# 		from_='+13473345592',
-				# 		to='+1' + envio_kraken.quien_envia.celular
-				# 		)
-				# 		mensaje = SistemaEmpresamensaje.objects.db_manager('kraken_cargo').create(tipo_mensaje=SistemaTipomensajes.objects.using('kraken_cargo').get(pk=2),envio=envio_kraken,texto = message.body,fecha= hoy.date(),precio=0.25,pagado=False,fecha_pago = hoy.date())
-				# 		#print(message.sid)
-				# 	#### MENSAJE DE ENTREGADO
-				# 	if int(estado) == int(estado_final.pk):
-				# 		account_sid = 'AC17aec886df904438ae784475a29acd60'
-				# 		auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
-				# 		twilio_client= Client(account_sid, auth_token)
-				# 		message = twilio_client.messages.create(
-				# 		body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' +'Saludos ' + envio_kraken.quien_envia.nombre_completo + envio_kraken.quien_envia.apellidos +'\n\n' +envio_kraken.empresa.nombre_empresa+' le informa que su envio '+envio_kraken.codigo + ' para ' + envio_kraken.quien_recibe.nombre_completo+ ', ha sido entregado satisfactoriamente.' + '\n' + 'Muchas gracias por confiar en nuestros servicios esperamos pronto seguirle brindando el mejor servicio.',
-				# 		from_='+13473345592',
-				# 		to='+1' + envio_kraken.quien_envia.celular
-				# 		)
-				# 		#print(message.sid)
-				# 		mensaje = SistemaEmpresamensaje.objects.db_manager('kraken_cargo').create(tipo_mensaje=SistemaTipomensajes.objects.using('kraken_cargo').get(pk=1),envio=envio_kraken,texto = message.body,fecha = hoy.date(),precio=0.25,pagado=False,fecha_pago = hoy.date())
-				## MENSAJES EXPRESS ENVIOS
-				if envio_cliente.credito:
-					if int(estado) == 4:
-						account_sid = 'AC17aec886df904438ae784475a29acd60'
-						auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
-						twilio_client= Client(account_sid, auth_token)
-						message = twilio_client.messages.create(
-						body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' + 'Saludos ' + envio_cliente.quien_envia.nombre_completo + '\n\n' +envio_cliente.empresa.nombre_empresa+' le informa que su envio '+envio_cliente.codigo + ' para ' + envio_cliente.quien_recibe.nombre_completo+ ', se encuentra en el Puerto de Honduras esperando el desembarque. Para evitar atrasos con su entrega favor realizar el pago pendiente de $'+ str(envio_cliente.saldo_pendiente) + '. Para más información contáctarse al número ' + envio_cliente.empresa.telefono_empresa ,
-						from_='+13473345592',
-						to='+1' + envio_cliente.quien_envia.celular
-						)
-						mensaje = EmpresaMensaje.objects.create(tipo_mensaje=TipoMensajes.objects.get(pk=2),envio=envio_cliente,texto = message.body)
-						#print(message.sid)
-				
-				if int(estado) == int(estado_final.pk):
-					account_sid = 'AC17aec886df904438ae784475a29acd60'
-					auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
-					twilio_client= Client(account_sid, auth_token)
-					message = twilio_client.messages.create(
-					body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' +'Saludos ' + envio_cliente.quien_envia.nombre_completo + '\n\n' +envio_cliente.empresa.nombre_empresa+' le informa que su envio '+envio_cliente.codigo + ' para ' + envio_cliente.quien_recibe.nombre_completo+ ', ha sido entregado satisfactoriamente.' + '\n' + 'Muchas gracias por confiar en nuestros servicios esperamos pronto seguirle brindando el mejor servicio.',
-					from_='+13473345592',
-					to='+1' + envio_cliente.quien_envia.celular
-					)
-					#print(message.sid)
-					mensaje = EmpresaMensaje.objects.create(tipo_mensaje=TipoMensajes.objects.get(pk=1),envio=envio_cliente,texto = message.body)
-			print('no va4')
-			return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
+					# 	###PUERTO HONDURAS CREDITO
+					# 	if envio_kraken.credito:
+					# 		if int(estado) == 4:
+					# 			account_sid = 'AC17aec886df904438ae784475a29acd60'
+					# 			auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
+					# 			twilio_client= Client(account_sid, auth_token)
+					# 			message = twilio_client.messages.create(
+					# 			body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' + 'Saludos ' + envio_kraken.quien_envia.nombre_completo + envio_kraken.quien_envia.apellidos +'\n\n' +envio_kraken.empresa.nombre_empresa+' le informa que su envio '+envio_kraken.codigo + ' para ' + envio_kraken.quien_recibe.nombre_completo+ ', se encuentra en el Puerto de Honduras esperando el desembarque. Para evitar atrasos con su entrega favor realizar el pago pendiente de $'+ str(envio_kraken.saldo_pendiente) + '. Para más información contáctarse al número ' + envio_kraken.empresa.telefono_empresa ,
+					# 			from_='+13473345592',
+					# 			to='+1' + envio_kraken.quien_envia.celular
+					# 			)
+					# 			mensaje = SistemaEmpresamensaje.objects.db_manager('kraken_cargo').create(tipo_mensaje=SistemaTipomensajes.objects.using('kraken_cargo').get(pk=2),envio=envio_kraken,texto = message.body,fecha= hoy.date(),precio=0.25,pagado=False,fecha_pago = hoy.date())
+					# 			#print(message.sid)
+					# 	#### PUERTO HONDURAS INFO
+					# 	if int(estado) == 4:
+					# 		account_sid = 'AC17aec886df904438ae784475a29acd60'
+					# 		auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
+					# 		twilio_client= Client(account_sid, auth_token)
+					# 		message = twilio_client.messages.create(
+					# 		body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' + 'Saludos ' + envio_kraken.quien_envia.nombre_completo + envio_kraken.quien_envia.apellidos +'\n\n' +envio_kraken.empresa.nombre_empresa+' le informa que su envio '+envio_kraken.codigo + ' para ' + envio_kraken.quien_recibe.nombre_completo+ ', se encuentra en el Puerto de Honduras esperando el desembarque. Muchas gracias por preferirnos. Para más información contáctarse al número ' + envio_kraken.empresa.telefono_empresa ,
+					# 		from_='+13473345592',
+					# 		to='+1' + envio_kraken.quien_envia.celular
+					# 		)
+					# 		mensaje = SistemaEmpresamensaje.objects.db_manager('kraken_cargo').create(tipo_mensaje=SistemaTipomensajes.objects.using('kraken_cargo').get(pk=2),envio=envio_kraken,texto = message.body,fecha= hoy.date(),precio=0.25,pagado=False,fecha_pago = hoy.date())
+					# 		#print(message.sid)
+					# 	#### MENSAJE DE ENTREGADO
+					# 	if int(estado) == int(estado_final.pk):
+					# 		account_sid = 'AC17aec886df904438ae784475a29acd60'
+					# 		auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
+					# 		twilio_client= Client(account_sid, auth_token)
+					# 		message = twilio_client.messages.create(
+					# 		body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' +'Saludos ' + envio_kraken.quien_envia.nombre_completo + envio_kraken.quien_envia.apellidos +'\n\n' +envio_kraken.empresa.nombre_empresa+' le informa que su envio '+envio_kraken.codigo + ' para ' + envio_kraken.quien_recibe.nombre_completo+ ', ha sido entregado satisfactoriamente.' + '\n' + 'Muchas gracias por confiar en nuestros servicios esperamos pronto seguirle brindando el mejor servicio.',
+					# 		from_='+13473345592',
+					# 		to='+1' + envio_kraken.quien_envia.celular
+					# 		)
+					# 		#print(message.sid)
+					# 		mensaje = SistemaEmpresamensaje.objects.db_manager('kraken_cargo').create(tipo_mensaje=SistemaTipomensajes.objects.using('kraken_cargo').get(pk=1),envio=envio_kraken,texto = message.body,fecha = hoy.date(),precio=0.25,pagado=False,fecha_pago = hoy.date())
+					## MENSAJES EXPRESS ENVIOS
+					if envio_cliente.credito:
+						try:
+							if int(estado) == 4:
+								account_sid = 'AC17aec886df904438ae784475a29acd60'
+								auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
+								twilio_client= Client(account_sid, auth_token)
+								message = twilio_client.messages.create(
+								body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' + 'Saludos ' + envio_cliente.quien_envia.nombre_completo + '\n\n' +envio_cliente.empresa.nombre_empresa+' le informa que su envio '+envio_cliente.codigo + ' para ' + envio_cliente.quien_recibe.nombre_completo+ ', se encuentra en el Puerto de Honduras esperando el desembarque. Para evitar atrasos con su entrega favor realizar el pago pendiente de $'+ str(envio_cliente.saldo_pendiente) + '. Para más información contáctarse al número ' + envio_cliente.empresa.telefono_empresa ,
+								from_='+13473345592',
+								to='+1' + envio_cliente.quien_envia.celular
+								)
+								mensaje = EmpresaMensaje.objects.create(tipo_mensaje=TipoMensajes.objects.get(pk=2),envio=envio_cliente,texto = message.body)
+								#print(message.sid)
+						except Exception as e:
+							print('No mensaje llegando a puerto destino error en numero: ', e)
+							
+					try:
+						if int(estado) == int(estado_final.pk):
+							account_sid = 'AC17aec886df904438ae784475a29acd60'
+							auth_token = 'd36a6c11614c87a982ff21406c2e8bb3'
+							twilio_client= Client(account_sid, auth_token)
+							message = twilio_client.messages.create(
+							body='ESTE ES UN MENSAJE GENERADO AUTOMATICAMENTE FAVOR NO RESPONDER. ' + '\n' +'Saludos ' + envio_cliente.quien_envia.nombre_completo + '\n\n' +envio_cliente.empresa.nombre_empresa+' le informa que su envio '+envio_cliente.codigo + ' para ' + envio_cliente.quien_recibe.nombre_completo+ ', ha sido entregado satisfactoriamente.' + '\n' + 'Muchas gracias por confiar en nuestros servicios esperamos pronto seguirle brindando el mejor servicio.',
+							from_='+13473345592',
+							# agregar concicionantes por pais
+							to='+1' + envio_cliente.quien_envia.celular
+							)
+							#print(message.sid)
+							mensaje = EmpresaMensaje.objects.create(tipo_mensaje=TipoMensajes.objects.get(pk=1),envio=envio_cliente,texto = message.body)
+					except Exception as e:
+							print('No mensaje estado final error en numero: ', e)
+				return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
 		except Exception as e:
 			#print e, 'error'
 			print("error --> ", e)
+			transaction.rollback()
 			return HttpResponseRedirect(reverse('ver_paquetes',kwargs={'id_estado':int(estado)-1}))
 	elif request.method == 'GET':
 		print(datos_envio)
@@ -3046,8 +3054,8 @@ def ver_contenedor_enviar(request,id):
 #@minified_response
 @login_required()
 def ver_camion_enviar(request,id):
-	camion = Camion.objects.get(pk=id)
-	detalle = DetalleEnvio.objects.filter(envio__camion=camion,fue_subida_camion=True,envio__estado_envio__in=(5,6))
+	camion_asg = Camion.objects.get(pk=id)
+	detalle = DetalleEnvio.objects.filter(envio__camion=camion_asg,fue_subida_camion=True,envio__estado_envio__in=(5,6))
 	estados = EstadoEnvio.objects.filter(pk__in=(5,6))
 	error = ''
 	#print detalle
@@ -3055,7 +3063,7 @@ def ver_camion_enviar(request,id):
 		guia_hija = request.POST['guia']
 		if request.POST['guia'] == '':
 			error = 'Debe ingresar la guía'
-			data = {'contenedor':contenedor,
+			data = {
 					'detalle_camion':detalle,
 					'error':error,
 					'estados':estados,
@@ -3063,22 +3071,26 @@ def ver_camion_enviar(request,id):
 			return render(request, 'ver_camion_enviar.html',data)
 		else:
 			try:
-				detalle_save = DetalleEnvio.objects.get(codigo=guia_hija)
-				detalle_save.fue_subida_camion = True 
-				detalle_save.save()
-				modificar_envio = Envio.objects.filter(pk=detalle_save.envio.pk).update(camion=camion)
-				return HttpResponseRedirect(reverse('ver_camion_enviar',args = (id, ))+"?ok")
+				with transaction.atomic():
+					detalle_save = DetalleEnvio.objects.get(codigo=guia_hija)
+					detalle_save.fue_subida_camion = True 
+					detalle_save.save()
+					print('este es el envio', detalle_save.envio.pk)
+					Envio.objects.filter(pk=detalle_save.envio.pk).update(camion=camion_asg)
+					return HttpResponseRedirect(reverse('ver_camion_enviar',args = (id, ))+"?ok")
 			except Exception as e:
 				error = 'No existe la guía u ocurrio un error'
-				data = {'camion':camion,
+				data = {'camion':camion_asg,
 						'detalle_camion':detalle,
 						'disponible':round(0,2),
 						'error':error,
 						'estados':estados,
 						}
+				print('este es el error ->', e)
+				transaction.rollback()
 				return render(request, 'ver_camion_enviar.html',data)
 	else:
-		data = {'camion':camion,
+		data = {'camion':camion_asg,
 				'detalle_camion':detalle,
 				'estados':estados,
 				}
@@ -3218,8 +3230,8 @@ def trasladar_camion(request):
 			envio = SeguimientoEnvio.objects.filter(codigo_envio=e.pk).update(estado=estado_db)
 			try:
 				historial = HistorialEnvio.objects.create(codigo_envio=envio_cliente,
-														  estado=estado_db,
-														   usuario_registro=request.user)
+														estado=estado_db,
+														usuario_registro=request.user)
 
 			except Exception as e:
 				#print e,"ERROR AL CREAR SEGUIMIENTO DE ENVIO"
@@ -3269,7 +3281,6 @@ def trasladar_camion(request):
 				envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
 				hoy = timezone.now()	
 		return JsonResponse({'option': 'save','url': reverse('ver_camion_enviar',args = (pk_camion, )),'tipo_error':tipo_error,'detalle_error':detalle_error})
-					 
 	elif request.method == 'GET':
 		return render(request, '404.html')
 @login_required
