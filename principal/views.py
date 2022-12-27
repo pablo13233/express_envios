@@ -2991,24 +2991,26 @@ def ver_contenedor_enviar(request,id):
 				'url':url}
 		return render(request, 'ver_contenedor_enviar.html',data)
 
+@login_required
+def distribuir_cajas(request):
+	return render(request, 'distribuir_cajas.html')
 
 #@minified_response
 @login_required()
 def ver_camion_enviar(request,id):
 	camion_asg = Camion.objects.get(pk=id)
-	# detalle = DetalleEnvio.objects.filter(envio__camion=camion_asg,fue_subida_camion=True,envio__estado_envio__in=(5,6))
+	detalle = DetalleEnvio.objects.filter(envio__camion=camion_asg,fue_subida_camion=True,envio__estado_envio__in=(5,6))
 	estados = EstadoEnvio.objects.filter(pk__in=(5,6))
 	error = ''
 	#print detalle
-	if request.method == 'GET':
-		guia_hg = request.GET.get('guia')
-		caja = DetalleEnvio.objects.filter(codigo=guia_hg)
-		return JsonResponse(caja, safe=False)
-	elif request.method == 'POST':
+	
+	if request.method == 'POST':
 		guia_hija = request.POST['guia']
 		accion = request.POST['accion']
 		if accion == 'consulta':
-			return ''
+			guia_hg = request.GET.get('guia')
+			caja = DetalleEnvio.objects.filter(codigo=guia_hg)
+			return JsonResponse(caja, safe=False)
 		elif accion == 'trasladar':
 			try:
 				with transaction.atomic():
@@ -3028,8 +3030,15 @@ def ver_camion_enviar(request,id):
 				print('este es el error ->', e)
 				transaction.rollback()
 			return render(request, 'ver_camion_enviar.html',data)
+	# elif request.method == 'GET':
+	# 	guia_hg = request.GET.get('guia')
+	# 	caja = DetalleEnvio.objects.filter(codigo=guia_hg)
+	# 	return JsonResponse(caja, safe=False)
 	else:
-		data = {}
+		data = {'camion':camion_asg,
+				'detalle_camion':detalle,
+				'estados':estados,
+				}
 		return render(request, 'ver_camion_enviar.html',data)
 
 @login_required

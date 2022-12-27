@@ -1,0 +1,96 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <form id="TrasladarForm" method="POST" action="{% url 'trasladar_camion' %}">
+            {% csrf_token %}
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-3">
+                        <label>Trasladar a:</label>
+                        <select class="select2" style="width: 100%;" id="id_estado_envio" name="estado_envio">
+                            {% for estado_ in estados %}
+                            <option value="{{estado_.pk}}">{{estado_.estado}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-3">
+                        <label>Camion:</label>
+                        <select class="select2" style="width: 100%;" id="id_camion" name="camion">
+                            {% for camion in camiones %}
+                            <option value="{{camion.pk}}">{{camion.placa}} | {{camion.descripcion}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <button type="submit" class="btn float-left btn-info">Aplicar traslado</button>
+        </form>
+        <br>
+        <br>
+        <br>
+        <br>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#home">Información</a>
+            </li>
+
+            <!--<li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#menu2">Menu 2</a>
+            </li>-->
+        </ul>
+
+        <div class="tab-content">
+            <div id="home" class="container tab-pane active"><br>
+                <h1>Detalle de camión</h1>
+                <table class="table table-striped">
+
+                    <tbody>
+                        <tr>
+                            <th scope="row">DESCRIPCIÓN:</th>
+                            <td>{{camion.descripcion}}</td>
+                        </tr>
+
+                        <tr>
+                            <th scope="row">PLACA:</th>
+                            <td>{{camion.placa}}</td>
+                        </tr>
+
+
+                    </tbody>
+                </table>
+
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Envia</th>
+                            <th>Recibe</th>
+                            <th>Caja</th>
+                            <th>Cantidad</th>
+                            <th>Guía padre</th>
+                            <th>Guía hija</th>
+                            <th>Accón</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+{% endblock contenido %}
+{% block js %}
+<script>
+
+</script>
+{% endblock js %}

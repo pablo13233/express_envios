@@ -91,6 +91,9 @@ urlpatterns = [
     url(r'^desactivar/camion/(?P<id>\d+)/$', desactivar_camion, name='desactivar_camion'),
     url(r'^datos/caja/edit/$', datos_caja_edit, name='datos_caja_edit'),
     url(r'^consultar/abonos/$', reporte_abonos, name='reporte_abonos'),
+    # alksdalk
+    url(r'^distribuir_cajas/', distribuir_cajas, name='distribuir_cajas'),
+
 ]
 # url(r'^$', inicio, name='inicio'),
 # url(r'^servicios/$', servicios, name='servicios'),
