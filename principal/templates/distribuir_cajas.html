@@ -6,82 +6,97 @@
 <section class="content">
     <div class="container-fluid">
         <br>
-        <form id="TrasladarForm" method="POST" action="{% url 'trasladar_camion' %}">
-            {% csrf_token %}
-            <div class="col-12">
-                <div class="row">
-                    <div class="col-3">
-                        <label>Trasladar a:</label>
-                        <select class="select2" style="width: 100%;" id="id_estado_envio" name="estado_envio">
-                            {% for estado_ in estados %}
-                            <option value="{{estado_.pk}}">{{estado_.estado}} </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-3">
-                        <label>Camion:</label>
-                        <select class="select2" style="width: 100%;" id="id_camion" name="camion">
-                            {% for camion in camiones %}
-                            <option value="{{camion.pk}}">{{camion.placa}} | {{camion.descripcion}} </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+        <div class="container">
+            <div class="card col-12">
+                <div class="card-header">
+                    <h6>Seleccione</h6>
+                </div>
+                <div class="card-body">
+                    <form id="TrasladarForm" method="POST" action="{% url 'trasladar_camion' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label>Camion:</label>
+                                        <select class="select2" style="width: 100%;" id="id_camion" name="camion">
+                                            <option selected value="0">--Seleccione--</option>
+                                            {% for camion in camiones %}
+                                            <option value="{{camion.pk}}">{{camion.placa}} | {{camion.descripcion}} </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row pt-4">
+                                    <div class="col-3">
+                                        <div class="input-group mb-3 text-uppercase">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">Numero: </span>
+                                            </div>
+                                            <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="camionId" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-6">
+                                        <div class="input-group mb-3 text-uppercase">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">Descripcion: </span>
+                                            </div>
+                                            <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="camionDescripcion" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-3">
+                                <button type="submit" class="btn float-left btn-info">Aplicar traslado</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <br>
-            <button type="submit" class="btn float-left btn-info">Aplicar traslado</button>
-        </form>
-        <br>
-        <br>
-        <br>
-        <br>
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#home">Información</a>
-            </li>
-
-            <!--<li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#menu2">Menu 2</a>
-            </li>-->
-        </ul>
-
-        <div class="tab-content">
-            <div id="home" class="container tab-pane active"><br>
-                <h1>Detalle de camión</h1>
-                <table class="table table-striped">
-
-                    <tbody>
-                        <tr>
-                            <th scope="row">DESCRIPCIÓN:</th>
-                            <td>{{camion.descripcion}}</td>
-                        </tr>
-
-                        <tr>
-                            <th scope="row">PLACA:</th>
-                            <td>{{camion.placa}}</td>
-                        </tr>
-
-
-                    </tbody>
-                </table>
-
-                <table id="example1" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Envia</th>
-                            <th>Recibe</th>
-                            <th>Caja</th>
-                            <th>Cantidad</th>
-                            <th>Guía padre</th>
-                            <th>Guía hija</th>
-                            <th>Accón</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
+        </div>
+        <!-- contenido del camion -->
+        <div class="container">
+            <div  class="card col-12"><br>
+                <div class="card-header">
+                    <h3>Detalle de camión</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="input-group mb-3 text-uppercase">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">Guia Hija: </span>
+                                </div>
+                                <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="guiaHija">
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-12">
+                            <table id="camionDetalle" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Envia</th>
+                                        <th scope="col">Recibe</th>
+                                        <th scope="col">Caja</th>
+                                        <th scope="col">Cantidad</th>
+                                        <th scope="col">Guía padre</th>
+                                        <th scope="col">Guía hija</th>
+                                        <th scope="col">Accón</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+            
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -92,5 +107,49 @@
 {% block js %}
 <script>
 
+$('#id_camion').change(function(){
+    var camion_id = $(this).val();
+    var camion_desc = $('#id_camion option:selected').text();
+
+    if(camion_id == 0){
+        $.notify("Error, Seleccion No Valida",{
+            className: 'error',
+            globalPosition:"right top", 
+            clickToHide: true,
+            autoHide: true,
+            autoHideDelay: 5000,
+            arrowShow: true,
+            arrowSize: 5,
+            style: 'bootstrap',
+            showAnimation: 'slideDown',
+            showDuration: 400,
+            hideAnimation: 'slideUp',
+            hideDuration: 200,
+            gap: 2
+        });
+        $('#camionId').val("");
+        $('#camionDescripcion').val("");
+    }else{
+        $('#camionId').val(camion_id);
+        $('#camionDescripcion').val(camion_desc);
+    }
+});
+
+$('#guiaHija').keypress(function(e){
+    if (e.which == 13){
+        var guia_hija = $(this).val();
+
+        $('#camionDetalle').append(
+            '<tr><td>' + 'juan' + '</td><td>' + 'juanito' + '</td><td>' + 'grande' + '</td><td>' + '1' + '</td><td>' + 'ee342134' + '</td><td>' + guia_hija + '</td><td>' + `<a rel="eliminarRow" class="btn btn-danger btn-sm btn-flat" title="Eliminar Fila"><i class="fa fa-solid fa-delete-left"></i></a>` + '</td></tr>'
+            );
+        
+        $(this).val("");
+        $(this).focus();
+    }
+});
+
+$('#camionDetalle tbody').on('click', 'a[rel="eliminarRow"]',function(){
+    $(this).closest('tr').remove();
+});
 </script>
 {% endblock js %}

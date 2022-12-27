@@ -2993,7 +2993,9 @@ def ver_contenedor_enviar(request,id):
 
 @login_required
 def distribuir_cajas(request):
-	return render(request, 'distribuir_cajas.html')
+	camiones = Camion.objects.all()
+	cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio__in=5)
+	return render(request, 'distribuir_cajas.html',{'camiones':camiones, 'cajas':cajas})
 
 #@minified_response
 @login_required()
