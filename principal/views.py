@@ -2993,20 +2993,24 @@ def ver_contenedor_enviar(request,id):
 
 @login_required
 def distribuir_cajas(request):
-	camiones = Camion.objects.all()
-	cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
 	if request.method == 'POST' :
 		try:
 			with transaction.atomic():
-				id_camion = Camion.objects.get(pk=request.POST('id_camion'))
-				guiaHija = request.POST.get['guia_Hijas']
-				for hija in guiaHija:
+				id_camion = Camion.objects.get(pk=request.POST['id_camion'])
+				print('camion -->',id_camion.id)
+				guiaHijas = request.POST.getlist['guia_Hijas']
+				print('Guias Hijas --> ', guiaHijas)
+				for hijo in guiaHijas:
+					print('Hijo-> ', hijo)
+				for hija in guiaHijas:
 					# verificamos si la caja ya ha sido actualizada para evitar actualizarla de nuevo
-					if DetalleEnvio.objects.get(codigo=guiaHija):
+					print('Hija--> ', hija)
+					subida = DetalleEnvio.objects.filter(codigo=hija)
+					print('subida? ',subida.fue_subida_camion)
+					if subida.fue_subida_camion == True:
 						print("no")
 					else:
 						# cambiamos estado de las cajas que subieron al camion
-						DetalleEnvio.objects.filter(codigo=hija).update(fue_subida_camion = True)
 						detalle_save = DetalleEnvio.objects.filter(codigo=hija)
 						detalle_save.fue_subida_camion = True
 						detalle_save.save()
@@ -3020,9 +3024,13 @@ def distribuir_cajas(request):
 		except Exception as e:
 			print('Error ---> ',e)
 			transaction.rollback()
-			return render(request, 'distribuir_cajas.html',{'camiones':camiones, 'cajas':cajas})
+			camiones = Camion.objects.all()
+			# cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
+			return render(request, 'distribuir_cajas.html',{'camiones':camiones, })
 	else:
-		return render(request, 'distribuir_cajas.html',{'camiones':camiones, 'cajas':cajas})
+		camiones = Camion.objects.all()
+		# cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
+		return render(request, 'distribuir_cajas.html',{'camiones':camiones, })
 
 #@minified_response
 @login_required()

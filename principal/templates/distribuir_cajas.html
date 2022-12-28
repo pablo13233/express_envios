@@ -185,20 +185,30 @@ $('#camionDetalle tbody').on('click', 'a[rel="eliminarRow"]',function(){
 
 $('#trasladarForm').submit(function(event){
     event.preventDefault(); // Previene el envío del formulario
+    var parametros = new FormData();
     token = $('input[name="csrfmiddlewaretoken"]').val();
     var cajas = [];
     var id_camion = $('#id_camion').val();
     $('#trasladarForm table tbody tr').each(function(){
         // Obtiene los datos de cada fila
-        var id_caja = $(this).find('td:nth-child(1)').text();
-        cajas.push({'id_caja': id_caja});
+        cajas.push($(this).find('td:nth-child(1)').val());
+        // cajas.push({'id_caja': id_caja});
     });
+    parametros.append('guia_Hijas', cajas);
+    parametros.append('id_camion', id_camion);
+    parametros.append('csrfmiddlewaretoken', token);
     // Envía los datos a la vista
+    alert(cajas);
     $.ajax({
         url: window.location.pathname,
         type: 'POST',
-        data: {'guia_Hijas':cajas, 'id_camion':id_camion, 'csrfmiddlewaretoken': token},
+        data: parametros,
+        dataType: 'json',
+        contentType: 'multipart/form-data',
+        processData: false,
+        contentType: false,
         success: function(response){
+            $('#trasladarForm')[0].reset();
             console.log(response)
         }
     });
