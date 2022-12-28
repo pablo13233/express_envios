@@ -2994,8 +2994,35 @@ def ver_contenedor_enviar(request,id):
 @login_required
 def distribuir_cajas(request):
 	camiones = Camion.objects.all()
-	cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio__in=5)
-	return render(request, 'distribuir_cajas.html',{'camiones':camiones, 'cajas':cajas})
+	cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
+	if request.method == 'POST' :
+		try:
+			with transaction.atomic():
+				id_camion = Camion.objects.get(pk=request.POST('id_camion'))
+				guiaHija = request.POST.get['guia_Hijas']
+				for hija in guiaHija:
+					# verificamos si la caja ya ha sido actualizada para evitar actualizarla de nuevo
+					if DetalleEnvio.objects.get(codigo=guiaHija):
+						print("no")
+					else:
+						# cambiamos estado de las cajas que subieron al camion
+						DetalleEnvio.objects.filter(codigo=hija).update(fue_subida_camion = True)
+						detalle_save = DetalleEnvio.objects.filter(codigo=hija)
+						detalle_save.fue_subida_camion = True
+						detalle_save.save()
+					# Asignar camion al Envio
+					if Envio.objects.get(pk=detalle_save.envio.pk, camion=id_camion):
+						#se salta si el envio ya tiene asignado ese camion, para no repertir updates en sistema
+						print("continua")
+					else:
+						Envio.objects.filter(pk=detalle_save.envio.pk).update(camion=id_camion)
+			return HttpResponseRedirect(reverse('distribuir_cajas'))
+		except Exception as e:
+			print('Error ---> ',e)
+			transaction.rollback()
+			return render(request, 'distribuir_cajas.html',{'camiones':camiones, 'cajas':cajas})
+	else:
+		return render(request, 'distribuir_cajas.html',{'camiones':camiones, 'cajas':cajas})
 
 #@minified_response
 @login_required()

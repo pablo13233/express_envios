@@ -9,63 +9,14 @@
         <div class="container">
             <div class="card col-12">
                 <div class="card-header">
-                    <h6>Seleccione</h6>
-                </div>
-                <div class="card-body">
-                    <form id="TrasladarForm" method="POST" action="{% url 'trasladar_camion' %}">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <label>Camion:</label>
-                                        <select class="select2" style="width: 100%;" id="id_camion" name="camion">
-                                            <option selected value="0">--Seleccione--</option>
-                                            {% for camion in camiones %}
-                                            <option value="{{camion.pk}}">{{camion.placa}} | {{camion.descripcion}} </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row pt-4">
-                                    <div class="col-3">
-                                        <div class="input-group mb-3 text-uppercase">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="basic-addon1">Numero: </span>
-                                            </div>
-                                            <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="camionId" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-1"></div>
-                                    <div class="col-6">
-                                        <div class="input-group mb-3 text-uppercase">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="basic-addon1">Descripcion: </span>
-                                            </div>
-                                            <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="camionDescripcion" disabled>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-3">
-                                <button type="submit" class="btn float-left btn-info">Aplicar traslado</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <!-- contenido del camion -->
-        <div class="container">
-            <div  class="card col-12"><br>
-                <div class="card-header">
-                    <h3>Detalle de camión</h3>
-                </div>
-                <div class="card-body">
                     <div class="row">
+                        <div class="div">
+                            <h4>Distribucion de cajas</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pt-2">
                         <div class="col-3">
                             <div class="input-group mb-3 text-uppercase">
                                 <div class="input-group-prepend">
@@ -75,29 +26,89 @@
                             </div>
                         </div>
                     </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-12">
-                            <table id="camionDetalle" class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Envia</th>
-                                        <th scope="col">Recibe</th>
-                                        <th scope="col">Caja</th>
-                                        <th scope="col">Cantidad</th>
-                                        <th scope="col">Guía padre</th>
-                                        <th scope="col">Guía hija</th>
-                                        <th scope="col">Accón</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-            
-                                </tbody>
-                            </table>
+                </div>
+            </div>
+        </div>
+        <!-- contenido del camion -->
+        <div class="container">
+            <form id="trasladarForm" method="POST" action=".">
+                {% csrf_token %}
+                <div  class="card col-12">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="div">
+                                <h4>Detalle de camión</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label>Camion:</label>
+                                            <select class="select2" style="width: 100%;" id="id_camion" name="camion">
+                                                <option selected value="0">--Seleccione--</option>
+                                                {% for camion in camiones %}
+                                                <option value="{{camion.pk}}">{{camion.placa}} | {{camion.descripcion}} </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="row pt-2">
+                                <div class="col-3">
+                                    <div class="input-group mb-3 text-uppercase">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">Numero: </span>
+                                        </div>
+                                        <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="camionId" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-1"></div>
+                                <div class="col-6">
+                                    <div class="input-group mb-3 text-uppercase">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">Descripcion: </span>
+                                        </div>
+                                        <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="camionDescripcion" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <table id="camionDetalle" class="table table-bordered table-striped text-uppercase text-center">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Guía hija</th>
+                                            <th scope="col">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-3">
+                                <button type="submit" class="btn float-left btn-info">Cargar</button>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-8">
+                                <p class="text-muted">Las cajas se asignaran al camion seleccionado y se cambiaran a estado En Transito Para Entrega</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -140,8 +151,28 @@ $('#guiaHija').keypress(function(e){
         var guia_hija = $(this).val();
 
         $('#camionDetalle').append(
-            '<tr><td>' + 'juan' + '</td><td>' + 'juanito' + '</td><td>' + 'grande' + '</td><td>' + '1' + '</td><td>' + 'ee342134' + '</td><td>' + guia_hija + '</td><td>' + `<a rel="eliminarRow" class="btn btn-danger btn-sm btn-flat" title="Eliminar Fila"><i class="fa fa-solid fa-delete-left"></i></a>` + '</td></tr>'
+            '<tr>'+
+                '<td>' + guia_hija + '</td>' +
+                '<td>' + `<a rel="eliminarRow" class="btn btn-danger btn-sm btn-flat rounded font-weight-bolder" title="Eliminar Fila">
+                    <i class="fa fa-solid fa-delete-left"></i> Eliminar</a>` + '</td>' +
+            '</tr>'
             );
+        
+        $.notify("Agregado a lista",{
+            className: 'success',
+            globalPosition:"right top", 
+            clickToHide: true,
+            autoHide: true,
+            autoHideDelay: 5000,
+            arrowShow: true,
+            arrowSize: 5,
+            style: 'bootstrap',
+            showAnimation: 'slideDown',
+            showDuration: 400,
+            hideAnimation: 'slideUp',
+            hideDuration: 200,
+            gap: 2
+        });
         
         $(this).val("");
         $(this).focus();
@@ -150,6 +181,27 @@ $('#guiaHija').keypress(function(e){
 
 $('#camionDetalle tbody').on('click', 'a[rel="eliminarRow"]',function(){
     $(this).closest('tr').remove();
+});
+
+$('#trasladarForm').submit(function(event){
+    event.preventDefault(); // Previene el envío del formulario
+    token = $('input[name="csrfmiddlewaretoken"]').val();
+    var cajas = [];
+    var id_camion = $('#id_camion').val();
+    $('#trasladarForm table tbody tr').each(function(){
+        // Obtiene los datos de cada fila
+        var id_caja = $(this).find('td:nth-child(1)').text();
+        cajas.push({'id_caja': id_caja});
+    });
+    // Envía los datos a la vista
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        data: {'guia_Hijas':cajas, 'id_camion':id_camion, 'csrfmiddlewaretoken': token},
+        success: function(response){
+            console.log(response)
+        }
+    });
 });
 </script>
 {% endblock js %}
