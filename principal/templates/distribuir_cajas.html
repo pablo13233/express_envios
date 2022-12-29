@@ -3,6 +3,7 @@
 {% load l10n %}
 {% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
 {% block contenido %}
+
 <section class="content">
     <div class="container-fluid">
         <br>
@@ -31,7 +32,7 @@
         </div>
         <!-- contenido del camion -->
         <div class="container">
-            <form id="trasladarForm" method="POST" action=".">
+            <form id="trasladarForm" method="POST" action="." enctype="multipart/form-data">
                 {% csrf_token %}
                 <div  class="card col-12">
                     <div class="card-header">
@@ -116,6 +117,8 @@
 </section>
 {% endblock contenido %}
 {% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.8/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.js"></script>
 <script>
 
 $('#id_camion').change(function(){
@@ -191,14 +194,14 @@ $('#trasladarForm').submit(function(event){
     var id_camion = $('#id_camion').val();
     $('#trasladarForm table tbody tr').each(function(){
         // Obtiene los datos de cada fila
-        cajas.push($(this).find('td:nth-child(1)').val());
+        cajas.push($(this).find('td:nth-child(1)').text());
         // cajas.push({'id_caja': id_caja});
     });
     parametros.append('guia_Hijas', cajas);
     parametros.append('id_camion', id_camion);
     parametros.append('csrfmiddlewaretoken', token);
     // Envía los datos a la vista
-    alert(cajas);
+    // alert(cajas);
     $.ajax({
         url: window.location.pathname,
         type: 'POST',
@@ -207,9 +210,29 @@ $('#trasladarForm').submit(function(event){
         contentType: 'multipart/form-data',
         processData: false,
         contentType: false,
-        success: function(response){
-            $('#trasladarForm')[0].reset();
-            console.log(response)
+        success: function(result){
+            if (result == "correcto"){
+                // alert("lol");
+                $('#trasladarForm')[0].reset();
+                $('#camionDetalle tbody tr').remove();
+                $('#id_camion').empty();
+                $('#id_camion').html(`<option selected value="0">--Seleccione--</option>
+                                        {% for camion in camiones %}
+                                        <option value="{{camion.pk}}">{{camion.placa}} | {{camion.descripcion}} </option>
+                                        {% endfor %}`);
+                texto = "Camion cargado con exito.";
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Correcto',
+                    text: texto
+                });
+            } else {
+                Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: result
+                    });
+            }
         }
     });
 });

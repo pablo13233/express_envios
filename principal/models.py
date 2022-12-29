@@ -299,7 +299,7 @@ class DetalleEnvio(models.Model):
 	fue_subida_camion = models.BooleanField(default=False) #False sin subir en camion / True subida en camion
 
 	def __str__(self):
-		return '{0} | {1}'.format(self.envio,self.tipo_caja)
+		return '{0} | {1} | {2}'.format(self.envio,self.tipo_caja,self.fue_subida_camion)
 
 class SeguimientoEnvio(models.Model):
 	codigo_envio =  models.ForeignKey(Envio,on_delete=models.CASCADE)
