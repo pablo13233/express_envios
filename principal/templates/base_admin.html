@@ -104,8 +104,8 @@
                 {% if get_empleado.rol_empleado.pk == 1 %}
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Administración<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-copy" style="font-size: 22px;"></i>
+                            <p class="ml-2" style="font-size: 16px;">Administración<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -132,7 +132,7 @@
                                     <i class="fas fa-file-alt nav-icon"></i><p>Empleados</p>
                                 </a>
                             </li>
-                             <div class="dropdown-divider"></div>
+                            <div class="dropdown-divider"></div>
                             <li class="nav-item">
                                 <a href="{% url 'camiones' %}" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i><p>Lista de camiones</p>
@@ -191,8 +191,8 @@
                     </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-truck-fast nav-icon" style="font-size: 22px;"></i>
+                            <p class="ml-1" style="font-size: 16px;">Envios/Entregas<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -219,24 +219,29 @@
                                     <i class="fas fa-file-alt nav-icon"></i><p>Registrar Contenedor</p>
                                 </a>
                             </li>
-                             <div class="dropdown-divider"></div>
-                           
+                            <div class="dropdown-divider"></div>
                             <li class="nav-item">
                                 <a href="{% url 'cargar_contenedor' %}" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i><p>Enviar Contenedor</p>
                                 </a>
                             </li>
-                            <div class="dropdown-divider"></div>
+                            <!-- <div class="dropdown-divider"></div>
                             
                             <li class="nav-item">
                                 <a href="{% url 'seleccionar_camion' %}" class="nav-link">
                                     <i class="fas fa-car-alt nav-icon"></i><p>Distribuir cajas</p>
                                 </a>
-                            </li>
+                            </li> -->
                             <div class="dropdown-divider"></div>
                             <li class="nav-item">
                                 <a href="{% url 'distribuir_cajas' %}" class="nav-link">
-                                    <i class="fas fa-car-alt nav-icon"></i><p>Distribuir Cajas</p>
+                                    <i class="fa-solid fa-person-dolly nav-icon"></i><p>Distribuir Cajas</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'seleccionar_camion' %}" class="nav-link">
+                                    <i class="fa-solid fa-car nav-icon"></i><p>Imprimir cajas en camion</p>
                                 </a>
                             </li>
                             <div class="dropdown-divider"></div>
@@ -256,8 +261,8 @@
                     </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Reportes<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-file-chart-column" style="font-size: 22px;"></i>
+                            <p class="ml-3" style="font-size: 16px;">Reportes<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -278,7 +283,7 @@
                                     <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
                                 </a>
                             </li>
-                             <li class="nav-item">
+                            <li class="nav-item">
                                 <a href="{% url 'reporte_ventas' %}" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i><p>Reporte de ventas</p>
                                 </a>
@@ -313,8 +318,8 @@
                 {% elif get_empleado.rol_empleado.pk == 2 %}
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Administración<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-copy" style="font-size: 22px;"></i>
+                            <p class="ml-2" style="font-size: 16px;">Administración<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -364,8 +369,8 @@
                     </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-truck-fast" style="font-size: 22px;"></i>
+                            <p class="ml-1" style="font-size: 16px;">Envios/Entregas<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -395,7 +400,13 @@
                             <div class="dropdown-divider"></div>
                             <li class="nav-item">
                                 <a href="{% url 'distribuir_cajas' %}" class="nav-link">
-                                    <i class="fas fa-car-alt nav-icon"></i><p>Distribuir Cajas</p>
+                                    <i class="fa-solid fa-person-dolly nav-icon"></i><p>Distribuir Cajas</p>
+                                </a>
+                            </li>
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'seleccionar_camion' %}"  class="nav-link">
+                                    <i class="fa-solid fa-car nav-icon"></i><p>Imprimir cajas en camion</p>
                                 </a>
                             </li>
                             <div class="dropdown-divider"></div>
@@ -403,8 +414,8 @@
                     </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Reportes<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-file-chart-column" style="font-size: 22px;"></i>
+                            <p class="ml-3" style="font-size: 16px;">Reportes<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -448,8 +459,8 @@
                 {% elif get_empleado.rol_empleado.pk == 5 %}
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Administración<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-copy" style="font-size: 22px;"></i>
+                            <p class="ml-2" style="font-size: 16px;">Administración<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -474,8 +485,8 @@
                     </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-truck-fast" style="font-size: 22px;"></i>
+                            <p class="ml-1" style="font-size: 16px;">Envios/Entregas<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -492,8 +503,8 @@
                         
                         <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-copy"></i>
-                                <p>Reportes<i class="fas fa-angle-left right"></i>
+                                <i class="fa-solid fa-file-chart-column" style="font-size: 22px;"></i>
+                                <p class="ml-3" style="font-size: 16px;">Reportes<i class="fas fa-angle-left right"></i>
                                 <span class="badge badge-info right"></span></p>
                             </a>
                             <ul class="nav nav-treeview">
@@ -522,8 +533,8 @@
                 {% elif get_empleado.rol_empleado.pk == 3 %}
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Administración<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-copy" style="font-size: 22px;"></i>
+                            <p class="ml-2" style="font-size: 16px;">Administración<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -554,8 +565,8 @@
                     </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Envios/Entregas<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-truck-fast" style="font-size: 22px;"></i>
+                            <p class="ml-1" style="font-size: 16px;">Envios/Entregas<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -581,8 +592,8 @@
                     </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-copy"></i>
-                            <p>Reportes<i class="fas fa-angle-left right"></i>
+                            <i class="fa-solid fa-file-chart-column" style="font-size: 22px;"></i>
+                            <p class="ml-3" style="font-size: 16px;">Reportes<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
@@ -784,7 +795,7 @@
         {% endblock contenido %}
     </div>
     <footer class="main-footer">
-        <strong>Copyright &copy;2020 <a href="http://adminlte.io">Cargo Internacional</a>.</strong>
+        <strong>Copyright &copy;2020 <a href="">Cargo Internacional</a>.</strong>
         All rights reserved.
     </footer>
 

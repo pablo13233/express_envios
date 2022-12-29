@@ -93,6 +93,8 @@ urlpatterns = [
     url(r'^consultar/abonos/$', reporte_abonos, name='reporte_abonos'),
     # alksdalk
     url(r'^distribuir_cajas/', distribuir_cajas, name='distribuir_cajas'),
+    url(r'^cajas_camion/(?P<id>\d+)/$', ver_cajas_camion, name='cajas_camion'),
+    
 
 ]
 # url(r'^$', inicio, name='inicio'),

@@ -3028,20 +3028,25 @@ def distribuir_cajas(request):
 							envios.append(codigo)
 				#se verifican si los envios tienen detalles faltantes para que no se guarde y retorna los faltantes
 				for en in envios:
+					# recorre los envios registrados de las guias hijas
 					dt = DetalleEnvio.objects.filter(envio=int(en))
+					falta = 0
 					for d in dt:
 						if d.fue_subida_camion == False:
 							if d.codigo not in detalles_faltantes:
 								detalles_faltantes.append(d.codigo)
+								falta = 1
 					if en not in envios_faltantes:
-						envios_faltantes.append(en)
+						if falta == 1:
+							envios_faltantes.append(en)
 				if (len(detalles_faltantes) > 0):
 					resultado = "Cajas faltantes: "+ str(detalles_faltantes) + " | Envios correspondientes: " + str(envios_faltantes)
 					#retorna la transacion para que no realize cambios
 					transaction.set_rollback(True)
 					return JsonResponse(resultado,safe=False)
 				else:
-					Envio.objects.filter(pk=detalle_save.envio.pk).update(camion=id_camion, estado_envio_id=6)
+					for en in envios:
+						Envio.objects.filter(pk=en).update(camion=id_camion, estado_envio_id=6)
 					resultado = "correcto"
 		except Exception as e:
 			print('Error ---> ',e)
@@ -3360,6 +3365,12 @@ def seleccionar_camion(request):
 	camiones = Camion.objects.filter(estado=True)
 	data = {'camiones':camiones}
 	return render(request, 'seleccionar_camion.html',data)
+
+@login_required
+def ver_cajas_camion(request,id):
+	camion_asg = Camion.objects.get(pk=id)
+	data = {'camiones':camion_asg}
+	return render(request, 'ver_cajas_camion.html',data)
 
 @login_required
 def enviar_transito(request):
