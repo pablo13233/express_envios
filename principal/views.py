@@ -3795,10 +3795,9 @@ def ver_cajas_camion(request,id):
 		detalle['guia'] = envio.codigo
 		detalle['cliente'] = envio.quien_recibe.nombre_completo
 		detalle['telefono'] = envio.celular_registrar
-		detalle['direccion'] = envio.departamento_destino
+		detalle['departamento'] = envio.departamento_destino 
+		detalle['direccion'] = envio.direccion_registrar
 		detalle['cantidad'] = DetalleEnvio.objects.filter(envio_id=envio.pk).count()
 		detalle['comentario'] = envio.comentario
-		detalle['direccion'] = envio.codigo
-
 		envios_detalle.append(detalle)
 	return render(request, 'ver_cajas_camion.html',{'camion':camion,'envios':envios_detalle})

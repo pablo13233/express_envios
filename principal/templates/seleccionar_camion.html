@@ -29,7 +29,7 @@
                                         <th>Descripción </th>
                                         <th>Placa</th>
 
-                                        <th>Cargar</th>
+                                        <th>Accion</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,7 +38,7 @@
                                         <td>{{camion.descripcion}}</td>
                                         <td>{{camion.placa}}</td>
                                         <td><a type='button' class="btn btn-primary"
-                                                href="{% url 'cajas_camion'  camion.pk %}">Cargar</a></td>
+                                                href="{% url 'cajas_camion'  camion.pk %}" target="blank">Ver</a></td>
 
                                     </tr>
                                     {% endfor %}
@@ -47,7 +47,7 @@
                                     <tr>
                                         <th>Descripción </th>
                                         <th>Placa</th>
-                                        <th>Cargar</th>
+                                        <th>Accion</th>
                                     </tr>
                                 </tfoot>
                             </table>
