@@ -18,11 +18,12 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.views.static import serve
 import express_envios.settings 
+from django.conf import settings
 admin.autodiscover()
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('principal.urls')),
     url(r'^media/(?P<path>.*)$', serve, {'document_root':express_envios.settings.MEDIA_ROOT}), 
-    url(r'^static/(?P<path>.*)$', serve, {'document_root':express_envios.settings.STATIC_ROOT}),
-]
+    # url(r'^static/(?P<path>.*)$', serve, {'document_root':express_envios.settings.STATIC_ROOT}),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
