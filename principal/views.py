@@ -47,6 +47,7 @@ from django.db.models import Sum
 # ##MENSAJE DE TEXTO
 from twilio.rest import Client
 from django.db import transaction
+import pandas as pd
 #from htmlmin.decorators import minified_response
 ###############################################################################
 def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, humanReadable = True):
@@ -3368,9 +3369,21 @@ def seleccionar_camion(request):
 
 @login_required
 def ver_cajas_camion(request,id):
-	camion_asg = Camion.objects.get(pk=id)
-	data = {'camiones':camion_asg}
-	return render(request, 'ver_cajas_camion.html',data)
+	camion = Camion.objects.get(pk=id)
+	envios = Envio.objects.filter(camion_id=camion.pk, estado_envio_id=6)
+	envios_detalle = []
+	for envio in envios:
+		detalle={}
+		detalle['guia'] = envio.codigo
+		detalle['cliente'] = envio.quien_recibe.nombre_completo
+		detalle['telefono'] = envio.celular_registrar
+		detalle['direccion'] = envio.departamento_destino
+		detalle['cantidad'] = DetalleEnvio.objects.filter(envio_id=envio.pk).count()
+		detalle['comentario'] = envio.comentario
+		detalle['direccion'] = envio.codigo
+
+		envios_detalle.append(detalle)
+	return render(request, 'ver_cajas_camion.html',{'camion':camion,'envios':envios_detalle})
 
 @login_required
 def enviar_transito(request):

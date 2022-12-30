@@ -1,0 +1,65 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+
+<section class="content">
+    <!-- <div class="container-fluid"> -->
+        <br>
+        <div class="container col-12">
+            <div class="card col-12">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="div">
+                            <p class="" style="font-size: 30px;">Cajas cargadas al camion: <span class="text-bold">{{camion.placa}} | {{camion.descripcion}}</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pt-2">
+                        <div class="col-12">
+                            <table id="detalle" class="table table-bordered table-striped text-uppercase text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Guía</th>
+                                        <th scope="col">Nombre del Cliente</th>
+                                        <th scope="col">Direccion</th>
+                                        <th scope="col">Telefono</th>
+                                        <th scope="col">Cantidad</th>
+                                        <th scope="col">Comentario</th>
+                                        <th scope="col">Firma del Cliente</th>
+                                        <th scope="col">Ruta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for en in envios %}
+                                    <tr>
+                                        <td >{{en.guia}}</td>
+                                        <td >{{en.cliente}}</td>
+                                        <td >{{en.direccion}}</td>
+                                        <td >{{en.telefono}}</td>
+                                        <td >{{en.cantidad}} - Caja(s)</td>
+                                        <td >{{en.comentario}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- </div> -->
+        <!-- contenido del camion -->
+        <div class="container">
+
+        </div>
+    </div>
+
+
+</section>
+
+{% endblock contenido %}
+{% block js %}
+
+{% endblock js %}
