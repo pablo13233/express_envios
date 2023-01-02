@@ -1,91 +1,66 @@
-<!DOCTYPE html>
-{% load static %} {% load tz %} {% load humanize %} {% load l10n %}
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css"
-        href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
-    <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro-v6@44659d9/css/all.min.css" rel="stylesheet"
-        type="text/css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"
-        integrity="sha512-GQGU0fMMi238uA+a/bdWJfpUGKUkBdgfFdgBm72SUQ6BeyWjoY/ton0tEjH+OSH9iP4Dfh+7HM0I9f5eR0L/4w=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-
-    <title>Envio No. {{envio.pk}} | {{envio.quien_envia}}</title>
-    <style type="text/css">
-        * {
-            font-size: 14px;
-            font-family: 'Times New Roman';
-            font-weight: bold;
-        }
-
-        @page {
-            size: A4 landscape;
-            margin: 5mm;
-            /* afecta el margen en la configuración de impresión */
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container col-12">
-        <div class="card col-12">
-            <div class="card-header">
-                <div class="row">
-                    <div class="div">
-                        <p class="fs-3">Cajas cargadas al camion: <span class="text-bold fs-2">{{camion.placa}} |
-                                {{camion.descripcion}}</span></p>
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN | IMPRIMIR CARGA DE CAMIONES {% endblock titulo %}
+{% block contenido %}
+<section>
+    <body>
+        <div class="container-fluid">
+            <br>
+            <div class="container col-12">
+                <div class="card col-12">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="div">
+                                <p class="fs-3">Cajas cargadas al camion: <span class="text-bold fs-2">{{camion.placa}} |
+                                        {{camion.descripcion}}</span></p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row pt-2">
-                    <div class="table-responsibe col-12">
-                        <table class="table table-striped table-hover align-items-center mb-0 " id="datatable">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Guía</th>
-                                    <th scope="col">Nombre del Cliente</th>
-                                    <th scope="col">Ruta</th>
-                                    <th scope="col">Direccion</th>
-                                    <th scope="col">Telefono</th>
-                                    <th scope="col">Cantidad</th>
-                                    <th scope="col">Comentario</th>
-                                    <th scope="col" style="width: 120px">Firma del Cliente</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for en in envios %}
-                                <tr>
-                                    <td>{{en.guia}}</td>
-                                    <td>{{en.cliente}}</td>
-                                    <td>{{en.departamento}}</td>
-                                    <td>{{en.direccion}}</td>
-                                    <td>{{en.telefono}}</td>
-                                    <td>{{en.cantidad}} - Caja(s)</td>
-                                    <td>{{en.comentario}}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="card-body">
+                        <form action="." method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-3">
+                                    <div class="input-group mb-3 text-uppercase">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">Motorista: </span>
+                                        </div>
+                                        <input type="text" class="form-control bg-white" aria-describedby="basic-addon1"
+                                            id="motorista" name="motorista">
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="input-group mb-3 text-uppercase">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">Ayuda: </span>
+                                        </div>
+                                        <input type="text" class="form-control bg-white" aria-describedby="basic-addon1"
+                                            id="ayuda" name="ayuda">
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="input-group mb-3 text-uppercase">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">Fecha: </span>
+                                        </div>
+                                        <input type="text" class="form-control bg-white" aria-describedby="basic-addon1"
+                                            id="fecha" value="{{hoy}}" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <button type="submit" class="btn float-left btn-info text-uppercase"
+                                        id="imprimir" target="blank">Imprimir</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </body>
+</section>
+{% endblock contenido %}
+{% block js %}
 
-</body>
-<script src="https://code.jquery.com/jquery-3.6.1.min.js"
-    integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
-    integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous">
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
-    integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous">
-</script>
-
-</html>
+{% endblock js %}

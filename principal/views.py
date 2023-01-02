@@ -5,18 +5,18 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.contrib.auth.models import User
 from django.contrib.auth import login as auth_login, logout, authenticate
 #from htmlmin.decorators import minified_response
-from django.core import serializers
+# from django.core import serializers
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
-from django.core.serializers import serialize
-from django.core.serializers.json import DjangoJSONEncoder
+# from django.core.serializers import serialize
+# from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404,FileResponse
 from django.template.loader import render_to_string, get_template
 from django.shortcuts import render,redirect
 from django.urls import reverse
 #from django.core.urlresolvers import //reverse esta ya no en la version 1.11.17
-from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text
-from django.template import RequestContext
+# from django.utils.decorators import method_decorator
+# from django.utils.encoding import force_text
+# from django.template import RequestContext
 from principal.models import *
 import os
 from django.conf import settings
@@ -29,9 +29,8 @@ from django.db import transaction,connections
 #import cStringIO as StringIO // ya no es valido en python 3.X 
 from io import StringIO, BytesIO
 from xhtml2pdf import pisa
-from django.template import Context
 from cgi import *
-import re
+# import re
 import json as simplejson
 ##para generar barcode
 from base64 import b64encode
@@ -48,6 +47,7 @@ from django.db.models import Sum
 from twilio.rest import Client
 from django.db import transaction
 import pandas as pd
+import datetime
 #from htmlmin.decorators import minified_response
 ###############################################################################
 def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, humanReadable = True):
@@ -3442,103 +3442,103 @@ def trasladar_a_transito(request,envio):
 	return HttpResponseRedirect(reverse('enviar_transito'))
 
 
-@login_required
-def buscar_caja_transito(request):
-	tiene_datos = 0
-	resultado = {}
-	data = []
-	if request.is_ajax():
-		try:
-			#seguimiento = SeguimientoEnvio.objects.get(codigo_envio__codigo= request.GET.get('guia'),estado=6)
-			seguimiento = SeguimientoEnvio.objects.filter(codigo_envio__codigo= request.GET.get('guia'),estado=6).order_by('-id')[0]
-			detalle = DetalleEnvio.objects.filter(envio__codigo=seguimiento.codigo_envio.codigo)
-			lista_detalle = []
-			if detalle:
-				tiene_datos = 1
-				for d in detalle:
-					dic = {}
-					dic['cantidad'] = d.cantidad
-					dic['caja'] = d.tipo_caja.tipo_caja.descripcion 
-					dic['precio'] = d.precio
-					dic['total'] = d.total
-					if d.fue_enviada:
-						dic['enviada'] = 'SI'
-					else:
-						dic['enviada'] = 'NO'
-					lista_detalle.append(dic) 
-			if seguimiento.codigo_envio.contenedor:
-				contendor = str(seguimiento.codigo_envio.contenedor.codigo_original)+'|'+str(seguimiento.codigo_envio.contenedor.codigo_express)
-			else:
-				contendor ='NO ESTA ASIGNADA A CONTENEDOR'
-			data = {'pk':seguimiento.pk,
-					'codigo':seguimiento.codigo_envio.codigo,
-					'envia':seguimiento.codigo_envio.quien_envia.nombre_completo,
-					'recibe':seguimiento.codigo_envio.quien_recibe.nombre_completo,
-					'estado':seguimiento.estado.estado,
-					'fechahora':str(seguimiento.fechahora),
-					'usuario_registro':seguimiento.usuario_registro.username,
-					'contenedor':contendor,
-					'tiene_datos':tiene_datos,
-					'lista_detalle':lista_detalle,
-					'url' : reverse('entregar_caja', kwargs={'envio':request.GET.get('guia')})}
-		except Exception as e:
-			data = {'tiene_datos':0}
-			#print 'errores', e
+# @login_required
+# def buscar_caja_transito(request):
+# 	tiene_datos = 0
+# 	resultado = {}
+# 	data = []
+# 	if request.is_ajax():
+# 		try:
+# 			#seguimiento = SeguimientoEnvio.objects.get(codigo_envio__codigo= request.GET.get('guia'),estado=6)
+# 			seguimiento = SeguimientoEnvio.objects.filter(codigo_envio__codigo= request.GET.get('guia'),estado=6).order_by('-id')[0]
+# 			detalle = DetalleEnvio.objects.filter(envio__codigo=seguimiento.codigo_envio.codigo)
+# 			lista_detalle = []
+# 			if detalle:
+# 				tiene_datos = 1
+# 				for d in detalle:
+# 					dic = {}
+# 					dic['cantidad'] = d.cantidad
+# 					dic['caja'] = d.tipo_caja.tipo_caja.descripcion 
+# 					dic['precio'] = d.precio
+# 					dic['total'] = d.total
+# 					if d.fue_enviada:
+# 						dic['enviada'] = 'SI'
+# 					else:
+# 						dic['enviada'] = 'NO'
+# 					lista_detalle.append(dic) 
+# 			if seguimiento.codigo_envio.contenedor:
+# 				contendor = str(seguimiento.codigo_envio.contenedor.codigo_original)+'|'+str(seguimiento.codigo_envio.contenedor.codigo_express)
+# 			else:
+# 				contendor ='NO ESTA ASIGNADA A CONTENEDOR'
+# 			data = {'pk':seguimiento.pk,
+# 					'codigo':seguimiento.codigo_envio.codigo,
+# 					'envia':seguimiento.codigo_envio.quien_envia.nombre_completo,
+# 					'recibe':seguimiento.codigo_envio.quien_recibe.nombre_completo,
+# 					'estado':seguimiento.estado.estado,
+# 					'fechahora':str(seguimiento.fechahora),
+# 					'usuario_registro':seguimiento.usuario_registro.username,
+# 					'contenedor':contendor,
+# 					'tiene_datos':tiene_datos,
+# 					'lista_detalle':lista_detalle,
+# 					'url' : reverse('entregar_caja', kwargs={'envio':request.GET.get('guia')})}
+# 		except Exception as e:
+# 			data = {'tiene_datos':0}
+# 			#print 'errores', e
 		
-		return HttpResponse(simplejson.dumps(data), content_type='application/javascript')
-	return render(request, 'buscar_caja_transito.html')
+# 		return HttpResponse(simplejson.dumps(data), content_type='application/javascript')
+# 	return render(request, 'buscar_caja_transito.html')
 
-@login_required
-def entregar_caja(request,envio):
-	e = Envio.objects.get(codigo=envio)
-	estado = 7
-	envio_cliente = Envio.objects.get(pk=e.pk)
-	empresa = Envio.objects.get(pk=e.pk)
-	estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
+# @login_required
+# def entregar_caja(request,envio):
+# 	e = Envio.objects.get(codigo=envio)
+# 	estado = 7
+# 	envio_cliente = Envio.objects.get(pk=e.pk)
+# 	empresa = Envio.objects.get(pk=e.pk)
+# 	estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
 	
 
-	###UPDATE EEHN
-	envio = SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e.pk)).update(estado=estado)
-	historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e.pk),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
-	envio_cliente.estado_envio = estado_final
-	envio_cliente.save()
-	###UPDATE KRAKEN
-	#OBTENER ENVIO EN kraken_cargo
-	es_kraken = False
-	kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = envio_cliente.guia_revendedor)
-	if kraken_envio.count() >= 1:
-		es_kraken = True
+# 	###UPDATE EEHN
+# 	envio = SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e.pk)).update(estado=estado)
+# 	historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e.pk),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
+# 	envio_cliente.estado_envio = estado_final
+# 	envio_cliente.save()
+# 	###UPDATE KRAKEN
+# 	#OBTENER ENVIO EN kraken_cargo
+# 	es_kraken = False
+# 	kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = envio_cliente.guia_revendedor)
+# 	if kraken_envio.count() >= 1:
+# 		es_kraken = True
 	
-	if es_kraken:
-		estado_kraken = ''
-		pk = 0
-		if estado_final.pk == 1:
-			estado_kraken = 'BODEGA EEUU'
-			pk = 8
-		elif estado_final.pk == 2:
-			estado_kraken = 'PUERTO EEUU'
-			pk = 9
-		elif estado_final.pk == 3:
-			estado_kraken = 'TRANSITO MARITIMO'
-			pk = 10
-		elif estado_final.pk == 4:
-			estado_kraken = 'PUERTO HONDURAS'
-			pk = 11
-		elif estado_final.pk == 5:
-			estado_kraken = 'BODEGA HONDURAS'
-			pk = 12
-		elif estado_final.pk == 6:
-			estado_kraken = 'EN TRANSITO PARA ENTREGA'
-			pk = 13
-		elif estado_final.pk == 7:
-			estado_kraken = 'ENTREGADO'
-			pk = 14
-		estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
-		seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
-		historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
-		envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
-		hoy = timezone.now()
-	return HttpResponseRedirect(reverse('enviar_transito'))
+# 	if es_kraken:
+# 		estado_kraken = ''
+# 		pk = 0
+# 		if estado_final.pk == 1:
+# 			estado_kraken = 'BODEGA EEUU'
+# 			pk = 8
+# 		elif estado_final.pk == 2:
+# 			estado_kraken = 'PUERTO EEUU'
+# 			pk = 9
+# 		elif estado_final.pk == 3:
+# 			estado_kraken = 'TRANSITO MARITIMO'
+# 			pk = 10
+# 		elif estado_final.pk == 4:
+# 			estado_kraken = 'PUERTO HONDURAS'
+# 			pk = 11
+# 		elif estado_final.pk == 5:
+# 			estado_kraken = 'BODEGA HONDURAS'
+# 			pk = 12
+# 		elif estado_final.pk == 6:
+# 			estado_kraken = 'EN TRANSITO PARA ENTREGA'
+# 			pk = 13
+# 		elif estado_final.pk == 7:
+# 			estado_kraken = 'ENTREGADO'
+# 			pk = 14
+# 		estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
+# 		seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
+# 		historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
+# 		envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
+# 		hoy = timezone.now()
+# 	return HttpResponseRedirect(reverse('enviar_transito'))
 
 
 @login_required
@@ -3771,6 +3771,15 @@ def distribuir_cajas(request):
 					return JsonResponse(resultado,safe=False)
 				else:
 					for en in envios:
+						#se busca el id de el envio
+						envio_cliente = Envio.objects.get(pk=en)
+						#se crea el historial correspondiente
+						HistorialEnvio.objects.create(codigo_envio=envio_cliente,
+														estado_id=6,
+														usuario_registro=request.user)
+						#se actualiza el seguimiento de el envio
+						SeguimientoEnvio.objects.filter(codigo_envio=en).update(estado=6)
+						#se actualiza el estado del envio en la tabla y se actualiza el camion al que fue asignado
 						Envio.objects.filter(pk=en).update(camion=id_camion, estado_envio_id=6)
 					resultado = "correcto"
 		except Exception as e:
@@ -3790,14 +3799,135 @@ def ver_cajas_camion(request,id):
 	camion = Camion.objects.get(pk=id)
 	envios = Envio.objects.filter(camion_id=camion.pk, estado_envio_id=6)
 	envios_detalle = []
+	hoy = datetime.date.today()
+	fecha = hoy.strftime('%B %d, %Y')
+
 	for envio in envios:
 		detalle={}
 		detalle['guia'] = envio.codigo
 		detalle['cliente'] = envio.quien_recibe.nombre_completo
 		detalle['telefono'] = envio.celular_registrar
-		detalle['departamento'] = envio.departamento_destino 
+		detalle['departamento'] = envio.departamento_destino.nombre 
 		detalle['direccion'] = envio.direccion_registrar
 		detalle['cantidad'] = DetalleEnvio.objects.filter(envio_id=envio.pk).count()
 		detalle['comentario'] = envio.comentario
+		debe = False
+		if (envio.saldo_pendiente > 0):
+			debe = True
+		detalle['saldo'] = debe
+
+		cajas = DetalleEnvio.objects.filter(envio_id=envio.pk)
+		cajas_agrupadas = {}  # diccionario para almacenar el resultado
+		for caja in cajas:
+			descripcion = caja.tipo_caja.tipo_caja.descripcion
+			if descripcion not in cajas_agrupadas:
+				cajas_agrupadas[descripcion] = 1
+			else:
+				cajas_agrupadas[descripcion] += 1
+
+		# construimos el string resultante a partir del diccionario
+		cajas_string = ''
+		for descripcion, cantidad in cajas_agrupadas.items():
+			cajas_string += f'{descripcion}:({cantidad}), '
+		cajas_string = cajas_string[:-2]  # eliminamos la última coma y espacio
+
+		detalle['cajas'] = cajas_string
+		
 		envios_detalle.append(detalle)
-	return render(request, 'ver_cajas_camion.html',{'camion':camion,'envios':envios_detalle})
+	if request.method == 'POST':
+		motorista = request.POST['motorista']
+		ayuda = request.POST['ayuda']
+		return generar_pdf('ver_cajas_camion_pdf.html',{
+				'camion':camion,
+				'envios':envios_detalle, 
+				'hoy':fecha, 
+				'motorista':motorista, 
+				'ayuda':ayuda,
+			})
+			
+	return render(request, 'ver_cajas_camion.html',{'camion':camion,'envios':envios_detalle, 'hoy':fecha})
+
+@login_required
+def entregar_caja(request,envio):
+	try:
+		with transaction.atomic():
+			e = Envio.objects.get(codigo=envio)
+			estado = 7
+			envio_cliente = Envio.objects.get(pk=e.pk)
+			empresa = Envio.objects.get(pk=e.pk)
+			estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
+			###UPDATE EEHN
+			# Actualiza el seguimiento
+			SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e.pk)).update(estado=estado)
+			#crea el historico
+			HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e.pk),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
+			envio_cliente.estado_envio = estado_final
+			envio_cliente.save()
+			hoy = timezone.now()
+			return HttpResponseRedirect(reverse('enviar_transito'))
+	except Exception as e:
+		print('Error ---> ',e)
+		transaction.rollback()
+	return HttpResponseRedirect(reverse('enviar_transito'))
+
+@login_required
+def buscar_caja_transito(request):
+	tiene_datos = 0
+	resultado = {}
+	data = []
+	if request.is_ajax():
+		try:
+			with transaction.atomic():
+				#seguimiento = SeguimientoEnvio.objects.get(codigo_envio__codigo= request.GET.get('guia'),estado=6)
+				guia = request.GET.get('guia')
+				guia_envio=''
+				try:
+					if Envio.objects.get(codigo=guia):
+						guia_envio = guia
+				except Exception as e:
+					# si el envio no existe salta a la siguiente comparacion
+					#buscamos la guia hija
+					guia_detalle = DetalleEnvio.objects.filter(codigo=guia)
+					id_envio_detalle = ''
+					for d in guia_detalle:
+						id_envio_detalle = d.envio.codigo
+					guia_envio = id_envio_detalle
+				seguimiento = SeguimientoEnvio.objects.filter(codigo_envio__codigo= guia_envio,estado=6).order_by('-id')[0]
+				detalle = DetalleEnvio.objects.filter(envio__codigo=seguimiento.codigo_envio.codigo)
+				lista_detalle = []
+				if detalle:
+					tiene_datos = 1
+					for d in detalle:
+						dic = {}
+						dic['cantidad'] = d.cantidad
+						dic['caja'] = d.tipo_caja.tipo_caja.descripcion 
+						dic['precio'] = d.precio
+						dic['total'] = d.total
+						if d.fue_enviada:
+							dic['enviada'] = 'SI'
+						else:
+							dic['enviada'] = 'NO'
+						lista_detalle.append(dic) 
+				if seguimiento.codigo_envio.contenedor:
+					contendor = str(seguimiento.codigo_envio.contenedor.codigo_original)+'|'+str(seguimiento.codigo_envio.contenedor.codigo_express)
+				else:
+					contendor ='NO ESTA ASIGNADA A CONTENEDOR'
+				data = {'pk':seguimiento.pk,
+						'codigo':seguimiento.codigo_envio.codigo,
+						'envia':seguimiento.codigo_envio.quien_envia.nombre_completo,
+						'recibe':seguimiento.codigo_envio.quien_recibe.nombre_completo,
+						'estado':seguimiento.estado.estado,
+						'fechahora':str(seguimiento.fechahora),
+						'usuario_registro':seguimiento.usuario_registro.username,
+						'contenedor':contendor,
+						'tiene_datos':tiene_datos,
+						'lista_detalle':lista_detalle,
+						'url' : reverse('entregar_caja', kwargs={'envio':guia_envio})}
+		except Exception as e:
+			print('Error ---> ',e)
+			transaction.rollback()
+			data = {'tiene_datos':0}
+			#print 'errores', e
+		
+		return HttpResponse(simplejson.dumps(data), content_type='application/javascript')
+	return render(request, 'buscar_caja_transito.html')

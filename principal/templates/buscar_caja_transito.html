@@ -1,5 +1,5 @@
 {% extends "base_admin.html" %}
- {% load static %}
+{% load static %}
 {% load l10n %}
 <!-- Select2 -->
 <link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
@@ -166,7 +166,7 @@ input[type=range]:focus::-ms-fill-upper {
                 <div id="id_resultados">
                     
                 </div>
-                 <div id="id_detalle">
+                <div id="id_detalle">
                     
                 </div>
                 <!--
@@ -220,7 +220,7 @@ input[type=range]:focus::-ms-fill-upper {
     
         if(guia =='' )
         {
-           $.notify("Error, Utilice un dato para buscar!",{
+          $.notify("Error, Utilice un dato para buscar!",{
                         className: 'error',
                         globalPosition:"right bottom",
                         clickToHide: true,
@@ -242,45 +242,45 @@ input[type=range]:focus::-ms-fill-upper {
                   type: "get",
                   url: "{% url 'buscar_caja_transito' %}",
                   data: {
-                     'guia': guia,
-                     'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val(),
+                    'guia': guia,
+                    'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val(),
                   },
                   contentType: "application/json; charset=utf-8",
                   dataType: "json", 
-                   success: function(data) {
-                       if (data.tiene_datos == 1)
-                       {
+                  success: function(data) {
+                      if (data.tiene_datos == 1)
+                      {
                                 
                             var tabla = "<table id='seguimiento' class='table table-striped table-bordered nowrap' cellspacing='0' width='100%'><thead><tr><th hidden='hidden'>id</th><th>Código</th><th>Envia</th><th>Recibe</th><th>Estado</th><th>Fecha</th><th>Usuario</th><th>Contenedor</th><th>Entregar</th></tr></thead><tbody>"
-                                     
-                                       tabla += "<tr>";
-                                       tabla +="<td hidden='hidden'>"+data.pk+"</td>";
-                                       tabla +="<td>"+data.codigo+"</td>";
-                                       tabla +="<td>"+data.envia+"</td>";
-                                       tabla +="<td>"+data.recibe+"</td>";
-                                       tabla +="<td>"+data.estado+"</td>";
-                                       tabla += "<td>"+data.fechahora+"</td>";
-                                       tabla += "<td>"+data.usuario_registro+"</td>";
-                                       tabla += "<td>"+data.contenedor+"</td>";
-                                       tabla += "<td>"+
-                                                    "<a class='btn btn-success' href='"+data.url+"'>"+
-                                                    "<i class='fa fa-refresh'></i>"+ 
-                                                    "Entregar </a>"+
-                                                    "</td>";
-                                        tabla += "</tr>";
-                                   
+                                    
+                                      tabla += "<tr>";
+                                      tabla +="<td hidden='hidden'>"+data.pk+"</td>";
+                                      tabla +="<td>"+data.codigo+"</td>";
+                                      tabla +="<td>"+data.envia+"</td>";
+                                      tabla +="<td>"+data.recibe+"</td>";
+                                      tabla +="<td>"+data.estado+"</td>";
+                                      tabla += "<td>"+data.fechahora+"</td>";
+                                      tabla += "<td>"+data.usuario_registro+"</td>";
+                                      tabla += "<td>"+data.contenedor+"</td>";
+                                      tabla += "<td>"+
+                                                  "<a class='btn btn-success' href='"+data.url+"'>"+
+                                                  "<i class='fa fa-refresh'></i>"+ 
+                                                  "Entregar </a>"+
+                                                  "</td>";
+                                      tabla += "</tr>";
+
                                 tabla +="</tbody></table>";
                                 document.getElementById('id_resultados').style.display = 'block'; //mostramos div de resultados
 
 
                                 var tabladetalle = "<table id='example' class='table table-striped table-bordered nowrap' cellspacing='0' width='100%'><thead><tr><th>Caja</th><th>Cantidad</th><th>Precio</th><th>Total</th><th>Enviada</th></tr></thead><tbody>"
-                                         $.each(data.lista_detalle, function(key, val) {
-                                           tabladetalle += "<tr>";
-                                           tabladetalle += "<td>"+val.caja+"</td>";
-                                           tabladetalle += "<td>"+val.cantidad+"</td>";
-                                           tabladetalle += "<td>"+val.precio+"</td>";
-                                           tabladetalle += "<td>"+val.total+"</td>";
-                                           tabladetalle += "<td>"+val.enviada+"</td>";
+                                        $.each(data.lista_detalle, function(key, val) {
+                                          tabladetalle += "<tr>";
+                                          tabladetalle += "<td>"+val.caja+"</td>";
+                                          tabladetalle += "<td>"+val.cantidad+"</td>";
+                                          tabladetalle += "<td>"+val.precio+"</td>";
+                                          tabladetalle += "<td>"+val.total+"</td>";
+                                          tabladetalle += "<td>"+val.enviada+"</td>";
                                         });
                                       tabladetalle +="</tbody></table>";
 
@@ -313,10 +313,116 @@ input[type=range]:focus::-ms-fill-upper {
             $('#id_guia').val("");     
             return false; //este return es para evitar refrescar la pagina
 
-         }
+        }
     });
+    $('#id_guia').keypress(function(e){
+    if (e.which == 13){
+      document.getElementById('id_resultados').style.display = 'none'; //ocultamos div de resultados
+        var guia = $('#id_guia').val();
+    
+        if(guia =='' )
+        {
+          $.notify("Error, Utilice un dato para buscar!",{
+                        className: 'error',
+                        globalPosition:"right bottom",
+                        clickToHide: true,
+                        autoHide: true,
+                        autoHideDelay: 5000,
+                        arrowShow: true,
+                        arrowSize: 5,
+                        style: 'bootstrap',
+                        showAnimation: 'slideDown',
+                        showDuration: 400,
+                        hideAnimation: 'slideUp',
+                        hideDuration: 200,
+                        gap: 2
+                    });
+            return;
+        }else{ 
+            // realizar ajax 
+              $.ajax({
+                  type: "get",
+                  url: "{% url 'buscar_caja_transito' %}",
+                  data: {
+                    'guia': guia,
+                    'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val(),
+                  },
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json", 
+                  success: function(data) {
+                      if (data.tiene_datos == 1)
+                      {
+                                
+                            var tabla = "<table id='seguimiento' class='table table-striped table-bordered nowrap' cellspacing='0' width='100%'><thead><tr><th hidden='hidden'>id</th><th>Código</th><th>Envia</th><th>Recibe</th><th>Estado</th><th>Fecha</th><th>Usuario</th><th>Contenedor</th><th>Entregar</th></tr></thead><tbody>"
+                                    
+                                      tabla += "<tr>";
+                                      tabla +="<td hidden='hidden'>"+data.pk+"</td>";
+                                      tabla +="<td>"+data.codigo+"</td>";
+                                      tabla +="<td>"+data.envia+"</td>";
+                                      tabla +="<td>"+data.recibe+"</td>";
+                                      tabla +="<td>"+data.estado+"</td>";
+                                      tabla += "<td>"+data.fechahora+"</td>";
+                                      tabla += "<td>"+data.usuario_registro+"</td>";
+                                      tabla += "<td>"+data.contenedor+"</td>";
+                                      tabla += "<td>"+
+                                                  "<a class='btn btn-success' href='"+data.url+"'>"+
+                                                  "<i class='fa fa-refresh'></i>"+ 
+                                                  "Entregar </a>"+
+                                                  "</td>";
+                                      tabla += "</tr>";
 
-     $(document).ready(function () {
+                                tabla +="</tbody></table>";
+                                document.getElementById('id_resultados').style.display = 'block'; //mostramos div de resultados
+
+
+                                var tabladetalle = "<table id='example' class='table table-striped table-bordered nowrap' cellspacing='0' width='100%'><thead><tr><th>Caja</th><th>Cantidad</th><th>Precio</th><th>Total</th><th>Enviada</th></tr></thead><tbody>"
+                                        $.each(data.lista_detalle, function(key, val) {
+                                          tabladetalle += "<tr>";
+                                          tabladetalle += "<td>"+val.caja+"</td>";
+                                          tabladetalle += "<td>"+val.cantidad+"</td>";
+                                          tabladetalle += "<td>"+val.precio+"</td>";
+                                          tabladetalle += "<td>"+val.total+"</td>";
+                                          tabladetalle += "<td>"+val.enviada+"</td>";
+                                        });
+                                      tabladetalle +="</tbody></table>";
+
+                                $('#id_resultados').html(tabla);
+                                $('#id_detalle').html(tabladetalle);
+                        }else{
+                            $.notify("Error, No hay datos que coincidan con esos criterios!",{
+                                        className: 'error',
+                                        globalPosition:"right bottom",
+                                        clickToHide: true,
+                                        autoHide: true,
+                                        autoHideDelay: 5000,
+                                        arrowShow: true,
+                                        arrowSize: 5,
+                                        style: 'bootstrap',
+                                        showAnimation: 'slideDown',
+                                        showDuration: 400,
+                                        hideAnimation: 'slideUp',
+                                        hideDuration: 200,
+                                        gap: 2
+                                    });
+                            return;
+                        }
+                        
+                    },
+                    error: function(ts) {
+                        alert(ts);
+                        } 
+              });
+            $('#id_guia').val("");     
+            return false; //este return es para evitar refrescar la pagina
+
+        }
+        
+        $(this).val("");
+        $(this).focus();
+    }
+});
+
+    $(document).ready(function () {
     var table = $('#seguimiento').DataTable({
         "oLanguage": {
                                 "sProcessing":     "Procesando...",
@@ -378,7 +484,7 @@ input[type=range]:focus::-ms-fill-upper {
     var dataUrl = canvas.toDataURL();
     drawText.innerHTML = dataUrl;
     drawImage.setAttribute("src", dataUrl);
-     }, false);
+    }, false);
 
     // Activamos MouseEvent para nuestra pagina
     var drawing = false;

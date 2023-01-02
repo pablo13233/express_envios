@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 300;
+            line-height: 1.42em;
+            color: #000000;
+        }
+
+        h1 {
+            font-size: 3em;
+            font-weight: bold;
+            line-height: 1em;
+            text-align: center;
+            color: #4DC3FA;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            display: block;
+            line-height: 1em;
+            padding-bottom: 0px;
+            color: #000000;
+        }
+
+        h2{
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #4DC3FA;
+            text-decoration: none;
+        }
+
+        .blue {
+            color: #185875;
+        }
+
+        .yellow {
+            color: #000000;
+        }
+
+        .container th {
+            font-weight: bold;
+            font-size: 1.75em;
+            text-align: left;
+            color: #000000;
+        }
+
+        .container td {
+            font-weight: normal;
+            font-size: 1.5em;
+        }
+
+        .container {
+            text-align: left;
+            overflow: hidden;
+            width: 100%;
+            margin: 0 auto;
+            display: table;
+            padding: 0 0 8em 0;
+        }
+
+        .container td,
+        .container th {
+            margin-bottom: 2%;
+            margin-top: 2%;
+            margin-left: 4px;
+            padding-top: 2px;
+            border-bottom:1px solid #9ea7af;
+            border-left:1px solid #dcdcdd;
+            border-right:1px solid #dcdcdd;
+        }
+
+        /* Background-color of the odd rows */
+        .container tr:nth-child(odd) {
+            background-color: #323C50;
+        }
+
+        /* Background-color of the even rows */
+        .container tr:nth-child(even) {
+            background-color: #2C3446;
+        }
+
+        .container th {
+            background-color: #bbbbbb;
+        }
+
+        @media (max-width: 800px) {
+
+            .container td:nth-child(4),
+            .container th:nth-child(4) {
+                display: none;
+            }
+        }
+        @page{
+            size: 11in 8.5in ;
+            margin: 1.91cm 0.64cm;;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>EXPRESS ENVIOS HN</h1>
+    <h2>Cajas cargadas al camion: <span class="yellow">{{camion.placa}} | {{camion.descripcion}}</span>
+    </h2>
+    <h2>Motorista: <span class="yellow">{{motorista}}</span> Ayuda: <span class="yellow">{{ayuda}}</span> Fecha: <span class="yellow">{{hoy}}</span></h2>
+
+    <table class="container">
+        <thead>
+            <tr>
+                <th>Guía</th>
+                <th>Nombre del Cliente</th>
+                <th>Ruta</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th>Cantidad</th>
+                <th>Comentario</th>
+                <th style="width: 150px">Firma del Cliente</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for en in envios %}
+
+            {% if en.saldo %}
+            <tr style="background-color: #fb6666;">
+                {% else %}
+            <tr>
+                {% endif %}
+                <td>{{en.guia}}</td>
+                <td>{{en.cliente}}</td>
+                <td>{{en.departamento}}</td>
+                <td>{{en.direccion}}</td>
+                <td>{{en.telefono}}</td>
+                <td>{{en.cajas}}</td>
+                <td>{{en.comentario}}</td>
+                <td></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
