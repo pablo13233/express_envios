@@ -3799,7 +3799,7 @@ def ver_cajas_camion(request,id):
 	camion = Camion.objects.get(pk=id)
 	envios = Envio.objects.filter(camion_id=camion.pk, estado_envio_id=6)
 	envios_detalle = []
-	hoy = datetime.date.today()
+	hoy = timezone.now()
 	fecha = hoy.strftime('%B %d, %Y')
 
 	for envio in envios:
@@ -3845,7 +3845,7 @@ def ver_cajas_camion(request,id):
 				'ayuda':ayuda,
 			})
 			
-	return render(request, 'ver_cajas_camion.html',{'camion':camion,'envios':envios_detalle, 'hoy':fecha})
+	return render(request, 'ver_cajas_camion.html',{'camion':camion, 'hoy':fecha})
 
 @login_required
 def entregar_caja(request,envio):
