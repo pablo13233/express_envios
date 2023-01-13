@@ -1,0 +1,195 @@
+{% extends "base_admin.html" %}
+{% load humanize %}
+{% load l10n %}
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block contenido %}
+
+<section class="content">
+    <div class="container-fluid">
+        <br>
+        <div class="container">
+            <div class="card col-12">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="div">
+                            <h4>Recibir cajas en Bodega Honduras</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pt-2">
+                        <div class="col-6">
+                            <div class="input-group mb-3 text-uppercase">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">Guia Hija: </span>
+                                </div>
+                                <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="guiaHija">
+                            </div>
+                        </div>
+                        <div class="col-6 text-right">
+                            <label for="">Imprimir Ultimo Registro</label> 
+                            <button id="btn_envios_pdf" class="btn btn-primary" value="{{ csrf_token }}" disabled>Imprimir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- contenido del camion -->
+        <div class="container">
+            <form id="trasladarForm" method="POST" action="." enctype="multipart/form-data">
+                {% csrf_token %}
+                <div  class="card col-12">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="div">
+                                <h4>Detalle de envios</h4>
+                                <h6 class="text-muted">Al final se imprime un reporte con los envios y cajas correspondientes que se registraron</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <table id="camionDetalle" class="table table-bordered table-striped text-uppercase text-center">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Guía hija</th>
+                                            <th scope="col">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-3">
+                                <button type="submit" class="btn float-left btn-info">Recibir</button>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-8">
+                                <p class="text-muted">Las cajas se cambiaran a estado Bodega Honduras</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+</section>
+{% endblock contenido %}
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.8/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.js"></script>
+<script>
+var envios_pdf;
+$('#guiaHija').keypress(function(e){
+    if (e.which == 13){
+        var guia_hija = $(this).val();
+
+        $('#camionDetalle').append(
+            '<tr>'+
+                '<td>' + guia_hija + '</td>' +
+                '<td>' + `<a rel="eliminarRow" class="btn btn-danger btn-sm btn-flat rounded font-weight-bolder" title="Eliminar Fila">
+                    <i class="fa fa-solid fa-delete-left"></i> Eliminar</a>` + '</td>' +
+            '</tr>'
+            );
+        
+        $.notify("Agregado a lista",{
+            className: 'success',
+            globalPosition:"right top", 
+            clickToHide: true,
+            autoHide: true,
+            autoHideDelay: 5000,
+            arrowShow: true,
+            arrowSize: 5,
+            style: 'bootstrap',
+            showAnimation: 'slideDown',
+            showDuration: 400,
+            hideAnimation: 'slideUp',
+            hideDuration: 200,
+            gap: 2
+        });
+        
+        $(this).val("");
+        $(this).focus();
+    }
+});
+
+$('#camionDetalle tbody').on('click', 'a[rel="eliminarRow"]',function(){
+    $(this).closest('tr').remove();
+});
+
+$('#trasladarForm').submit(function(event){
+    event.preventDefault(); // Previene el envío del formulario
+    var parametros = new FormData();
+    token = $('input[name="csrfmiddlewaretoken"]').val();
+    var cajas = [];
+    $('#trasladarForm table tbody tr').each(function(){
+        // Obtiene los datos de cada fila
+        cajas.push($(this).find('td:nth-child(1)').text());
+        // cajas.push({'id_caja': id_caja});
+    });
+    parametros.append('guia_Hijas', cajas);
+    parametros.append('csrfmiddlewaretoken', token);
+    // Envía los datos a la vista
+    // alert(cajas);
+    $.ajax({
+        url: window.location.pathname,
+        type: 'POST',
+        data: parametros,
+        dataType: 'json',
+        contentType: 'multipart/form-data',
+        processData: false,
+        contentType: false,
+        success: function(result){
+            if (result.result == "correcto"){
+                // console.log(result.envios);
+                envios_pdf = result.envios;
+                $("#btn_envios_pdf").attr("disabled",false);
+                $('#trasladarForm')[0].reset();
+                $('#camionDetalle tbody tr').remove();
+                texto = "Cajas recibidas con exito.";
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Correcto',
+                    text: texto,
+                    confirmButtonText: 'OK',
+                });
+                var encoded = encodeURIComponent(JSON.stringify(result.envios));
+                window.open("{% url 'recibido_bodega_hn' %}?pdf="+ encoded);
+            } else {
+                Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: result
+                    });
+            }
+        }
+    });
+});
+$("#btn_envios_pdf").on("click", function() {
+    var csrf_token = $(this).val();
+    alert(envios_pdf);
+    $.ajax({
+        url: "{% url 'recibido_bodega_hn' %}",
+        type: "POST",
+        data: {'envios': envios_pdf,
+                "csrfmiddlewaretoken": csrf_token
+        },
+        dataType: 'json',
+        contentType: 'multipart/form-data',
+        processData: false,
+        contentType: false,
+        success: function(response) {
+        //Aqui se abre una nueva pestaña con la url de la funcion recibido_bodega_hn
+            window.open("{% url 'recibido_bodega_hn' %}", "_blank");
+            envios_pdf = "";
+        }
+    });
+});
+</script>
+{% endblock js %}

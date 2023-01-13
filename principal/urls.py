@@ -94,7 +94,8 @@ urlpatterns = [
     # alksdalk
     url(r'^distribuir_cajas/', distribuir_cajas, name='distribuir_cajas'),
     url(r'^cajas_camion/(?P<id>\d+)/$', ver_cajas_camion, name='cajas_camion'),
-    
+    url(r'^recibir_bodega_hn/', recibir_bodega, name='recibir_bodega_hn'),
+    url(r'^ver_recibido_bodega_hn/', recibido_bodega_hn, name='recibido_bodega_hn'),
 
 ]
 # url(r'^$', inicio, name='inicio'),

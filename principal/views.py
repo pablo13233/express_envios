@@ -48,6 +48,8 @@ from twilio.rest import Client
 from django.db import transaction
 import pandas as pd
 import datetime
+from urllib.parse import unquote
+import json
 #from htmlmin.decorators import minified_response
 ###############################################################################
 def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, humanReadable = True):
@@ -93,7 +95,7 @@ def resultado_busqueda(request):
 def buscar_envio(request):
 	empleado = Empleado.objects.get(usuario=request.user)
 	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
-	envios = Envio.objects.filter(empresa=empresa.empresa, fecha_envio__range=["2022-08-01","2023-02-28"])
+	envios = Envio.objects.filter(empresa=empresa.empresa, fecha_envio__range=["2022-08-01","2023-06-30"])
 	er = Revendedor.objects.count()
 	if er >0:
 		r = Revendedor.objects.filter(usuario=request.user)
@@ -150,7 +152,7 @@ def ver_paquetes(request,id_estado):
 		estado_siguiente = EstadoEnvio.objects.get(pk=estado_sigui)
 		
 		if(int(id_estado) == 7):
-			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=["2022-08-01","2023-02-28"]) 
+			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=["2022-08-01","2023-06-30"]) 
 		else:
 			envios = Envio.objects.filter(estado_envio=estado)
 		#envios = SeguimientoEnvio.objects.filter(estado=id_estado)
@@ -934,7 +936,7 @@ def validad_actividades(request,quien_envia):
 def actividades(request):
 	es_sadmin = Empleado.objects.get(usuario=request.user)
 	empresa = EmpresaEmpleado.objects.get(empleado = es_sadmin)
-	hoy = datetime.now() 
+	hoy = timezone.now() 
 	fecha_hoy = hoy.strftime("%Y-%m-%d")
 	fecha_inicio = "2022-08-01"
 	print(fecha_hoy)
@@ -1614,12 +1616,12 @@ def registrar_envio(request):
 						total = float(precio) * int(1)
 						try:
 							detalle = DetalleEnvio.objects.create(envio=envio,
-															  tipo_caja=caja_pais,
-															  precio=precio,
-															  cantidad=1,
-															  codigo_orden=acum_prueba,
-															  codigo=codigo_detalle,
-															  total=total)
+																tipo_caja=caja_pais,
+																precio=precio,
+																cantidad=1,
+																codigo_orden=acum_prueba,
+																codigo=codigo_detalle,
+																total=total)
 						except Exception as e:
 							#print 'ERROR EN DETALLE', e
 							return 0
@@ -3931,3 +3933,133 @@ def buscar_caja_transito(request):
 		
 		return HttpResponse(simplejson.dumps(data), content_type='application/javascript')
 	return render(request, 'buscar_caja_transito.html')
+# ------- de puerto a bodega
+@login_required
+def recibir_bodega(request):
+	if request.method == 'POST' :
+		resultado = []
+		detalles_faltantes = []
+		envios_faltantes = []
+		# print(user_reg)
+		envios_a_pdf = []
+		try:
+			with transaction.atomic():
+				guiaHijas = request.POST['guia_Hijas']
+				guias = guiaHijas.split(",") #separamos la lista por comas
+				envios = []
+				# print('Guias Hijas --> ', guias)
+				for hija in guias:
+					# verificamos si la caja ya ha sido actualizada para evitar actualizarla de nuevo
+					# print('Hija--> ', hija)
+					
+					detalle_envio = DetalleEnvio.objects.get(codigo=hija)
+					# print(detalle_envio)
+					envio_lel = Envio.objects.filter(pk=detalle_envio.envio.pk, estado_envio_id=4)
+					for e in envio_lel:
+						codigo = e.pk
+						if codigo not in envios:
+							envios.append(codigo)
+				#se verifican si los envios tienen detalles faltantes para que no se guarde y retorna los faltantes
+				for en in envios:
+					# recorre los envios registrados de las guias hijas
+					detalles_envio = DetalleEnvio.objects.filter(envio=int(en))
+					# print(detalles_envio)
+					falta = 0
+					for det in detalles_envio:
+						if det.codigo not in guias:
+							# print(det.codigo)
+							detalles_faltantes.append(det.codigo)
+							# print(detalles_faltantes)
+							falta = 1
+					if en not in envios_faltantes:
+						if falta == 1:
+							codigo_en = Envio.objects.get(pk=en)
+							envios_faltantes.append(codigo_en.codigo)
+				# print(detalles_faltantes, envios_faltantes)
+				if (len(detalles_faltantes) > 0):
+					resultado = "Cajas faltantes: "+ str(detalles_faltantes) + " | Envios correspondientes: " + str(envios_faltantes)
+					#retorna la transacion para que no realize cambios
+					transaction.set_rollback(True)
+					return JsonResponse(resultado,safe=False)
+				else:
+					for en in envios:
+						#se busca el id de el envio
+						envio_cliente = Envio.objects.get(pk=en)
+						#se crea el historial correspondiente
+						HistorialEnvio.objects.create(codigo_envio=envio_cliente,
+														estado_id=5,
+														usuario_registro=request.user)
+						#se actualiza el seguimiento de el envio
+						SeguimientoEnvio.objects.filter(codigo_envio=en).update(estado=5)
+						#se actualiza el estado del envio en la tabla y se actualiza el camion al que fue asignado
+						Envio.objects.filter(pk=en).update(estado_envio_id=5)
+						envios_a_pdf.append(en)
+						# print("je")
+						#para el PDF
+					
+					resultado = "correcto"
+		except Exception as e:
+			print('Error ---> ',e) 
+			transaction.rollback()
+			# camiones = Camion.objects.all()
+			# cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
+			resultado = "error"
+		# print('estos envios',envios_a_pdf)
+		return JsonResponse({"result":resultado,"envios":envios_a_pdf},safe=False)
+	else:
+		# cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
+		return render(request, 'recibir_bodega_hn.html',)
+
+def recibido_bodega_hn(request):
+	user_reg = request.user
+	envios_detalle = []
+	hoy = timezone.now()
+	fecha = hoy.strftime('%B %d, %Y')
+	envios = []
+	if request.method == 'GET':
+		pdf = request.GET['pdf']
+		if pdf is not None:
+			pdf_decode = unquote(pdf)
+			envios = json.loads(pdf_decode)
+			# print(envios)
+			# envios = envs.split(",")
+			for envio in envios:
+				detalle={}
+				envio_d = Envio.objects.get(pk=envio)
+				detalle['guia'] = envio_d.codigo
+				detalle['cliente'] = envio_d.quien_recibe.nombre_completo
+				detalle['telefono'] = envio_d.celular_registrar
+				detalle['departamento'] = envio_d.departamento_destino.nombre 
+				detalle['direccion'] = envio_d.direccion_registrar
+				detalle['cantidad'] = DetalleEnvio.objects.filter(envio_id=envio_d.pk).count()
+				detalle['comentario'] = envio_d.comentario
+				debe = False
+				if (envio_d.saldo_pendiente > 0):
+					debe = True
+				detalle['saldo'] = debe
+
+				cajas = DetalleEnvio.objects.filter(envio_id=envio_d.pk)
+				cajas_agrupadas = {}  # diccionario para almacenar el resultado
+				for caja in cajas:
+					descripcion = caja.tipo_caja.tipo_caja.descripcion
+					if descripcion not in cajas_agrupadas:
+						cajas_agrupadas[descripcion] = 1
+					else:
+						cajas_agrupadas[descripcion] += 1
+
+				# construimos el string resultante a partir del diccionario
+				cajas_string = ''
+				for descripcion, cantidad in cajas_agrupadas.items():
+					cajas_string += f'{descripcion}:({cantidad}), '
+				cajas_string = cajas_string[:-2]  # eliminamos la última coma y espacio
+
+				detalle['cajas'] = cajas_string
+				
+				envios_detalle.append(detalle)
+		
+			return generar_pdf('ver_recibido_bodega_hn_pdf.html',{
+									'envios':envios_detalle, 
+									'hoy':fecha, 
+									'registra': user_reg,
+								})
+		return HttpResponse('No se ha recibido el parámetro pdf')
