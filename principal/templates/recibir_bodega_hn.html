@@ -26,10 +26,6 @@
                                 <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="guiaHija">
                             </div>
                         </div>
-                        <div class="col-6 text-right">
-                            <label for="">Imprimir Ultimo Registro</label> 
-                            <button id="btn_envios_pdf" class="btn btn-primary" value="{{ csrf_token }}" disabled>Imprimir</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -85,7 +81,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.4.8/sweetalert2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.js"></script>
 <script>
-var envios_pdf;
+
 $('#guiaHija').keypress(function(e){
     if (e.which == 13){
         var guia_hija = $(this).val();
@@ -148,7 +144,6 @@ $('#trasladarForm').submit(function(event){
         success: function(result){
             if (result.result == "correcto"){
                 // console.log(result.envios);
-                envios_pdf = result.envios;
                 $("#btn_envios_pdf").attr("disabled",false);
                 $('#trasladarForm')[0].reset();
                 $('#camionDetalle tbody tr').remove();
@@ -171,25 +166,6 @@ $('#trasladarForm').submit(function(event){
         }
     });
 });
-$("#btn_envios_pdf").on("click", function() {
-    var csrf_token = $(this).val();
-    alert(envios_pdf);
-    $.ajax({
-        url: "{% url 'recibido_bodega_hn' %}",
-        type: "POST",
-        data: {'envios': envios_pdf,
-                "csrfmiddlewaretoken": csrf_token
-        },
-        dataType: 'json',
-        contentType: 'multipart/form-data',
-        processData: false,
-        contentType: false,
-        success: function(response) {
-        //Aqui se abre una nueva pestaña con la url de la funcion recibido_bodega_hn
-            window.open("{% url 'recibido_bodega_hn' %}", "_blank");
-            envios_pdf = "";
-        }
-    });
-});
+
 </script>
 {% endblock js %}
