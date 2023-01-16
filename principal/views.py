@@ -47,7 +47,8 @@ from django.db.models import Sum
 from twilio.rest import Client
 from django.db import transaction
 import pandas as pd
-import datetime
+from datetime import datetime, date
+import calendar
 from urllib.parse import unquote
 import json
 #from htmlmin.decorators import minified_response
@@ -1930,7 +1931,7 @@ def imprimir_credito(request):
 
 @login_required
 def cierre(request):
-	fecha = datetime.now()
+	fecha = timezone.now()
 	user = request.user
 	envios = Envio.objects.filter(cierre= False, usuario_aprobo = user, aprobado = True)
 	cajas = ReciboCaja.objects.filter(cierre = False, usuario_registro = user)
@@ -2060,18 +2061,21 @@ def cierre_mensual_print(request):
 		revendedor = ''
 
 	if request.method == 'POST':
-		mes = request.POST.get('mes')
+		date_p = request.POST.get('mes')
+		date_object = datetime.strptime(date_p, '%Y-%m-%d')
+		month = date_object.month
+		year = date_object.year
+
 		total_envios = 0.00
 		total_cajas = 0.00
 		total_vehiculos = 0.00
 		total_contenedores = 0.00
 		total = 0.00
+
+		inicio = date(year, month, 1)
+		fin = date(year, month, calendar.monthrange(year, month)[1])
 		try:
-			inicio = mes +'-'+ '01'
-			if mes == '02':
-				fin = mes +'-'+'29'
-			else:
-				fin = mes +'-'+'31'
+			
 			
 			if es_revendedor:
 				envios = Envio.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
@@ -2085,11 +2089,6 @@ def cierre_mensual_print(request):
 				contenedores = ReciboContenedor.objects.filter(fecha_cierre__range = (inicio,fin))
 		except Exception as e:
 			try:
-				inicio = mes +'-'+ '01'
-				if mes == '02':
-					fin = mes +'-'+'28'
-				else:
-					fin = mes +'-'+'30'
 
 				if es_revendedor:
 					envios = Envio.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
@@ -2112,11 +2111,9 @@ def cierre_mensual_print(request):
 					total_contenedores += co.valor_contenedor
 				
 				total = total_envios + total_cajas + total_vehiculos + total_contenedores
-				ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':mes, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'tota_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
+				ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':month, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'tota_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
 				return render(request, 'cierre_mensual_print.html',ctx)
 			except Exception as e:
-				inicio = mes +'-'+ '01'
-				fin = mes +'-'+'28'
 
 				if es_revendedor:
 					envios = Envio.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
@@ -2139,7 +2136,7 @@ def cierre_mensual_print(request):
 					total_contenedores += co.valor_contenedor
 				
 				total = total_envios + total_cajas + total_vehiculos + total_contenedores
-				ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':mes, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'tota_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
+				ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':month, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'tota_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
 				return render(request, 'cierre_mensual_print.html',ctx)
 		else:
 			for e in envios:
@@ -2152,7 +2149,7 @@ def cierre_mensual_print(request):
 				total_contenedores += co.valor_contenedor
 			
 			total = total_envios + total_cajas + total_vehiculos + total_contenedores
-			ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':mes, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'total_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
+			ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':month, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'total_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
 			return render(request, 'cierre_mensual_print.html',ctx)
 			########END TRY
 	elif request.method == 'GET':

@@ -325,7 +325,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn float-right btn-info" id="btn_add_envio" onClick="reset_form();">Agregar</button>
+                            <button type="submit" class="btn float-right btn-info" id="btn_add_envio" onclick="submitForm()">Agregar</button>
                         </form>
                     </div>
                 </div>
@@ -1428,18 +1428,22 @@ function ver() {
 }
 </script>
 <script>
-    function reset_form(){
-        $.ajax({
-            url: window.location.pathname,
-            success: function(){
-                $("#form_registro_envio")[0].reset();
-                
-            },
-            error: function(){
-                $("#form_registro_envio")[0].reset();
-            }
-        });
+function submitForm() {
+  //submit form using ajax
+    var form = document.getElementById("form_registro_envio");
+    var data = new FormData(form);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", form.action);
+    xhr.send(data);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            //reset form
+            document.getElementById("form_registro_envio").reset();
+            //redirect to new window
+            window.open(form.action,'_blank');
+        }
     }
+}
 </script>
 
 

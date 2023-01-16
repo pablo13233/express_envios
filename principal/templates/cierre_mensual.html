@@ -6,6 +6,8 @@
 <link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
 <!-- Tempusdominus Bbootstrap 4  OJO-->
 <link rel="stylesheet" href="{% static  'admin/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
 {% block contenido %}
 <!-- Main content -->
 <section class="content">
@@ -21,12 +23,8 @@
                 {% csrf_token %}
                 <div class="col-md-3">
                   <div class="form-group">
-                    <div class="input-group date" id="datetimepicker11" data-target-input="nearest">
-                      <input id="id_mes" name="mes" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker11"/>
-                      <div class="input-group-append" data-target="#datetimepicker11" data-toggle="datetimepicker">
-                          <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                      </div>
-                    </div>
+                      <label for="mes">Fecha:</label>
+                      <input type="text" class="form-control datepicker p-0" id="mes" name="mes">
                   </div>
                 </div>
                 <div class="col-md-3">
@@ -58,6 +56,7 @@
 <script src="{% static  'admin/plugins/moment/moment.min.js' %}"></script>
 <!-- Tempusdominus Bootstrap 4 OJO -->
 <script src="{% static  'admin/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script>
     $(function () {
       //Initialize Select2 Elements
@@ -80,17 +79,12 @@
 <script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
 <script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
 <script type="text/javascript">
-    $(function () {
-        $('#datetimepicker1').datetimepicker({
-            format: 'L'
-        });
-        //Timepicker
-        $('#timepicker').datetimepicker({
-            format:'LT'
-        });
-        $('#datetimepicker11').datetimepicker({
-            viewMode: 'years',
-            format: 'YYYY-MM'
+    $(document).ready(function () {
+        
+        $('#mes').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayBtn: true
         });
     });
 </script>

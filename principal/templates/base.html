@@ -29,8 +29,8 @@
   <link href="{% static  'plantilla/vendors/jvectormap/jquery-jvectormap.css' %}" type="text/css" rel="stylesheet">
   <link href="{% static  'plantilla/vendors/flag-icon/css/flag-icon.min.css' %}" type="text/css" rel="stylesheet">
   
-   <link href="{% static  'plantilla/vendors/sweetalert/dist/sweetalert.css' %}" type="text/css" rel="stylesheet">
-   <!-- jQuery Library -->
+  <link href="{% static  'plantilla/vendors/sweetalert/dist/sweetalert.css' %}" type="text/css" rel="stylesheet">
+  <!-- jQuery Library -->
   <script type="text/javascript" src="{% static 'plantilla/vendors/jquery-3.2.1.min.js' %}"></script>
   <!--materialize js-->
   <script type="text/javascript" src="{% static 'plantilla/js/materialize.min.js' %}"></script>
@@ -384,7 +384,7 @@
         today: 'Today',
         clear: 'Clear',
         close: 'Ok',
-        closeOnSelect: false // Close upon selecting a date,
+        closeOnSelect: false, // Close upon selecting a date,
         container: undefined, // ex. 'body' will append picker to body
       });
       $('.timepicker').pickatime({
