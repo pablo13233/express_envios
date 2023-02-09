@@ -96,7 +96,10 @@ def resultado_busqueda(request):
 def buscar_envio(request):
 	empleado = Empleado.objects.get(usuario=request.user)
 	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
-	envios = Envio.objects.filter(empresa=empresa.empresa, fecha_envio__range=["2022-08-01","2023-06-30"])
+	hoy = timezone.now() 
+	fecha_hoy = hoy.strftime("%Y-%m-%d")
+	fecha_inicio = hoy - timedelta(days=180)
+	envios = Envio.objects.filter(empresa=empresa.empresa, fecha_envio__range=[fecha_inicio,fecha_hoy])
 	er = Revendedor.objects.count()
 	if er >0:
 		r = Revendedor.objects.filter(usuario=request.user)
@@ -147,23 +150,29 @@ def ver_paquetes(request,id_estado):
 	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
 	estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
 	estado = EstadoEnvio.objects.get(pk = id_estado)
+	hoy = timezone.now() 
+	fecha_hoy = hoy.strftime("%Y-%m-%d")
+	fecha_inicio = hoy - timedelta(days=180)
 	if int(id_estado) != int(estado_final.pk): 
 		estado_sigui = int(id_estado)+1
 		estado = EstadoEnvio.objects.get(pk=id_estado)
 		estado_siguiente = EstadoEnvio.objects.get(pk=estado_sigui)
 		
 		if(int(id_estado) == 7):
-			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=["2022-08-01","2023-06-30"]) 
+			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=[fecha_inicio,fecha_hoy]) 
 		else:
 			envios = Envio.objects.filter(estado_envio=estado)
 		#envios = SeguimientoEnvio.objects.filter(estado=id_estado)
-		ctx = {'envios':envios,'estado':estado,'estado_siguiente':estado_siguiente,'estado_final':estado_final}
+		volumen = sum(de.tipo_caja.tipo_caja.espacio_cubico for en in envios for de in DetalleEnvio.objects.filter(envio_id=en.pk))
+		f_volumen = "{:.2f}".format(volumen)
+		
+		ctx = {'envios':envios,'estado':estado,'estado_siguiente':estado_siguiente,'estado_final':estado_final, 'volumen':f_volumen}
 		return render(request,'ver_paquetes.html',ctx)
 	else:
 		estado = EstadoEnvio.objects.get(pk=id_estado)
 		#envios = SeguimientoEnvio.objects.filter(estado=estado_final)
 		if(int(id_estado) == 7):
-			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=["2022-08-01","2023-02-28"])
+			envios = Envio.objects.filter(estado_envio=estado, fecha_envio__range=[fecha_inicio,fecha_hoy])
 		else:
 			envios = Envio.objects.filter(estado_envio=estado)
 		ctx = {'envios':envios,'estado':estado,'estado_final':estado_final}
@@ -939,8 +948,8 @@ def actividades(request):
 	empresa = EmpresaEmpleado.objects.get(empleado = es_sadmin)
 	hoy = timezone.now() 
 	fecha_hoy = hoy.strftime("%Y-%m-%d")
-	fecha_inicio = "2022-08-01"
-	print(fecha_hoy)
+	fecha_inicio = hoy - timedelta(days=180)
+	# print(fecha_hoy)
 	cajas = EmpresaControlCaja.objects.filter(empresa=empresa.empresa)
 	if request.user.is_superuser == True:
 		empresas = Empresa.objects.all()
@@ -1932,12 +1941,11 @@ def imprimir_credito(request):
 @login_required
 def cierre(request):
 	fecha = timezone.now()
-	user = request.user
-	envios = Envio.objects.filter(cierre= False, usuario_aprobo = user, aprobado = True)
-	cajas = ReciboCaja.objects.filter(cierre = False, usuario_registro = user)
-	vehiculos = ReciboVehiculos.objects.filter(cierre = False, usuario_registro = user)
-	contenedores = ReciboContenedor.objects.filter(cierre = False, usuario_registro = user)
-	pagos = PagosCredito.objects.filter(cierre = False, usuario_registro = user)
+	envios = Envio.objects.filter(cierre= False, aprobado = True)
+	cajas = ReciboCaja.objects.filter(cierre = False)
+	vehiculos = ReciboVehiculos.objects.filter(cierre = False)
+	contenedores = ReciboContenedor.objects.filter(cierre = False)
+	pagos = PagosCredito.objects.filter(cierre = False)
 
 	saldo = 0
 	saldo_cajas = 0
@@ -2015,16 +2023,18 @@ def cierre(request):
 def realizar_cierre(request):
 	fecha = datetime.now()
 	user = request.user
-	if user.is_superuser:
-		envios = Envio.objects.filter(cierre= False, usuario_aprobo = user, aprobado = True)
-	else:
-		envios = Envio.objects.filter(cierre= False, usuario_registro = user)
-
-	cajas = ReciboCaja.objects.filter(cierre=False, usuario_registro = user)
-	vehiculos = ReciboVehiculos.objects.filter(cierre=False,usuario_registro = user)
-	contenedores = ReciboContenedor.objects.filter(cierre=False, usuario_registro = user)
+	envios = Envio.objects.filter(cierre= False, aprobado = True)
+	
+	# cajas = ReciboCaja.objects.filter(cierre=False, usuario_registro = user)
+	# vehiculos = ReciboVehiculos.objects.filter(cierre=False,usuario_registro = user)
+	# contenedores = ReciboContenedor.objects.filter(cierre=False, usuario_registro = user)
+	# #tareas = AgendaActividades.objects.filter(cierre = False, usuario_registro = user)
+	# pagos = PagosCredito.objects.filter(cierre = False, usuario_registro = user)
+	cajas = ReciboCaja.objects.filter(cierre=False)
+	vehiculos = ReciboVehiculos.objects.filter(cierre=False)
+	contenedores = ReciboContenedor.objects.filter(cierre=False)
 	#tareas = AgendaActividades.objects.filter(cierre = False, usuario_registro = user)
-	pagos = PagosCredito.objects.filter(cierre = False, usuario_registro = user)
+	pagos = PagosCredito.objects.filter(cierre = False)
 	for e in envios:
 		envio = Envio.objects.filter(pk=e.pk).update(cierre=True, fecha_cierre=fecha.strftime('%Y-%m-%d'))
 	for c in cajas:

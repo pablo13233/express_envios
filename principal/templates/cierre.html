@@ -28,7 +28,7 @@
                       </div>
                     {% endif %}
                     <div >
-                      <h4 class="header">CIERRE DEL DIA {{fecha}} <strong>|</strong> USUARIO: {{request.user}} <br>TOTAL FACTURAS: ${{saldo}}  <strong>|</strong>  TOTAL CAJAS: ${{saldo_cajas}}  <strong>|</strong>  TOTAL VEHICULOS: ${{saldo_vehiculos}}  <strong>|</strong>  TOTAL CONTENEDORES: ${{saldo_contenedores}}  <strong>|</strong>  TOTAL PAGOS EFECTIVO: ${{saldo_pagos_efectivo}}  <strong>|</strong>  TOTAL NETO PAGOS: ${{saldo_pagos}}</h4>
+                      <h4 class="header">CIERRE DEL DIA {{fecha}} <br>TOTAL FACTURAS: ${{saldo}}  <strong>|</strong>  TOTAL CAJAS: ${{saldo_cajas}}  <strong>|</strong>  TOTAL VEHICULOS: ${{saldo_vehiculos}}  <strong>|</strong>  TOTAL CONTENEDORES: ${{saldo_contenedores}}  <strong>|</strong>  TOTAL PAGOS EFECTIVO: ${{saldo_pagos_efectivo}}  <strong>|</strong>  TOTAL NETO PAGOS: ${{saldo_pagos}}</h4>
                       <a href="{% url 'realizar_cierre' %}" class="btn dorne-btn">REALIZAR CIERRE</a> <a class="btn waves-effect waves-light" target="blank" href="{% url 'cierre_diario_print' %}">Imprimir</a>
                       <div class="col-md-12"><br>
                         <h4 class="header"><strong>Facturas</strong></h4>
