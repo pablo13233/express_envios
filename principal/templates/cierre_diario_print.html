@@ -4,9 +4,8 @@
  
 <head>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-  <script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
-  <title>CIERRE {{mes}} {{year}}</title>
+  <meta charset="UTF-8">
+  <title>CIERRE</title>
   <link rel="icon" href="{% static  'plantilla/images/favicon/favicon-32x32.png' %}" sizes="32x32">
   <!-- Favicons-->
   <link rel="apple-touch-icon-precomposed" href="{% static  'plantilla/images/favicon/apple-touch-icon-152x152.png' %}">
@@ -19,19 +18,21 @@
       font-family: 'Times New Roman';
       font-weight: bold;
     }
-     
     .centrado {
       text-align: center;
       align-content: center;
     }
+    .ticket{
+      width:100%;
+      
+    }
     img {
       max-width: inherit;
     }
-    @page 
-    {
-        size:  auto;   /* auto es el valor inicial */
-        margin: 10mm;  /* afecta el margen en la configuración de impresión */
-    }
+    @page {
+        size: A4;
+        margin: 5mm;  /* afecta el margen en la configuración de impresión */
+      }
   </style>
 <script>
     function imprimir(){
@@ -46,12 +47,13 @@
       <tbody>
         <tr>
           <td width="25%" >
-              <img width="175 px" src="http://forithn.com/media/portafolio/eehn.png">
+              <img width="175px" src="{{empresa.logo_empresa.path}}">
           </td>
           <td width="75%">
             <center>
-              <span style="font-size: 30px;">EXPRESS */98S HN</span><br><br>
-              <span style="font-size: 18px;">6004 W 34TH ST HOUSTON, TX 77092 UNIDAD 6004-H<br>TELÉFONO: 346-228-1479 / 832-538-1046</span>
+              <p style="font-size: 20px;">EXPRESS ENVIOS HN<br>DIRECCIÓN: {{empresa.direccion_empresa}}<br>TELÉFONO:
+                {{empresa.telefono_empresa}} {% if empresa.celular_empresa %} |
+                {{empresa.celular_empresa}} {% endif %}<br></p>
             </center>  
           </td>
         </tr>
@@ -61,7 +63,7 @@
     <table class="centrado" width="100%">
       <tbody>
         <tr>
-          <center><td style="font-size: 20px;text-transform: uppercase;">CIERRE DEL DIA {{fecha}} DEL USUARIO: {{request.user}}</td></center>
+          <center><td style="font-size: 20px;text-transform: uppercase;">CIERRE DEL DIA {{fecha}} <br> GENERADO POR EL USUARIO: {{usuario}}</td></center>
         </tr>
       </tbody>
     </table><br>

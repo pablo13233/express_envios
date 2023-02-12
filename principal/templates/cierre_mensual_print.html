@@ -4,8 +4,7 @@
  
 <head>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	<script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
+	<meta charset="UTF-8">
   <title>CIERRE {{mes}} {{year}}</title>
   <link rel="icon" href="{% static  'plantilla/images/favicon/favicon-32x32.png' %}" sizes="32x32">
   <!-- Favicons-->
@@ -27,11 +26,10 @@
     img {
       max-width: inherit;
     }
-    @page 
-    {
-        size:  auto;   /* auto es el valor inicial */
-        margin: 10mm;  /* afecta el margen en la configuración de impresión */
-    }
+    @page {
+        size: A4;
+        margin: 5mm;  /* afecta el margen en la configuración de impresión */
+      }
   </style>
 <script>
     function imprimir(){
@@ -45,30 +43,21 @@
     <table>
       <tbody>
         <tr>
-          {% if revendedor %}
-            <td>
-              <center>
-                  <img src="{{revendedor.logo.path}}" width="300px" class="img-responsive" alt="Logo">
-                  <!--<span style="font-size: 40px;">{{envio.empresa.nombre_empresa}}</span><br><br>                  style="margin: 0 auto !important; height: {{altura}}px; width: {{anchura}}px;"-->
-                  <p style="font-size: 20px;">DIRECCIÓN: {{revendedor.direccion}}<br>TELÉFONO: {{revendedor.telefono_empresa}} {% if revendedor.celular_empresa %} | {{revendedor.celular_empresa}} {% endif %}<br>FMC No. 3172NF</p>
-              </center>  
-            </td>
-          {% else %}
-            <td>
-              <center>
-                  <img src="{{empresa.empresa.logo_empresa.path}}" width="300px" class="img-responsive" alt="Logo">
-                  <!--<span style="font-size: 40px;">{{empresa.nombre_empresa}}</span><br><br>                  style="margin: 0 auto !important; height: {{altura}}px; width: {{anchura}}px;"-->
-                  <p style="font-size: 20px;">DIRECCIÓN: {{empresa.empresa.direccion_empresa}}<br>TELÉFONO: {{empresa.empresa.telefono_empresa}} {% if empresa.empresa.celular_empresa %} | {{empresa.empresa.celular_empresa}} {% endif %}<br>FMC No. 3172NF</p>
-                </center>  
-            </td>
-          {% endif %}
+          <td width="200" >
+            <img src="{{empresa.logo_empresa.path}}" width="300px" class="img-responsive" alt="Logo">
+          </td>
+          <td>
+            <center>
+              <p style="font-size: 20px;">DIRECCIÓN: {{empresa.direccion_empresa}}<br>TELÉFONO: {{empresa.telefono_empresa}} {% if empresa.celular_empresa %} | {{empresa.celular_empresa}} {% endif %}<br>FMC No. 3172NF</p>
+            </center>  
+          </td>
         </tr>
       </tbody>
     </table>
     <table class="centrado" width="100%">
       <tbody>
         <tr>
-          <center><td style="font-size: 25px;">CIERRE DEL {{mes}}</td></center>
+          <center><td style="font-size: 20px;">CIERRE DE {{mes}} DEL {{year}} </td></center>
         </tr>
         <tr>
           <center><td style="font-size: 40px;">${{total|unlocalize|intcomma}}</td></center>

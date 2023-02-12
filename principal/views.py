@@ -51,6 +51,7 @@ from datetime import datetime, date
 import calendar
 from urllib.parse import unquote
 import json
+import numpy as np
 #from htmlmin.decorators import minified_response
 ###############################################################################
 def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, humanReadable = True):
@@ -62,12 +63,6 @@ def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, human
 	drawing.scale(barcode_scale, barcode_scale)
 	drawing.add(barcode, name='barcode')
 	return drawing
-
-@login_required
-def prueba(request):
-	kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').all()
-	ctx = {'kraken_envio':kraken_envio}
-	return render(request,'aprueba.html',ctx)
 
 def inicio_cliente(request):
 	return render(request,'inicio_cliente.html')
@@ -1605,36 +1600,39 @@ def registrar_envio(request):
 								'comentario':request.POST.get('comentario').upper(),
 								'estado_envio':EstadoEnvio.objects.get(pk=1)})
 			try:
-				envio = Envio(**query_envio)
-				envio.save()
-				acum = 0
-				for detalle in request.POST.getlist('cajas'):
-					acum+=1
-					dato = detalle.split('|')
-					pk_caja = dato[0]
-					cantidad = dato[1]
-					pk = dato[2]
-					caja_pais = CajaPais.objects.get(pk=int(pk))
-					precio = caja_pais.precio
-					#codigo_detalle = codigo_final + str(acum)
-					#total = float(precio) * int(cantidad)
-					
-					acum_prueba = 0
-					for x in range(0, int(cantidad)):
-						acum_prueba += 1
-						codigo_detalle = codigo_final + str(caja_pais.pk) +str(acum_prueba)
-						total = float(precio) * int(1)
-						try:
-							detalle = DetalleEnvio.objects.create(envio=envio,
-																tipo_caja=caja_pais,
-																precio=precio,
-																cantidad=1,
-																codigo_orden=acum_prueba,
-																codigo=codigo_detalle,
-																total=total)
-						except Exception as e:
-							#print 'ERROR EN DETALLE', e
-							return 0
+				with transaction.atomic():
+					envio = Envio(**query_envio)
+					envio.save()
+					acum = 0
+					for detalle in request.POST.getlist('cajas'):
+						acum+=1
+						dato = detalle.split('|')
+						pk_caja = dato[0]
+						cantidad = dato[1]
+						pk = dato[2]
+						caja_pais = CajaPais.objects.get(pk=int(pk))
+						precio = caja_pais.precio
+						#codigo_detalle = codigo_final + str(acum)
+						#total = float(precio) * int(cantidad)
+						
+						acum_prueba = 0
+						for x in range(0, int(cantidad)):
+							acum_prueba += 1
+							codigo_detalle = codigo_final + str(caja_pais.pk) +str(acum_prueba)
+							total = float(precio) * int(1)
+							try:
+								detalle = DetalleEnvio.objects.create(envio=envio,
+																	tipo_caja=caja_pais,
+																	precio=precio,
+																	cantidad=1,
+																	codigo_orden=acum_prueba,
+																	codigo=codigo_detalle,
+																	total=total)
+							except Exception as e:
+								#print 'ERROR EN DETALLE', e
+								return 0
+						seguimiento = SeguimientoEnvio.objects.create(codigo_envio=Envio.objects.get(pk=envio.pk),estado=EstadoEnvio.objects.get(pk=1),empresa=empresa.empresa,usuario_registro=request.user)
+						historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=envio.pk),estado=EstadoEnvio.objects.get(pk=1),usuario_registro=request.user)
 			except Exception as e:
 				#print (e,'errores')
 				errores['extra'] = e
@@ -1648,8 +1646,7 @@ def registrar_envio(request):
 				#odepto = Departamento.objects.get(pk=request.POST.get('departamento'))
 				#ndepto = str(odepto.pk) + '|' + str(odepto.nombre)
 				#cliente_recibe_update = ClienteRecibe.objects.filter(pk = envio.quien_recibe.pk).update(celular=request.POST.get('celular_registrar'), direccion=request.POST.get('direccion_registrar').upper(),pais=npais,departamento=ndepto)
-				seguimiento = SeguimientoEnvio.objects.create(codigo_envio=Envio.objects.get(pk=envio.pk),estado=EstadoEnvio.objects.get(pk=1),empresa=empresa.empresa,usuario_registro=request.user)
-				historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=envio.pk),estado=EstadoEnvio.objects.get(pk=1),usuario_registro=request.user)
+				
 				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
 				ctx = {'es_revendedor':es_revendedor,'ingreso_correcto':ingreso_correcto, 'envio':envio,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio}
 				#return HttpResponseRedirect(reverse('registrar_envio')+"?ok" +"&envio="+ str(envio.pk))
@@ -2057,24 +2054,18 @@ def cierre_mensual(request):
 @login_required
 def cierre_mensual_print(request):
 	empleado = Empleado.objects.get(usuario=request.user)
-	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
-	revendedor = ''
-	er = Revendedor.objects.count()
-	es_revendedor = False
-	if er > 0:
-		r = Revendedor.objects.filter(usuario=request.user)
-		es_revendedor = False
-		if r.count() >= 1:
-			es_revendedor = True
-			revendedor = Revendedor.objects.get(usuario=request.user)
-	else:
-		revendedor = ''
-
+	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
+	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
+	
 	if request.method == 'POST':
-		date_p = request.POST.get('mes')
-		date_object = datetime.strptime(date_p, '%Y-%m-%d')
-		month = date_object.month
-		year = date_object.year
+		month = request.POST['mes']
+		month = int(month)
+		year = request.POST['year']
+		year = int(year)
+		# date_object = datetime.strptime(date_p, '%Y-%m-%d')
+		# month = date_object.month
+		# year = date_object.year
+		nombre_mes = {1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto', 9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'}.get(month, 'Mes inválido')
 
 		total_envios = 0.00
 		total_cajas = 0.00
@@ -2084,70 +2075,14 @@ def cierre_mensual_print(request):
 
 		inicio = date(year, month, 1)
 		fin = date(year, month, calendar.monthrange(year, month)[1])
+		print(fin)
 		try:
-			
-			
-			if es_revendedor:
-				envios = Envio.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
-				cajas = ReciboCaja.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-				vehiculos = ReciboVehiculos.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-				contenedores = ReciboContenedor.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-			else:
-				envios = Envio.objects.filter(fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
-				cajas = ReciboCaja.objects.filter(fecha_cierre__range = (inicio,fin))
-				vehiculos = ReciboVehiculos.objects.filter(fecha_cierre__range = (inicio,fin))
-				contenedores = ReciboContenedor.objects.filter(fecha_cierre__range = (inicio,fin))
+			envios = Envio.objects.filter(fecha_cierre__range = (inicio,fin), cierre=True, aprobado=True)
+			cajas = ReciboCaja.objects.filter(fecha_cierre__range = (inicio,fin))
+			vehiculos = ReciboVehiculos.objects.filter(fecha_cierre__range = (inicio,fin))
+			contenedores = ReciboContenedor.objects.filter(fecha_cierre__range = (inicio,fin))
 		except Exception as e:
-			try:
-
-				if es_revendedor:
-					envios = Envio.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
-					cajas = ReciboCaja.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-					vehiculos = ReciboVehiculos.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-					contenedores = ReciboContenedor.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-				else:
-					envios = Envio.objects.filter(fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
-					cajas = ReciboCaja.objects.filter(fecha_cierre__range = (inicio,fin))
-					vehiculos = ReciboVehiculos.objects.filter(fecha_cierre__range = (inicio,fin))
-					contenedores = ReciboContenedor.objects.filter(fecha_cierre__range = (inicio,fin))
-				
-				for e in envios:
-					total_envios += e.total
-				for c in cajas:
-					total_cajas += c.valor_caja
-				for v in vehiculos:
-					total_vehiculos += v.valor_vehiculo
-				for co in contenedores:
-					total_contenedores += co.valor_contenedor
-				
-				total = total_envios + total_cajas + total_vehiculos + total_contenedores
-				ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':month, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'tota_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
-				return render(request, 'cierre_mensual_print.html',ctx)
-			except Exception as e:
-
-				if es_revendedor:
-					envios = Envio.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
-					cajas = ReciboCaja.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-					vehiculos = ReciboVehiculos.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-					contenedores = ReciboContenedor.objects.filter(usuario_registro = request.user,fecha_cierre__range = (inicio,fin))
-				else:
-					envios = Envio.objects.filter(fecha_cierre__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
-					cajas = ReciboCaja.objects.filter(fecha_cierre__range = (inicio,fin))
-					vehiculos = ReciboVehiculos.objects.filter(fecha_cierre__range = (inicio,fin))
-					contenedores = ReciboContenedor.objects.filter(fecha_cierre__range = (inicio,fin))
-				
-				for e in envios:
-					total_envios += e.total
-				for c in cajas:
-					total_cajas += c.valor_caja
-				for v in vehiculos:
-					total_vehiculos += v.valor_vehiculo
-				for co in contenedores:
-					total_contenedores += co.valor_contenedor
-				
-				total = total_envios + total_cajas + total_vehiculos + total_contenedores
-				ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':month, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'tota_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
-				return render(request, 'cierre_mensual_print.html',ctx)
+			print("Error es-->",str(e))
 		else:
 			for e in envios:
 				total_envios += e.total
@@ -2157,73 +2092,33 @@ def cierre_mensual_print(request):
 				total_vehiculos += v.valor_vehiculo
 			for co in contenedores:
 				total_contenedores += co.valor_contenedor
-			
+			# print('envios-->',total_envios)
+			# print('cajas-->',total_cajas)
+			# print('contenedores-->',total_contenedores)
 			total = total_envios + total_cajas + total_vehiculos + total_contenedores
-			ctx = {'revendedor':revendedor,'empresa':empresa, 'empleado':empleado,'mes':month, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'total_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
-			return render(request, 'cierre_mensual_print.html',ctx)
-			########END TRY
-	elif request.method == 'GET':
-		return cierre_mensual(request)
-
-@login_required
-def cierre_anual_print(request):
-	if request.method == 'POST':
-		year = request.POST.get('tyear')
-		total_envios = 0.00
-		total_cajas = 0.00
-		total_vehiculos = 0.00
-		total_contenedores = 0.00
-		total = 0.00
-		try:
-			inicio = year +'-'+ '01' +'-'+ '01'
-			fin = year +'-'+ '12' +'-'+'31'
-			envios = Envio.objects.filter(fecha_envio__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
-			cajas = ReciboCaja.objects.filter(fecha_cierre__range = (inicio,fin))
-			vehiculos = ReciboVehiculos.objects.filter(fecha_cierre__range = (inicio,fin))
-			contenedores = ReciboContenedor.objects.filter(fecha_cierre__range = (inicio,fin))
-		except Exception as e:
-			inicio = year +'-'+ '01' +'-'+ '01'
-			fin = year +'-'+ '12' +'-'+'31'
-			envios = Envio.objects.filter(fecha_envio__range = (inicio,fin), aprobado=True).order_by('pais_destino', 'pk')
-			cajas = ReciboCaja.objects.filter(fecha_cierre__range = (inicio,fin))
-			vehiculos = ReciboVehiculos.objects.filter(fecha_cierre__range = (inicio,fin))
-			contenedores = ReciboContenedor.objects.filter(fecha_cierre__range = (inicio,fin))
-			for e in envios:
-				total_envios += e.total
-			for c in cajas:
-				total_cajas += c.valor_caja
-			for v in vehiculos:
-				total_vehiculos += v.valor_vehiculo
-			for co in contenedores:
-				total_contenedores += co.valor_contenedor
-			total = total_envios + total_cajas + total_vehiculos + total_contenedores
-			ctx = {'year':year, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'total_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
-			return render(request, 'cierre_anual_print.html',ctx)
-		else:
-			for e in envios:
-				total_envios += e.total
-			for c in cajas:
-				total_cajas += c.valor_caja
-			for v in vehiculos:
-				total_vehiculos += v.valor_vehiculo
-			for co in contenedores:
-				total_contenedores += co.valor_contenedor
-			total = total_envios + total_cajas + total_vehiculos + total_contenedores
-			ctx = {'year':year, 'inicio':inicio, 'fin':fin,'envios':envios,'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'total_cajas':total_cajas,'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total} 
-			return render(request, 'cierre_anual_print.html',ctx)
-			########END TRY
-	elif request.method == 'GET':
-		return cierre_mensual(request)
+			# print(total)
+			return generar_pdf('cierre_mensual_print.html',
+						{'pagesize':'A4',
+						'orientation':'landscape',
+						'empresa':empresa, 'empleado':empleado,'mes':nombre_mes, 'inicio':inicio, 'fin':fin,'envios':envios, 'year':year,
+						'cajas':cajas,'vehiculos':vehiculos,'contenedores':contenedores, 'total_envios':total_envios,'total_cajas':total_cajas,
+						'total_vehiculos':total_vehiculos,'total_contenedores':total_contenedores,'total':total,
+						}
+					)
 
 @login_required
 def cierre_diario_print(request):
 	fecha = datetime.now()
 	user = request.user
-	envios = Envio.objects.filter(cierre= False, usuario_aprobo = user, aprobado = True)
-	cajas = ReciboCaja.objects.filter(cierre = False, usuario_registro = user)
-	vehiculos = ReciboVehiculos.objects.filter(cierre = False, usuario_registro = user)
-	contenedores = ReciboContenedor.objects.filter(cierre = False, usuario_registro = user)
-	pagos = PagosCredito.objects.filter(cierre = False, usuario_registro = user)
+	empleado = Empleado.objects.get(usuario=user)
+	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
+	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
+	print(empresa)
+	envios = Envio.objects.filter(cierre= False, aprobado = True)
+	cajas = ReciboCaja.objects.filter(cierre = False)
+	vehiculos = ReciboVehiculos.objects.filter(cierre = False)
+	contenedores = ReciboContenedor.objects.filter(cierre = False)
+	pagos = PagosCredito.objects.filter(cierre = False)
 
 	saldo = 0
 	saldo_cajas = 0
@@ -2294,9 +2189,15 @@ def cierre_diario_print(request):
 			saldo_pagos_efectivo += p.pago
 		dic_pagos.append(datos)
 
-
-	ctx = {'datos':dic_datos,'dic_cajas':dic_cajas,'dic_vehiculos':dic_vehiculos,'dic_contenedores':dic_contenedores,'saldo':saldo, 'fecha':fecha,'saldo_cajas':saldo_cajas,'saldo_vehiculos':saldo_vehiculos,'saldo_contenedores':saldo_contenedores, 'pagos':dic_pagos, 'saldo_pagos':saldo_pagos, 'saldo_pagos_efectivo':saldo_pagos_efectivo}
-	return render(request, 'cierre_diario_print.html',ctx)
+	return generar_pdf('cierre_diario_print.html',
+						{'pagesize':'A4',
+						'orientation':'landscape',
+						'datos':dic_datos,'dic_cajas':dic_cajas,'dic_vehiculos':dic_vehiculos,'dic_contenedores':dic_contenedores,
+						'saldo':saldo, 'fecha':fecha,'saldo_cajas':saldo_cajas,'saldo_vehiculos':saldo_vehiculos,
+						'saldo_contenedores':saldo_contenedores, 'pagos':dic_pagos, 'saldo_pagos':saldo_pagos, 
+						'saldo_pagos_efectivo':saldo_pagos_efectivo,'empresa':empresa,'usuario':user,
+						}
+	)
 
 def validar_contenedor(request,quien_envia):
 	query_contenedor,errores,ret_data,retorno = {},{},{},{}
@@ -4070,3 +3971,65 @@ def recibido_bodega_hn(request):
 									'registra': user_reg,
 								})
 		return HttpResponse('No se ha recibido el parámetro pdf')
+
+@login_required
+def cierre_anual(request):
+	return render(request, 'cierre_anual.html')
+
+@login_required
+def cierre_anual_print(request):
+	empleado = Empleado.objects.get(usuario=request.user)
+	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
+	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
+	if request.method == 'POST':
+		year = request.POST['year']
+		try:
+			envios = Envio.objects.filter(fecha_cierre__year = year, aprobado=True, cierre = True)
+			cajas = ReciboCaja.objects.filter(fecha_cierre__year = year)
+			vehiculos = ReciboVehiculos.objects.filter(fecha_cierre__year = year)
+			contenedores = ReciboContenedor.objects.filter(fecha_cierre__year = year)
+			
+			resultados_envios = {}
+			resultados_cajas = {}
+			resultados_vehiculos = {}
+			resultados_contenedores = {}
+
+			total_anual_envios=0.0
+			total_anual_cajas=0.0
+			total_anual_vehiculos=0.0
+			total_anual_contenedores=0.0
+
+			for month in range(1,13):
+				envios_mes = envios.filter(fecha_cierre__month = month)
+				envios_sin_NaN = envios_mes.exclude(total='NaN')
+				total_mes_envios = envios_sin_NaN.aggregate(Sum('total'))['total__sum'] or 0
+				resultados_envios[month] = total_mes_envios
+				total_anual_envios += total_mes_envios
+
+				cajas_mes = cajas.filter(fecha_cierre__month = month)
+				total_mes_cajas = cajas_mes.aggregate(Sum('valor_caja'))['valor_caja__sum'] or 0
+				resultados_cajas[month] = total_mes_cajas
+				total_anual_cajas += total_mes_cajas
+
+				vehiculos_mes = vehiculos.filter(fecha_cierre__month = month)
+				total_mes_vehiculos = vehiculos_mes.aggregate(Sum('valor_vehiculo'))['valor_vehiculo__sum'] or 0
+				resultados_vehiculos[month] = total_mes_vehiculos
+				total_anual_vehiculos += total_mes_vehiculos
+
+				contenedores_mes = contenedores.filter(fecha_cierre__month = month)
+				total_mes_contenedores = contenedores_mes.aggregate(Sum('valor_contenedor'))['valor_contenedor__sum'] or 0
+				resultados_contenedores[month] = total_mes_contenedores
+				total_anual_contenedores += total_mes_contenedores
+
+			total_general = total_anual_envios + total_anual_cajas + total_anual_vehiculos + total_anual_contenedores
+			return generar_pdf('cierre_anual_print.html',
+						{'pagesize':'A4',
+						'orientation':'landscape',
+						'empresa':empresa, 'resultados_envios': resultados_envios, 'resultados_cajas': resultados_cajas, 'resultados_vehiculos': resultados_vehiculos,
+                        'resultados_contenedores': resultados_contenedores, 'total_anual_envios': total_anual_envios,'total_anual_cajas': total_anual_cajas,
+                        'total_anual_vehiculos': total_anual_vehiculos,'total_anual_contenedores': total_anual_contenedores, 'total_general': total_general,
+						'year':year,'iterador':range(1,13),
+						}
+					)
+		except Exception as e:
+			print('Error--> ',str(e))

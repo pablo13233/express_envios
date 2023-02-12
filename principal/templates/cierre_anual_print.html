@@ -4,9 +4,10 @@
  
 <head>
 
+  <meta charset="UTF-8">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://files.codepedia.info/files/uploads/iScripts/html2canvas.js"></script>
-  <title>CIERRE {{mes}} {{year}}</title>
+  <title>CIERRE {{year}}</title>
   <link rel="icon" href="{% static  'plantilla/images/favicon/favicon-32x32.png' %}" sizes="32x32">
   <!-- Favicons-->
   <link rel="apple-touch-icon-precomposed" href="{% static  'plantilla/images/favicon/apple-touch-icon-152x152.png' %}">
@@ -19,7 +20,7 @@
       font-family: 'Times New Roman';
       font-weight: bold;
     }
-     
+    
     .centrado {
       text-align: center;
       align-content: center;
@@ -27,11 +28,10 @@
     img {
       max-width: inherit;
     }
-    @page 
-    {
-        size:  auto;   /* auto es el valor inicial */
-        margin: 10mm;  /* afecta el margen en la configuración de impresión */
-    }
+    @page {
+        size: A4;
+        margin: 5mm;  /* afecta el margen en la configuración de impresión */
+      }
   </style>
 <script>
     function imprimir(){
@@ -39,20 +39,20 @@
     }
 </script>
 </head>
- 
+
 <body onload="imprimir()">
   <div class="ticket">
       <table>
         <tbody>
           <tr>
             <td width="200" >
-                <img width="190px" src="http://forit-hn.com/media/portafolio/eehn.png">
+              <img src="{{empresa.logo_empresa.path}}" width="300px" class="img-responsive" alt="Logo">
             </td>
             <td>
               <center>
-                <span style="font-size: 40px;">EXPRESS ENVIOS HN</span><br><br>
-                <span style="font-size: 15px;">6004 W 34TH ST HOUSTON, TX 77092 UNIDAD 6004-H<br>TELÉFONO: 346-228-1479 / 832-538-1046</span>
-              </center>  
+                <!--<span style="font-size: 40px;">{{empresa.nombre_empresa}}</span><br><br>                  style="margin: 0 auto !important; height: {{altura}}px; width: {{anchura}}px;"-->
+                <p style="font-size: 20px;">DIRECCIÓN: {{empresa.direccion_empresa}}<br>TELÉFONO: {{empresa.telefono_empresa}} {% if empresa.celular_empresa %} | {{empresa.celular_empresa}} {% endif %}<br>FMC No. 3172NF</p>
+            </center>  
             </td>
           </tr>
         </tbody>
@@ -63,94 +63,117 @@
           <tr>
             <center><td style="font-size: 25px;">CIERRE DEL AÑO {{year}}</td></center>
           </tr>
-          <tr>
-            <center><td style="font-size: 40px;">${{total|unlocalize|intcomma}}</td></center>
-          </tr>
         </tbody>
       </table>
-    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL FACTURAS: ${{total_envios|unlocalize|intcomma}}</h2>
-    <table width="100%" border="1" cellspacing="3" cellpadding="3">
-      <thead>
-        <tr>
-          <th>Fact N°</th>
-          <!--<th>Encomiendas</th>-->
-          <th>Descripcion</th>
-          <th>Pago</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for envio in envios  %}
-            <tr>
-              <td>{{envio.codigo}} | {{envio.quien_envia.nombre_completo}}</td>         
-              <td>{% if envio.cajas != 'None' %}{{envio.cajas}}{% else %}SIN DESCRIPCION{% endif %}</td>
-              <td class="text-right" >{{envio.total|unlocalize|intcomma}}</td>
-            </tr>
-          {% endfor %}
-      </tbody>
-    </table><br>
-    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL CAJAS: ${{total_cajas|unlocalize|intcomma}}</h2>
-    <table width="100%" border="1" cellspacing="3" cellpadding="3">
-      <thead>
-        <tr>
-          <th>Codigo</th>
-          <th>Cliente</th>
-          <th>Descripcion</th>
-          <th>Pago</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for t in cajas  %}
+      <table width="100%" border="1" cellspacing="3" cellpadding="3">
+        <center>
           <tr>
-            <td>{{t.recibo_no}}</td>
-            <td>{{t.cliente}}</td> 
-            <td>{{t.size_caja}}</td>            
-            <td class="text-right" >{{t.valor_caja|unlocalize|intcomma}}</td>
+            <th style="font-size: 18px;">Mes</th>
+            <th style="font-size: 18px;">Envíos</th>
+            <th style="font-size: 18px;">Cajas</th>
+            <th style="font-size: 18px;">Vehículos</th>
+            <th style="font-size: 18px;">Contenedores</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table><br>
-    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL VEHICULOS: ${{total_vehiculos|unlocalize|intcomma}}</h2>
-    <table width="100%" border="1" cellspacing="3" cellpadding="3">
-      <thead>
+        </center>
         <tr>
-          <th>Codigo</th>
-          <th>Cliente</th>
-          <th>Vehiculo</th>
-          <th>Pago</th>
+          <td style="text-align: center;">Enero</td>
+          <td style="text-align: right;">$ {{ resultados_envios.1 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.1  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.1  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.1  }}</td>
         </tr>
-      </thead>
-      <tbody>
-        {% for t in vehiculos  %}
-          <tr>
-            <td>{{t.recibo_no}}</td>
-            <td>{{t.cliente}}</td> 
-            <td>{{t.marca_vehiculo}} | {{t.modelo_vehiculo}}</td>            
-            <td class="text-right" >{{t.valor_vehiculo|unlocalize|intcomma}}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table><br>
-    <h2 class="centrado" style="font-size: 20px;color:red">TOTAL CONTENEDORES: ${{total_contenedores}}</h2>
-    <table width="100%" border="1" cellspacing="3" cellpadding="3">
-      <thead>
         <tr>
-          <th>Codigo</th>
-          <th>Cliente</th>
-          <th>Contenedor</th>
-          <th>Pago</th>
+          <td style="text-align: center;">Febrero</td>
+          <td style="text-align: right;">$ {{ resultados_envios.2 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.2  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.2  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.2  }}</td>
         </tr>
-      </thead>
-      <tbody>
-        {% for t in contenedores  %}
-          <tr>
-            <td>{{t.recibo_no}}</td>
-            <td>{{t.cliente}}</td> 
-            <td>{{t.pais_destino}} | {{t.tamano_contenedor}} </td>            
-            <td class="text-right" >{{t.valor_contenedor|unlocalize|intcomma}}</td>
+        <tr>
+          <td style="text-align: center;">Marzo</td>
+          <td style="text-align: right;">$ {{ resultados_envios.3 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.3  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.3  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.3  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Abril</td>
+          <td style="text-align: right;">$ {{ resultados_envios.4 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.4  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.4  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.4  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Mayo</td>
+          <td style="text-align: right;">$ {{ resultados_envios.5 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.5  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.5  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.5  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Junio</td>
+          <td style="text-align: right;">$ {{ resultados_envios.6 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.6  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.6  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.6  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Julio</td>
+          <td style="text-align: right;">$ {{ resultados_envios.7 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.7  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.7  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.7  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Agosto</td>
+          <td style="text-align: right;">$ {{ resultados_envios.8 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.8 }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.8  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.8  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Septiembre</td>
+          <td style="text-align: right;">$ {{ resultados_envios.9}}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.9  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.9  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.9  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Octubre</td>
+          <td style="text-align: right;">$ {{ resultados_envios.10 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.10  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.10  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.10  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">Noviembre</td>
+          <td style="text-align: right;">$ {{ resultados_envios.11 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.11  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.11  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.11  }}</td>
+        </tr>
+        <tr>
+          <td style="text-align: center;">$ Diciembre</td>
+          <td style="text-align: right;">$ {{ resultados_envios.12 }}</td>
+          <td style="text-align: right;">$ {{ resultados_cajas.12  }}</td>
+          <td style="text-align: right;">$ {{ resultados_vehiculos.12  }}</td>
+          <td style="text-align: right;">$ {{ resultados_contenedores.12  }}</td>
+        </tr>
+        <tr>
+          <td><b>Total Anual</b></td>
+          <td style="text-align: right;">$ {{ total_anual_envios }}</td>
+          <td style="text-align: right;">$ {{ total_anual_cajas }}</td>
+          <td style="text-align: right;">$ {{ total_anual_vehiculos }}</td>
+          <td style="text-align: right;">$ {{ total_anual_contenedores }}</td>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table><br>
+      </table>
+  </div>
+  <div>
+    <center>
+      <br>
+      <p style="font-size: 25px;">Total General</p>
+      <p style="font-size: 20px">$ {{ total_general }}</p>
+    </center>
   </div>
 </body>
 </html>

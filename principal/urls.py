@@ -54,7 +54,6 @@ urlpatterns = [
 	url(r'^realizar/cierre/$', realizar_cierre, name='realizar_cierre'),
     url(r'^ver/cierres/$', cierre_mensual, name='cierre_mensual'),
 	url(r'^cierre/imprimir/$', cierre_mensual_print, name='cierre_mensual_print'),
-	url(r'^cierre/anual/imprimir/$', cierre_anual_print, name='cierre_anual_print'),
 	url(r'^cierre/diario/imprimir/$', cierre_diario_print, name='cierre_diario_print'),
     ##NUEVAS URL RECIBOS############
 	url(r'^recibo/contenedor/$', recibo_contenedor, name='recibo_contenedor'),
@@ -65,7 +64,6 @@ urlpatterns = [
 	url(r'^ver/pdf/vehiculo/(?P<id>\d+)/$', ver_pdf_vehiculo_pdf, name='ver_pdf_vehiculo_pdf'),
     url(r'^top/clientes$', top_clientes, name='top_clientes'),
 
-    url(r'^prueba$', prueba, name='prueba'),
     url(r'^cajas/$', cajas_tipo, name='cajas_tipo'),
     url(r'^modal/recibe/$', modal_agregar_recibe, name='modal_agregar_recibe'),
     url(r'^modal/editar/recibe/$', modal_editar_recibe, name='modal_editar_recibe'),
@@ -96,6 +94,8 @@ urlpatterns = [
     url(r'^cajas_camion/(?P<id>\d+)/$', ver_cajas_camion, name='cajas_camion'),
     url(r'^recibir_bodega_hn/', recibir_bodega, name='recibir_bodega_hn'),
     url(r'^ver_recibido_bodega_hn/', recibido_bodega_hn, name='recibido_bodega_hn'),
+    url(r'^ver/cierre_anual/$', cierre_anual, name='cierre_anual'),
+	url(r'^cierre/anual/imprimir/$', cierre_anual_print, name='cierre_anual_print'),
 
 ]
 # url(r'^$', inicio, name='inicio'),
