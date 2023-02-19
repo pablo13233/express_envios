@@ -1013,39 +1013,42 @@ def finalizar_actividad(request):
 			errores.update({'cajas_post':'Debe seleccionar al menos una caja'})
 			ret_data.update({'cajas_envio': request.POST.getlist('cajas')})
 			error = True
+			
 		
 		if not error:
 			try:
-				for p in cajas_post:
-					separar = p.split("|")
-					#print separar[0],'separar0'
-					#print separar[1],'separar1'
-					caja = EmpresaControlCaja.objects.get(pk = separar[0])
-					if int(separar[1] > 1):
-						texto = 'CAJAS'
-					else:
-						texto = 'CAJA'
-					if descripcion_entrega == '':
-						descripcion_entrega += separar[1] + " " + texto + " de " + caja.medida_caja
-					else:
-						descripcion_entrega += ", "+separar[1] + " " + texto + " de " + caja.medida_caja 
-				
-				cliente = EmpresaActividades.objects.get(pk = actividad)
-				recibo_no = ReciboCaja.objects.filter(empresa=cliente.empresa).count()
-				recibo_no += 1
-				codigo_final = cliente.empresa.codigo_empresa+ '00' + str(recibo_no)
-				new_recibo_caja = ReciboCaja.objects.create(
-					empresa = cliente.empresa,
-					recibo_no=codigo_final,
-					cliente=cliente.cliente,
-					descripcion_entrega=descripcion_entrega,
-					valor_caja=deposito,
-					usuario_registro=request.user)
-				nactividad = EmpresaActividades.objects.filter(pk=actividad).update(estado = True, deposito =deposito, fecha_realizo = datetime.now(), descripcion_entrega = descripcion_entrega, recibo_entrega= new_recibo_caja.pk)
-				recibo_entrega = new_recibo_caja.pk
+				with transaction.atomic():
+					for p in cajas_post:
+						separar = p.split("|")
+						#print separar[0],'separar0'
+						#print separar[1],'separar1'
+						caja = EmpresaControlCaja.objects.get(pk = separar[0])
+						if int(separar[1]) > 1:
+							texto = 'CAJAS'
+						else:
+							texto = 'CAJA'
+						if descripcion_entrega == '':
+							descripcion_entrega += separar[1] + " " + texto + " de " + caja.medida_caja
+						else:
+							descripcion_entrega += ", "+separar[1] + " " + texto + " de " + caja.medida_caja 
+					
+					cliente = EmpresaActividades.objects.get(pk = actividad)
+					recibo_no = ReciboCaja.objects.filter(empresa=cliente.empresa).count()
+					recibo_no += 1
+					codigo_final = cliente.empresa.codigo_empresa+ '00' + str(recibo_no)
+					new_recibo_caja = ReciboCaja.objects.create(
+						empresa = cliente.empresa,
+						recibo_no=codigo_final,
+						cliente=cliente.cliente,
+						descripcion_entrega=descripcion_entrega,
+						valor_caja=deposito,
+						usuario_registro=request.user)
+					nactividad = EmpresaActividades.objects.filter(pk=actividad).update(estado = True, deposito =deposito, fecha_realizo = datetime.now(), descripcion_entrega = descripcion_entrega, recibo_entrega= new_recibo_caja.pk)
+					recibo_entrega = new_recibo_caja.pk
 			except Exception as e:
 				#print 'hay errores',e
 				errores['extra'] = e
+				print("Error --> | ", str(e))
 				transaction.rollback()
 				ctx = {'ret_data':ret_data,'cajas_post':cajas_post,'error':error}
 				return HttpResponseRedirect(reverse('actividades'))
@@ -1070,16 +1073,17 @@ def finalizar_actividad(request):
 	else:
 		return HttpResponseRedirect(reverse('actividades'))
 
-def recibo_caja_pdf(request, id): 
-	caja = ReciboCaja.objects.get(pk = id)
-	hoy = datetime.now().date()
+def recibo_caja_pdf(request, id):
+	recibo_actividad = EmpresaActividades.objects.get(id=id) 
+	caja = ReciboCaja.objects.get(pk = recibo_actividad.recibo_entrega)
+	fecha = caja.fecha
 	barcode = get_barcode(value = id, width = 600)
 	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
-	return generar_pdf('recibo_caja_pdf.html',{'pagesize':'A4','orientation':'landscape','caja':caja,'codigo':codigo, 'fecha':hoy})
+	return generar_pdf('recibo_caja_pdf.html',{'pagesize':'A4','orientation':'landscape','caja':caja,'codigo':codigo, 'fecha':fecha})
 
 @login_required
 def terminar_tarea(request):
-	hoy = datetime.now().date()
+	hoy = timezone.now().date()
 	tarea = request.GET['id']
 
 	nactividad = EmpresaActividades.objects.filter(pk=tarea).update(estado = True,fecha_realizo = datetime.now())

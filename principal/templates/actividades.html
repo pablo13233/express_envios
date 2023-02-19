@@ -14,7 +14,7 @@
         <div class="col-md-12">
             <div class="card card-primary card-outline">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-edit"></i>Registoioiuro Entrega/Recoleccion Cajas</h3>
+                    <h3 class="card-title"><i class="fas fa-edit"></i>Registro Entrega/Recoleccion Cajas</h3>
                 </div>
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
@@ -74,15 +74,7 @@
                                                         <td><center><button id="{{a.pk}}" data-toggle="tooltip" title="Terminar" type='button' class="btn button btn-danger" onclick="finalizar(this.id,'{{a.actividad}}')"><i class="fas fa-check-circle"></i></button></center></td>
                                                     {%endif %}
                                                 {% endif %}
-                                                <!--<td style="color:white"><center><button id="{{a.pk}}" data-toggle="tooltip" title="Terminar" type='button' class="btn button btn-danger" onclick="finalizar(this.id,'{{a.actividad}}')"><i class="fas fa-check-circle"></i></button></center></td>-->
-
                                             </tr>
-                                            <div id="myModal" class="modal fade" role="dialog">
-                                                <div class="modal-dialog ">
-                                                    <div id="agregarmodal" >
-                                                    </div>
-                                                </div>
-                                            </div>
                                         {% endfor %}
                                     </tbody>
                                     <tfoot>
@@ -119,7 +111,7 @@
                                                 <td>{{a.fecha}} | {{a.hora}}</td>
                                                 <td style="color:white" id="fila_{{a.pk}}"><center><a data-toggle="tooltip" title="Ir" type='button' class="btn button btn-primary " href="http://maps.apple.com/maps?q={{a.cliente.direccion}}" target="_blank">Ir</a></center></td>
                                                 {% if a.estado %}
-                                                    {% if a.actividad %}
+                                                    {% if a.actividad %} 
                                                         <td><center><a data-toggle="tooltip" title="Ver" class="btn button btn-success" target="blank" href="{% url 'recibo_caja_pdf' a.pk %}"><i class="fas fa-eye"></i></a></center></td>
                                                     {% endif %}
                                                 {% else %}
@@ -244,12 +236,6 @@
                                                 <!--<td style="color:white"><center><button id="{{a.pk}}" data-toggle="tooltip" title="Terminar" type='button' class="btn button btn-danger" onclick="finalizar(this.id,'{{a.actividad}}')"><i class="fas fa-check-circle"></i></button></center></td>-->
 
                                             </tr>
-                                            <div id="myModal" class="modal fade" role="dialog">
-                                                <div class="modal-dialog ">
-                                                    <div id="agregarmodal" >
-                                                    </div>
-                                                </div>
-                                            </div>
                                         {% endfor %}
                                     </tbody>
                                     <tfoot>
@@ -318,49 +304,113 @@
         </div>
         
     </div>
+    <div id="modalTerminar" class="modal fade" role="dialog">
+        <div class="modal-dialog ">
+            <div id="agregarmodal" >
+                <form id="myForm" class='form-horizontal' enctype='multipart/form-data' method='POST' action="{% url 'finalizar_actividad' %}">{% csrf_token %}
+                    <div class='modal-dialog '>
+                        <div class='modal-content card-primary card-outline'>
+                            <div class='modal-header'><h4 class='modal-title'><strong>Ingresar Caja Entregada</strong></h4>
+                                <button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
+                            </div>
+                    <div class='modal-body' >
+                        <div class='col-md-4' style='float:left' >
+                            <div class='col-md-12'>
+                                <label class='col-form-label'>Caja entregada:</label>
+                                <select class='form-control select2' style='width: 100%;' name='caja' id='caja'>   
+                                    {% for c in cajas %} 
+                                        <option value='{{c.pk}}|{{c.medida_caja}}'>{{c.medida_caja}}</option> 
+                                    {% endfor %}   
+                                </select>
+                            </div>
+                        </div>
+                        <div class='col-md-5' style='float:left'>
+                            <input hidden name='actividad' type='text' value="" id="actividadId">
+                            <div class='col-md-12' >
+                                <label class='col-form-label'>Cantidad:</label>
+                            </div>
+                            <div class='col-md-6' style='float:left'>
+                                <input type='number' class='form-control' name='cantidad' id='cantidad' value='1'>
+                            </div>
+                            <div class='col-md-6' style='float:left'>
+                                <button class='btn btn-success' name='btnInsertar' id='btnInsertar' type='button' onclick='addMaterial()'><i class='fas fa-plus-square'></i></button>
+                            </div>        
+                        </div>
+                        <div class='col-md-3' style='float:left'>
+                            <div class='col-md-12'><label for='deposito_pedido' class='col-form-label'>Deposito:</label>
+                            </div>
+                            <div class='col-md-12' style='float:left'>
+                                <input type='number' class='form-control text-uppercase' name='deposito_pedido' id='deposito_pedido'value='0'>
+                            </div>
+                        </div>
+                        <div id='agregartabla' class='col-md-12' style='float:left'><br></div>
+                    </div>
+                    <div class='modal-footer justify-content-between'>
+                        <button type='button' class='btn btn-default' data-dismiss='modal'>Cerrar</button>
+                        <button id='submitBtn' class='btn btn-primary'>Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </section>
 {% endblock contenido %}
 
 {% block js%}
-<!-- jQuery -->
-<script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
-<!-- Bootstrap 4 -->
-<script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<!-- Select2 -->
-<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
-<!-- AdminLTE App -->
-<script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="{% static  'admin/dist/js/demo.js' %}"></script>
-<!-- Select2 -->
-<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
-<!-- InputMask OJO -->
-<script src="{% static  'admin/plugins/moment/moment.min.js' %}"></script>
-<!-- Tempusdominus Bootstrap 4 OJO -->
-<script src="{% static  'admin/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
-<script>
-    $(function () {
-      //Initialize Select2 Elements
-      $('.select2').select2()
-  
-      //Initialize Select2 Elements
-      $('.select2bs4').select2({
-        theme: 'bootstrap4'
-      })
-  
-    });
 
-    
-</script>
-<!-- DATATABLES-->
-<script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
-<script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
-<script type="text/javascript">
-    $(function () {
+<script>
+
+    window.onload = function () {
+        $("#example1").DataTable({
+            responsive: true
+        });
+
+        $('#example3').DataTable({
+            "bAutoWidth": false,
+            responsive: true
+        });
+        // Cogemos los valores pasados por get
+        var valores = getGET();
+        if (valores) {
+            //recogemos los valores que nos envia la URL en variables para trabajar 
+            //con ellas
+            var id = valores['envio'];
+            // hacemos un bucle para pasar por cada indice del array de valores
+            document.getElementById("enviopk").value = id;
+        }
+    };
+
+    function finalizar(id, tipo_actividad) {
+        $.ajax({
+            type: 'GET',
+            url: "{% url 'terminar_tarea' %}",
+            data: {
+                'id': id,
+            }, dataType: 'json',
+            success: function (data) {
+                valor = data.valor;
+                if (valor == 2) {
+                    swal("Éxito!", "Tarea terminada buena!", "success");
+                    $(".confirm").click(function () {
+                        window.location.href = '/recibo/caja/' + id + '/';
+                    });
+                } else {
+                    swal("Éxito!", "Tarea terminada!", "success");
+                    $(".confirm").click(function () {
+                        window.location.href = '/tareas/';
+                    });
+                }
+            }
+        });
+    }
+
+    function mostrarModal(id) {
+        $("#actividadId").val(id);
+        $("#modalTerminar").modal('show');
+    }
+
+    $(document).ready(function () {
         $('#datetimepicker1').datetimepicker({
             format: 'l'
         });
@@ -368,511 +418,113 @@
         $('#timepicker').datetimepicker({
             format:'LT'
         });
-    });
-</script>
-<script>
-$(function () {
-    $("#example1").DataTable({
-        responsive: true
-    });
-    
-    $('#example3').DataTable({
-        "bAutoWidth": false,
-        responsive: true
-    });
-});    
-function Registrar()
-{
-    var valor = 0;
-    var quien_envia = $("#id_quien_envia").val();
-    var nombre = $("#id_nombre_completo").val();
-    var celular = $("#id_celular").val();
-    var correo = $("#id_correo").val();
-    var direccion = $("#id_direccion").val();
-    if (quien_envia == 0){
-        alert('Seleccione un cliente para realizar la operacion');
-        
-    }else{
-        $.ajax({
-            type: "POST",
-            dataType: 'json',
-            url: "{% url 'recibe' %}",
-            data: {
-                'quien_envia': quien_envia,
-                'nombre': nombre,
-                'celular': celular,
-                'correo': correo,
-                "credentials": 'include',
-                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
-                'direccion': direccion
-            },
-            success: function(data){
-                valor = data.valor;
-                Limpiar();
-                $('#collapseOne').removeClass('show')
-                quien_recibe_ver();
-            }
-        });
-        
-        alert("Éxito!" + '\n' + "Cliente agregado correctamente!");
-        /*$( ".confirm" ).click(function() {
-            window.location.href = '/ver/paquetes/'+'{{estado.pk}}';
-        });*/
 
-    }
-    
-}   
-function Limpiar()
-{
-    $("#id_nombre_completo").val("");
-    $("#id_celular").val("");
-    $("#id_direccion").val("");
-}
-function quien_recibe_ver()
-{
-    $('#id_quien_recibe').find('option').remove();
-    $('#id_quien_recibe').append("<option value='0'selected>Seleccion una opción</option>");
-    var quien_envia = $("#id_quien_envia").val();
-    $.ajax({
-        url: "{% url 'ver_recibe' %}",
-        type: "get",
-        data: {
-            'quien_envia': quien_envia
-        },
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function(data) {
-            $.each(data, function(key, val) {
-                $("#id_quien_recibe").append('<option value='+val.pk+'>'+val.nombre_completo +'|'+val.celular +'</option>');
-            });
-        $("#id_quien_recibe").select2(); //se tiene que iniciar la clase select
-        },
-        error: function(ts) {
-            
-        }
-    });
-
-}
-//AGREGAR DEPARTAMENTO AL CAMBIAR PAIS
-$('#id_pais').on('change',departamentos);  
-    //funcion para extraer los departamentos de cada pais
-    function departamentos() {
-            $('#id_departamento').find('option').remove();
-            $('#id_departamento').append("<option value='0'selected>Seleccion una opción</option>");
-            $.ajax({
-                url: "{% url 'departamento' %}",
-                type: "get",
-                data: {
-                    'idpais': $(this).val(),
-                },
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(data) {
-                    $.each(data, function(key, val) {
-                        $("#id_departamento").append('<option value='+val.id+'>'+val.nombre+'</option>');
-                    });
-                $("#id_departamento").select2(); //se tiene que iniciar la clase select
-                },
-                error: function(ts) {
-                    
-                }
-            });
-    };
-//AGREGAR QUIEN RECIBE AL CAMBIAR QUIEN ENVIA
-$('#id_quien_envia').on('change',quien_recibe);
-    //funcion para extraer los departamentos de cada pais
-    function quien_recibe() {
-        if($('#id_quien_envia').val() == 0){
-            $('#datos_quien_recibe').addAttr('hidden');
-            $('#datos_quien_recibe').removeClass('show');
-        }
-            $('#id_quien_recibe').find('option').remove();
-            $('#id_quien_recibe').append("<option value='0'selected>Seleccion una opción</option>");
-            $.ajax({
-                url: "{% url 'ver_recibe' %}",
-                type: "get",
-                data: {
-                    'quien_envia': $(this).val()
-                },
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(data) {
-                    $.each(data, function(key, val) {
-                        $("#id_quien_recibe").append('<option value='+val.pk+'>'+val.nombre_completo +' | '+val.celular +'</option>');
-                    });
-                $("#id_quien_recibe").select2(); //se tiene que iniciar la clase select
-                },
-                error: function(ts) {
-                    
-                }
-            });
-    };
-//AGREGAR DATOS DE QUIEN RECIBE A INPUTS
-$('#id_quien_recibe').on('change',datos);   
-    //funcion para extraer los departamentos de cada pais
-    function datos() {
-        if ($('#id_quien_recibe').val()!= 0){
-            $("#id_celular_registrar").val("");
-            $("#id_direccion_registrar").val("");
-            $.ajax({
-                url: "{% url 'datos_recibe' %}",
-                type: "get",
-                data: {
-                    'cliente_recibe': $(this).val(),
-                },
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(data) {
-                    $.each(data, function(key, val) {
-                        $("#id_celular_registrar").val(val.celular);
-                        $("#id_direccion_registrar").val(val.direccion);
-                        var pais = val.pais;
-                        var depto = val.departamento;
-                        var t = pais + depto + '';
-                        if(t.length > 1){
-                            pais = pais.split("|");
-                            depto = depto.split("|");
-                            $('#id_pais').find('option').remove();
-                            $('#id_departamento').find('option').remove();
-                            $('#id_pais').append("<option value='"+pais[0]+"'selected>"+pais[1]+"</option>");
-                            $('#id_departamento').append("<option value='"+depto[0]+"'selected>"+depto[1]+"</option>");
-                        }else{
-                            $('#id_pais').find('option').remove();
-                            $('#id_departamento').find('option').remove();
-                            $("#id_pais").append("<option value='0' >SELECCIONE</option>");
-                            $("#id_departamento").append("<option value='0' >SELECCIONE</option>");
-                            {% for p in pais %}
-                                $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-                            {% endfor %}
-                        }
-                        
-                    });
-                    $('#datos_quien_recibe').removeAttr('hidden');
-                    $('#datos_quien_recibe').addClass('show');
-                },
-                error: function(ts) {
-                    
-                }
-            });
-        }else{
-            {% for p in pais %}
-                $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-            {% endfor %}
-            departamentos();
-        }
-    };
-    function Mostrar(){
-        {% for p in pais %}
-            $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-        {% endfor %}
-    }
-</script>
-<script>
- 
-    /**
-    * Funcion que captura las variables pasados por GET
-    * Devuelve un array de clave=>valor
-    */
-    function getGET()
-    {
-        // capturamos la url
-        var loc = document.location.href;
-        // si existe el interrogante
-        if(loc.indexOf('?')>1)
-        {
-            // cogemos la parte de la url que hay despues del interrogante
-            var getString = loc.split('?')[1];
-            // obtenemos un array con cada clave=valor
-            var GET = getString.split('&');
-            var get = {};
-            // recorremos todo el array de valores
-            for(var i = 0, l = GET.length; i < l; i++){
-                var tmp = GET[i].split('=');
-                get[tmp[0]] = unescape(decodeURI(tmp[1]));
-            }
-            return get;
-        }
-    }
-    window.onload = function()
-    {
-        // Cogemos los valores pasados por get
-        var valores=getGET();
-        if(valores)
-        {
-            //recogemos los valores que nos envia la URL en variables para trabajar 
-                //con ellas
-            var id = valores['envio'];
-                // hacemos un bucle para pasar por cada indice del array de valores
-            document.getElementById("enviopk").value = id;  
-        }
-    }
-    </script>
-<script>
-function ver() {
-    id = $('#enviopk').val();
-    window.open("/envio/pdf/"+id +"/",'_blank');
-}
-</script>
- <script>
-    function finalizar(id, tipo_actividad) {
-      //if(tipo_actividad != 0){
-        //var pago = prompt("Ingrese el deposito recibido", "$0.00");
-        //var descripcion_entrega = prompt("Descripcion de lo entregado", "Ingrese aqui");
-        //if (pago != null && descripcion_entrega != null) {
-          $.ajax({
-            type: 'GET',
-            url: "{% url 'terminar_tarea' %}",
-            data: {
-                //'tipo_actividad':tipo_actividad,
-                'id': id,
-                //'descripcion_entrega': descripcion_entrega,
-                //'deposito': pago,
-                //'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
-            },dataType: 'json',
-            success: function (data) { 
-              valor = data.valor;
-              if(valor == 2){
-                swal("Éxito!", "Tarea terminada buena!", "success");
-                $( ".confirm" ).click(function() {
-                  window.location.href = '/recibo/caja/' + id + '/';
-                });
-              }else{
-                swal("Éxito!", "Tarea terminada!", "success");
-                $( ".confirm" ).click(function() {
-                  window.location.href = '/tareas/';
-                });
-              }
-            }
-          }); 
-        }
-      //}}
-
-    function reactivar(id) {
-      var valor = 0;
-      swal({   title: "REACTIVAR ACTIVIDAD",
-        text: "Dar clic en OK si desea reactivar la tarea",
-        type: "info",   showCancelButton: true,
-        closeOnConfirm: false,
-        showLoaderOnConfirm: true, },
-        function(isConfirm){
-          if (isConfirm) {
-            $.ajax({
-              type: 'GET',
-              url: "{% url 'reactivar_tarea' %}",
-              data: {
-                  'id': id,
-                  //'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
-              },dataType: 'json',
-              success: function (data) { 
-                valor = data.valor;
-              }
-            });
-            setTimeout(function(isConfirm){ 
-                if(valor == 1){
-                  swal("Éxito!", "Traslado realizdo correctamente!", "success");
-                  $( ".confirm" ).click(function() {
-                    window.location.href = '/tareas/';
-                  });
-                  
-                }else{
-                  swal("Cancelado", "El traslado se cancelo :)", "error");
-                }
-            }, 300);  
-          }else {
-            setTimeout(function(){swal("Cancelado", "El traslado se cancelo :)", "error");}, 150);
-          }
-      });
-    }
-
-    function eliminar(id) {
-      var valor = 0;
-      swal({   title: "ELIMINAR ACTIVIDAD",
-        text: "Dar clic en OK si desea eliminar la tarea",
-        type: "info",   showCancelButton: true,
-        closeOnConfirm: false,
-        showLoaderOnConfirm: true, },
-        function(isConfirm){
-          if (isConfirm) {
-            $.ajax({
-              type: 'GET',
-              url: "{% url 'reactivar_tarea' %}",
-              data: {
-                  'id': id,
-                  //'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
-              },dataType: 'json',
-              success: function (data) { 
-                valor = data.valor;
-              }
-            });
-            setTimeout(function(isConfirm){ 
-                if(valor == 1){
-                  swal("Éxito!", "Tarea eliminada correctamente!", "success");
-                  $( ".confirm" ).click(function() {
-                    window.location.href = '/tareas/';
-                  });
-                  
-                }else{
-                  swal("Cancelado", "El traslado se cancelo :)", "error");
-                }
-            }, 300);  
-          }else {
-            setTimeout(function(){swal("Cancelado", "El traslado se cancelo :)", "error");}, 150);
-          }
-      });
-    }
-
-
-  </script>
-<!--AGREGAR CAJAS A TABLA-->
-<!--
-    <table class="table table-striped tablaDatos table-responsive table-bordered" id="tblDatos" name="tblDatos_list">
-        <thead>
-            <tr class="tablaDatosTitulo">
-                <th>Caja</th>
-                <th>Cantidad</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody >
-        </tbody>
-    </table>
--->
-
-<script>
-
-    function mostrarModal(id) {
-    $('.modal').on('shown.bs.modal', function () {
-        let myTable="<form id='myForm' class='form-horizontal' enctype='multipart/form-data' method='POST' action='{% url 'finalizar_actividad' %}'>{% csrf_token %}<div class='modal-dialog '><div class='modal-content card-primary card-outline'><div class='modal-header'><h4 class='modal-title'><strong>Ingresar Caja Entregada</strong></h4><button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button></div>";
-        myTable+="<div class='modal-body' ><div class='col-md-4' style='float:left' ><div class='col-md-12'><label class='col-form-label'>Caja entregada:</label><select class='form-control select2' style='width: 100%;' name='caja' id='caja'>   {% for c in cajas %} <option value='{{c.pk}}|{{c.medida_caja}}'>{{c.medida_caja}}</option> {% endfor %}   </select></div></div><div class='col-md-5' style='float:left'><input hidden name='actividad' type='text' value='"+ id +"'><div class='col-md-12' ><label class='col-form-label'>Cantidad:</label></div><div class='col-md-6' style='float:left'><input type='number' class='form-control' name='cantidad' id='cantidad' value='1'></div><div class='col-md-6' style='float:left'><button class='btn btn-success' name='btnInsertar' id='btnInsertar' type='button' onclick='addMaterial()'><i class='fas fa-plus-square'></i></button></div>        </div><div class='col-md-3' style='float:left'><div class='col-md-12'><label for='deposito_pedido' class='col-form-label'>Deposito:</label></div><div class='col-md-12' style='float:left'><input type='number' class='form-control text-uppercase' name='deposito_pedido' id='deposito_pedido'value='0'></div></div><div id='agregartabla' class='col-md-12' style='float:left'><br></div></div>";
-        myTable+="<div class='modal-footer justify-content-between'><button type='button' class='btn btn-default' data-dismiss='modal'>Cerrar</button><button id='submitBtn' class='btn btn-primary'>Guardar</button></div></form>";
-        document.getElementById('agregarmodal').innerHTML = myTable;
-    })
-    $("#myModal").modal("show");
-    }
-
-    $(document).ready(function(){
-        $("#submitBtn").click(function(){        
-            $("#myForm").submit(); // Submit the form
+        $("#submitBtn").click(function () {
+            $("#myForm").submit(); 
         });
     });
-    /*AGREGAR LOS DATOS*/
+    
     var acum = 0;
 
-    function addMaterial(){ 
+    function addMaterial() {
         var caja = $("#caja").val();
         var texto = caja.split("|");
         var id_producto = $("#caja").val();
         var cantidad = $("#cantidad").val();
-        var tablaDatos= $("#tblDatos");
+        var tablaDatos = $("#tblDatos");
 
-        var nombre_articulo=texto[1];
+        var nombre_articulo = texto[1];
         var informacion = id_producto.split("|")
-        var subtotal = parseFloat(cantidad) * informacion[1].replace(",",".")
-        var precio = informacion[1].replace(",",".")
-        var isv_pagar = (parseFloat(subtotal)*(parseFloat(informacion[1])/100))
+        var subtotal = parseFloat(cantidad) * informacion[1].replace(",", ".")
+        var precio = informacion[1].replace(",", ".")
+        var isv_pagar = (parseFloat(subtotal) * (parseFloat(informacion[1]) / 100))
         var agrego = 0;
 
-        if(cantidad== ""){
+        if (cantidad == "") {
             alert("Ingrese la cantidad de cajas entregadas");
-        }else if(cantidad!=" " || id_producto !=" "){ 
+        } else if (cantidad != " " || id_producto != " ") {
             var oTable = document.getElementById('tblDatos');
             var i;
-            if(oTable){
+            if (oTable) {
                 var rowLength = oTable.rows.length;
                 for (i = 1; i < rowLength; i++) {
                     var oCells = oTable.rows.item(i).cells;
                     if (texto[0] == oCells[0].firstChild.data) {
                         cantidad = parseInt(parseInt(oCells[2].firstChild.data) + parseInt(cantidad));
                         subtotal = cantidad * informacion[1];
-                        isv_pagar = (parseFloat(subtotal)*(parseFloat(informacion[1])/100));
-                        //seleccionar(oCells[8].firstChild.data);
-                        //document.getElementById("tblDatos").deleteRow(oCells[8].firstChild.data);
+                        isv_pagar = (parseFloat(subtotal) * (parseFloat(informacion[1]) / 100));
 
-                        document.getElementById('can'+oCells[8].firstChild.data).firstChild.data = cantidad;
-                        document.getElementById('su'+oCells[8].firstChild.data).firstChild.data =subtotal;
-                        document.getElementById('impuesto'+oCells[8].firstChild.data).firstChild.data = isv_pagar;
-                        var cp = document.getElementById('cprod'+oCells[8].firstChild.data).value;
-                        var cajas = document.getElementById('cajas'+oCells[8].firstChild.data).value;
+                        document.getElementById('can' + oCells[8].firstChild.data).firstChild.data = cantidad;
+                        document.getElementById('su' + oCells[8].firstChild.data).firstChild.data = subtotal;
+                        document.getElementById('impuesto' + oCells[8].firstChild.data).firstChild.data = isv_pagar;
+                        var cp = document.getElementById('cprod' + oCells[8].firstChild.data).value;
+                        var cajas = document.getElementById('cajas' + oCells[8].firstChild.data).value;
                         var caja = cajas.split("|");
-                        document.getElementById('cajas'+oCells[8].firstChild.data).value = texto[0]+"|"+cantidad;
-                        //document.getElementById('cprod'+oCells[8].firstChild.data).val();
+                        document.getElementById('cajas' + oCells[8].firstChild.data).value = texto[0] + "|" + cantidad;
                         var cprod = cp.split("|");
-                        var nc = cantidad ;
-                        document.getElementById('cprod'+oCells[8].firstChild.data).value = nc;
-                        agrego = 1 ;
+                        var nc = cantidad;
+                        document.getElementById('cprod' + oCells[8].firstChild.data).value = nc;
+                        agrego = 1;
                     }
                 }
-                acum+= 1;
-                
-                if (parseInt(agrego)==0){
-                    tablaDatos.append("<tr id="+acum+" ><td hidden>"+informacion[0]+"</td><td >"+nombre_articulo+"</td><td id=can"+acum+">"+cantidad+"</td><td hidden ><input id=cajas"+acum+" name='cajas' value="+texto[0]+"|"+cantidad+"></td><td hidden id=su"+acum+" class='subtotal'"+acum+">"+ subtotal +"</td><td hidden id=impuesto"+acum+" class='isv'>"+ isv_pagar +"</td><td hidden ><input id=cprod"+acum+" name='productos' value="+cantidad +'|'+texto[0]+"></></td><td ><input type='button' class='btn btn-danger btn-sm' value='Eliminar' onclick='seleccionar("+acum+");'></td><td hidden>"+acum+"</td></tr>"); 
+                acum += 1;
+
+                if (parseInt(agrego) == 0) {
+                    tablaDatos.append("<tr id=" + acum + " ><td hidden>" + informacion[0] + "</td><td >" + nombre_articulo + "</td><td id=can" + acum + ">" + cantidad + "</td><td hidden ><input id=cajas" + acum + " name='cajas' value=" + texto[0] + "|" + cantidad + "></td><td hidden id=su" + acum + " class='subtotal'" + acum + ">" + subtotal + "</td><td hidden id=impuesto" + acum + " class='isv'>" + isv_pagar + "</td><td hidden ><input id=cprod" + acum + " name='productos' value=" + cantidad + '|' + texto[0] + "></></td><td ><input type='button' class='btn btn-danger btn-sm' value='Eliminar' onclick='seleccionar(" + acum + ");'></td><td hidden>" + acum + "</td></tr>");
                 }
-                
-            }else{
+
+            } else {
                 /*CREAR LA TABLA*/
                 //function generar_tabla(){
-                let myTable= "<br><table width='100%' style='overflow-y: scroll;height: 150px;' class=' center table table-striped tablaDatos table-responsive table-bordered' id='tblDatos' name='tblDatos_list'>";
-                myTable+= "<thead><tr class='tablaDatosTitulo'><th>Caja</th><th>Cantidad</th><th>Acción</th></tr></thead>";
-                myTable+="<tbody></tbody>";
-                myTable+="</table>";
+                let myTable = "<br><table width='100%' style='overflow-y: scroll;height: 150px;' class=' center table table-striped tablaDatos table-responsive table-bordered' id='tblDatos' name='tblDatos_list'>";
+                myTable += "<thead><tr class='tablaDatosTitulo'><th>Caja</th><th>Cantidad</th><th>Acción</th></tr></thead>";
+                myTable += "<tbody></tbody>";
+                myTable += "</table>";
                 document.getElementById('agregartabla').innerHTML = myTable;
                 addMaterial();
                 //}
             }
-            
+
         }
 
     }
 
-    function seleccionar(id_fila){
+    function seleccionar(id_fila) {
         var parent = document.getElementById(id_fila).parentNode;
         parent.removeChild(document.getElementById(id_fila));
     }
 
-</script>
-<script>
     /**
     * Funcion que captura las variables pasados por GET
     * Devuelve un array de clave=>valor
     */
-    function getGET()
-    {
+    function getGET() {
         // capturamos la url
         var loc = document.location.href;
         // si existe el interrogante
-        if(loc.indexOf('?')>1)
-        {
+        if (loc.indexOf('?') > 1) {
             // cogemos la parte de la url que hay despues del interrogante
             var getString = loc.split('?')[1];
             // obtenemos un array con cada clave=valor
             var GET = getString.split('&');
             var get = {};
             // recorremos todo el array de valores
-            for(var i = 0, l = GET.length; i < l; i++){
+            for (var i = 0, l = GET.length; i < l; i++) {
                 var tmp = GET[i].split('=');
                 get[tmp[0]] = unescape(decodeURI(tmp[1]));
             }
             return get;
         }
     }
-    window.onload = function()
-    {
-        // Cogemos los valores pasados por get
-        var valores=getGET();
-        if(valores)
-        {
-            //recogemos los valores que nos envia la URL en variables para trabajar 
-                //con ellas
-            var id = valores['envio'];
-                // hacemos un bucle para pasar por cada indice del array de valores
-            document.getElementById("enviopk").value = id;  
-        }
+
+
+    function ver() {
+        id = $('#enviopk').val();
+        window.open("/envio/pdf/" + id + "/", '_blank');
     }
-    </script>
-<script>
-function ver() {
-    id = $('#enviopk').val();
-    window.open("recibo/caja/"+id +"/",'_blank');
-}
+
+    
+    
 </script>
+
 {% endblock js %}

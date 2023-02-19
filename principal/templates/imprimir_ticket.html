@@ -4,9 +4,6 @@
 
 <head>
   <meta charset="UTF-8">
-  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous"> -->
-  <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <title>Envio No. {{envio.pk}} | {{envio.quien_envia}}</title>
   <style type="text/css">
     * {
@@ -22,6 +19,10 @@
     .ticket{
       width:100%;
       
+    }
+    .tablas{
+      border: 3px solid black;
+      border-collapse: collapse;
     }
     img {
       max-width: inherit;
@@ -51,7 +52,7 @@
           <div class="row page1"></div>
           <div class="container tpage">
             <center>
-              <div style="text-align:center;"><img width="125px" src="{{envio.empresa.logo_empresa.path}}"></div>
+              <div style="text-align:center;"><img width="175px" src="{{envio.empresa.logo_empresa.path}}"></div>
 
               <p style="font-size: 20px;">DIRECCIÓN: {{envio.empresa.direccion_empresa}}<br>TELÉFONO:
                 {{envio.empresa.telefono_empresa}} {% if envio.empresa.celular_empresa %} |
@@ -152,47 +153,47 @@
             <div style="page-break-after: always;"></div>
           {% endif %}
           <div class="container tpage" >
-            <br><br><br><br><br><br>
+            <br>
             <center>
-              <div style="text-align:center;"><img width="200px" src="{{envio.empresa.logo_empresa.path}}" style="margin-top:10px;"></div>
+              <div style="text-align:center;"><img width="300px" src="{{envio.empresa.logo_empresa.path}}" style="margin-top:10px;"></div>
 
               <p style="font-size: 20px;">DIRECCIÓN: {{envio.empresa.direccion_empresa}}<br>TELÉFONO:
                 {{envio.empresa.telefono_empresa}} {% if envio.empresa.celular_empresa %} |
                 {{envio.empresa.celular_empresa}} {% endif %}<br>FMC No. 3172NF</p>
             </center>
             <table width="100%">
-              <tbody>
+              <thead>
                 <tr>
-                  <td style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">Guia: {{l.guia_padre}}
-                  </td>
+                  <th style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">Guia: {{l.guia_padre}}
+                  </th>
                 </tr>
-              </tbody>
+              </thead>
             </table>
             <center>
               <div>
-                <table width="100%" border="1" cellspacing="3" cellpadding="3">
+                <table class="tablas" width="100%"  cellspacing="3" cellpadding="3" >
                   <tbody>
                     <tr>
-                      <td style="font-size:15px;font-weight: bold;">DATOS CONSIGNATARIO:</td>
+                      <td style="font-size:22px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">DATOS CONSIGNATARIO:</td>
                     </tr>
                     <tr>
-                      <td style="font-size:25px;font-weight: bold;">{{l.destinatario}}</td>
+                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.destinatario}}</td>
                     </tr>
                     <tr>
-                      <td style="font-size:20px;font-weight: bold;">Producto: {{l.producto}}</td>
+                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">Producto: {{l.producto}}</td>
                     </tr>
                     <tr>
-                      <td style="font-size:20px;font-weight: bold;">{{l.departamento}} | {{l.direccion}}</td>
+                      <td style="font-size:25px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.departamento}} | {{l.direccion}}</td>
                     </tr>
                     <tr>
-                      <td style="font-size:30px;font-weight: bold;">{{l.telefono}}</td>
+                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.telefono}}</td>
                     </tr>
                   </tbody>
                 </table>
               </div><br>
               <!--CANTIDADES DE PAGO-->
               <div class="text-center">
-                <img src="data:image/png;base64,{{l.codigo}}" height="60" width="250">
+                <img src="data:image/png;base64,{{l.codigo}}" height="120" width="500">
               </div>
             </center>
             <center>
