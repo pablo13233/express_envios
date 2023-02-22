@@ -375,6 +375,7 @@
         if (valores) {
             //recogemos los valores que nos envia la URL en variables para trabajar 
             //con ellas
+            console.log(valores);
             var id = valores['envio'];
             // hacemos un bucle para pasar por cada indice del array de valores
             document.getElementById("enviopk").value = id;
@@ -391,12 +392,12 @@
             success: function (data) {
                 valor = data.valor;
                 if (valor == 2) {
-                    swal("Éxito!", "Tarea terminada buena!", "success");
+                    alert("Éxito! Tarea terminada buena!");
                     $(".confirm").click(function () {
                         window.location.href = '/recibo/caja/' + id + '/';
                     });
                 } else {
-                    swal("Éxito!", "Tarea terminada!", "success");
+                    alert("Éxito! Tarea terminada!");
                     $(".confirm").click(function () {
                         window.location.href = '/tareas/';
                     });
@@ -520,11 +521,10 @@
 
     function ver() {
         id = $('#enviopk').val();
-        window.open("/envio/pdf/" + id + "/", '_blank');
+        window.open("/recibo/caja/" + id + "/", '_blank');
     }
 
-    
-    
+
 </script>
 
 {% endblock js %}

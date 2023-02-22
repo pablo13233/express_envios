@@ -1066,7 +1066,7 @@ def finalizar_actividad(request):
 					update_control_caja = EmpresaControlCaja.objects.filter(pk=separar[0]).update(existencia = caja.existencia - int(separar[1]))
 				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
 				ctx = {'ingreso_correcto':ingreso_correcto,}
-				return HttpResponseRedirect(reverse('actividades')+"?ok" +"&envio="+ str(new_recibo_caja.pk))
+				return HttpResponseRedirect(reverse('actividades')+"?ok" +"&envio="+ str(actividad))
 		else:
 			ctx = {'ret_data':ret_data,'errores':errores, 'cajas_post':cajas_post,'error':error}
 			return HttpResponseRedirect(reverse('actividades'))
@@ -1074,6 +1074,7 @@ def finalizar_actividad(request):
 		return HttpResponseRedirect(reverse('actividades'))
 
 def recibo_caja_pdf(request, id):
+	print(id)
 	recibo_actividad = EmpresaActividades.objects.get(id=id) 
 	caja = ReciboCaja.objects.get(pk = recibo_actividad.recibo_entrega)
 	fecha = caja.fecha
