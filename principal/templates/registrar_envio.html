@@ -1063,7 +1063,7 @@ function quien_recibe_ver()
         dataType: "json",
         success: function(data) {
             $.each(data, function(key, val) {
-                $("#id_quien_recibe").append('<option value='+val.pk+'>'+val.nombre_completo +'|'+val.celular +'</option>');
+                $("#id_quien_recibe").append('<option value='+val.pk+'>'+ val.nombre_completo +'|'+val.celular +'</option>');
             });
         $("#id_quien_recibe").select2(); //se tiene que iniciar la clase select
         },
@@ -1292,7 +1292,7 @@ $('#id_quien_envia').on('change',quien_recibe);
             $('#datos_quien_recibe').addAttr('hidden');
             $('#datos_quien_recibe').removeClass('show');
         }
-           
+        
             $("#id_envia_pk").val($(this).val());
             $('#id_quien_recibe').find('option').remove();
             $('#id_quien_recibe').append("<option value='0'selected>Seleccion una opción</option>");

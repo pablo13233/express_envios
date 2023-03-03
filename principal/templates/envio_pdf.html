@@ -91,13 +91,13 @@ var getCanvas; // global variable
           <td width="63%" style="font-size:20px;font-weight: bold;">Fecha: {{envio.fecha_recoleccion}}</td>
           <td width="15%" style="font-size:30px;font-weight: bold;text-align:right;color:#ff4444">Guia:</td>
           <td width="10%" style="font-size:30px;font-weight: bold;color:#ff4444">{{envio.codigo}}</td>
-        </tr>        
+        </tr>
       </tbody>
     </table>
       <!--REVENDEDOR-->
       
       {% if envio.revendedor %}
-        <table style="position: fixed;bottom: 0;right: 0;" width="50%" border="1" cellspacing="3" cellpadding="3">
+        <table style="position: fixed;bottom: 0;right: 0;" width="100%" border="1" cellspacing="3" cellpadding="3">
           <tbody >
             <tr ><td bgcolor="#0099CC" width="100%" style="font-size:15px;font-weight: bold;" align="center">GUIA REVENDEDOR: {{envio.guia_revendedor}}</td></tr>
           </tbody>

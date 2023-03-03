@@ -52,39 +52,47 @@
           <div class="row page1"></div>
           <div class="container tpage">
             <center>
-              <div style="text-align:center;"><img width="175px" src="{{envio.empresa.logo_empresa.path}}"></div>
+              <div style="text-align:center;"><img width="750px" height="250px" src="{{revendedor.logo.path}}" style="margin-top:10px;"></div>
 
-              <p style="font-size: 20px;">DIRECCIÓN: {{envio.empresa.direccion_empresa}}<br>TELÉFONO:
-                {{envio.empresa.telefono_empresa}} {% if envio.empresa.celular_empresa %} |
-                {{envio.empresa.celular_empresa}} {% endif %}<br>FMC No. 3172NF</p>
+              <p style="font-size: 20px;">DIRECCIÓN: {{revendedor.direccion}}<br>TELÉFONO:
+                {{revendedor.telefono}} {% if revendedor.celular_empresa %} |
+                {{revendedor.celular_empresa}} {% endif %}<br></p>
             </center>
             <table width="100%">
-              <tbody>
+              <thead>
                 <tr>
-                  <td style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">Guia: {{envio.codigo}}
-                  </td>
+                  <th style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">Guia: {{l.guia_padre}}
+                  </th>
                 </tr>
-              </tbody>
+              </thead>
             </table>
-            <table width="100%" border="1" cellspacing="3" cellpadding="3">
-              <tbody>
-                <tr>
-                  <td style="font-size:15px;font-weight: bold;">DATOS CONSIGNATARIO:</td>
-                </tr>
-                <tr>
-                  <td style="font-size:25px;font-weight: bold;">{{envio.quien_recibe}} {{envio.quien_recibev}}</td>
-                </tr>
-                <tr>
-                  <td style="font-size:20px;font-weight: bold;">{{envio.departamento_destino}},
-                    {{envio.direccion_registrar}}</td>
-                </tr>
-                <tr>
-                  <td style="font-size:30px;font-weight: bold;">{{envio.quien_recibe.celular}}</td>
-                </tr>
-              </tbody>
-            </table><br>
-
-            <center><img src="data:image/png;base64,{{codigo}}" height="60" width="250"></center>
+            <center>
+              <div>
+                <table class="tablas" width="100%"  cellspacing="3" cellpadding="3" >
+                  <tbody>
+                    <tr>
+                      <td style="font-size:22px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">DATOS CONSIGNATARIO:</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.destinatario}}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">Producto: {{l.producto}}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:25px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.departamento}} | {{l.direccion}}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.telefono}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div><br>
+              <!--CANTIDADES DE PAGO-->
+              <div class="text-center">
+                <img src="data:image/png;base64,{{l.codigo}}" height="120" width="500">
+              </div>
+            </center>
             <center>
               <p style="font-size:30px;font-weight: bold;">{{forloop.counter}} / {{cantT}} </p>
             </center>
