@@ -1680,8 +1680,9 @@ def envio_pdf(request, id):
 		abonos_totales = 0
 	else:
 		abonos_totales = float(abonos['abonos_envios'])
-	saldo = envio.total - (float(envio.pago_recibido)+float(abonos_totales))
+	saldo = round(envio.total,2) - (float(envio.pago_recibido)+float(abonos_totales))
 	detalle_guia = []
+	print(saldo)
 	for d in detalle:
 		lista = {}
 		lista['descripcion'] = d.tipo_caja.tipo_caja.descripcion
