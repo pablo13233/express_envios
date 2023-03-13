@@ -1449,13 +1449,6 @@ def validad_envio(request,quien_envia,quien_recibe,pais,departamento):
 		query_envio['quien_recibe'] = quien_recibe_query
 	else:
 		errores['quien_recibe'] = u'Falta ingresar la persona que realiza el envío'
-	
-	#if request.POST.get('descripcion_embarque') != '':
-		#ret_data.update({'descripcion_embarque':request.POST.get('descripcion_embarque').upper()})
-		#query_envio.update({'descripcion_embarque':request.POST.get('descripcion_embarque').upper()})
-	#else:
-		#errores['descripcion_embarque'] = u'Falta ingresar el contenido del embarque'
-
 	if request.POST.get('pais', '') and request.POST.get('pais', '') != '0':
 		ret_data['id_pais'] = int(request.POST.get('pais',''))
 		pais_query = pais.get(pk=request.POST.get('pais',''))
@@ -4038,3 +4031,158 @@ def cierre_anual_print(request):
 					)
 		except Exception as e:
 			print('Error--> ',str(e))
+
+@login_required
+def registrar_envio_rv(request):
+	empleado = Empleado.objects.get(usuario=request.user)
+	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
+	r = Revendedor.objects.filter(usuario=request.user)
+	pais = Pais.objects.all()
+	ver_clientes = Cliente.objects.all()
+	departamento = Departamento.objects.all()
+	quien_recibe = ClienteRecibe.objects.all()
+	es_revendedor = False
+	correlativo = Envio.objects.filter(empresa=empresa.empresa)
+	#print correlativo.count(), 'correlativo'
+	tipo_contenido = TipoContenido.objects.all()
+	tipo_envio = TipoEnvio.objects.all()
+	if r.count() >= 1:
+		revendedor_creo = Revendedor.objects.get(usuario = request.user)
+		es_revendedor = True
+		revendedor_creo = Revendedor.objects.get(usuario = request.user)
+		quien_envia = Cliente.objects.filter(empresa=empresa.empresa,revendedor = True,revenedor_creo=revendedor_creo.pk)
+	else:
+		quien_envia = Cliente.objects.filter(empresa=empresa.empresa)
+
+	#imagen = request.FILES.get('imagen')
+	if request.method == 'POST':
+		valor_adicional = 0
+		valor_emplasticado = 0
+		valor_seguro = 0
+		codigo_inicial = 2006
+		correlativo = Envio.objects.filter(empresa=empresa.empresa)
+		codigo_envio = int(codigo_inicial) + int(correlativo.count())
+		codigo_empresa = empresa.empresa.codigo_empresa
+		codigo_final = codigo_empresa + '00' + str(codigo_envio)
+		ret_data,errores,query_envio,recibo,ingreso_correcto = {},{},{},{},{}
+		recibo = validad_envio(request,quien_envia,quien_recibe,pais,departamento)
+		ret_data.update(recibo['ret_data'])
+		errores.update(recibo['errores'])
+		query_envio.update({'empresa':empresa.empresa})
+		query_envio.update({'codigo':codigo_final})
+		query_envio.update(recibo['query_envio'])
+		#//////
+		ret_data.update({'precioadicional':valor_adicional})
+		query_envio.update({'valor_adicional':valor_adicional})
+		ret_data.update({'valor_emplasticado':valor_emplasticado})
+		query_envio.update({'valor_emplasticado':valor_emplasticado})
+		ret_data.update({'valor_seguro':valor_seguro})
+		query_envio.update({'valor_seguro':valor_seguro})
+
+		if request.POST.get('valor_envio') == '':
+			errores.update({'valor_envio':'DEBE REALIZAR EL CALCULO DEL ENVIO'})
+		else:
+			if float(request.POST.get('valor_envio')) <=0:
+				errores.update({'valor_envio':'DEBE REALIZAR EL CALCULO DEL ENVIO O AGREGAR CAJAS'})
+		if not errores:
+			valor = float(request.POST.get('valor_envio'))
+			total = valor + float(valor_adicional) + float(valor_emplasticado) + float(valor_seguro)
+			pago_recibido = float(request.POST.get('pago_recibido'))
+			
+			if pago_recibido < total:
+				credito = True
+				saldo_pendiente = (total - pago_recibido)
+			else:
+				credito = False
+				saldo_pendiente = 0.00
+			if es_revendedor:
+				if request.POST.get('guia_revendedor') != '':
+					ret_data.update({'guia_revendedor':request.POST.get('guia_revendedor')})
+					query_envio.update({'guia_revendedor':request.POST.get('guia_revendedor').upper()})
+					query_envio.update({'revendedor':True})
+					query_envio.update({'aprobado':False})
+				else:
+					errores['guia_revendedor'] = u'Falta ingresar la guia de revendedor'
+
+			query_envio.update({'guia_revendedor':request.POST.get('guia_revendedor').upper()})
+			if request.POST.get('tipo_contenido', '') and request.POST.get('tipo_contenido', '') != '0':
+				ret_data['id_tipo_contenido'] = int(request.POST.get('tipo_contenido',''))
+				tipo_contenido_query = tipo_contenido.get(pk=request.POST.get('tipo_contenido',''))
+				query_envio['tipo_contenido'] = tipo_contenido_query
+			else:
+				tipo_contenido_query = TipoContenido.objects.get(pk=1)
+				query_envio['tipo_contenido'] = tipo_contenido_query
+			
+			if request.POST.get('tipo_envio', '') and request.POST.get('tipo_envio', '') != '0':
+				ret_data['id_tipo_envio'] = int(request.POST.get('tipo_envio',''))
+				tipo_envio_query = tipo_envio.get(pk=request.POST.get('tipo_envio',''))
+				query_envio['tipo_envio'] = tipo_envio_query
+			else:
+				tipo_envio_query = TipoEnvio.objects.get(pk=1)
+				query_envio['tipo_envio'] = tipo_envio_query
+
+			query_envio.update({'total':total,'usuario_registro':request.user,
+								'usuario_aprobo':request.user,
+								'credito':credito,
+								'valor_emplasticado':valor_emplasticado,
+								'saldo_pendiente':saldo_pendiente,
+								'comentario':request.POST.get('comentario').upper(),
+								'estado_envio':EstadoEnvio.objects.get(pk=1)})
+			try:
+				with transaction.atomic():
+					envio = Envio(**query_envio)
+					envio.save()
+					acum = 0
+					for detalle in request.POST.getlist('cajas'):
+						acum+=1
+						dato = detalle.split('|')
+						pk_caja = dato[0]
+						cantidad = dato[1]
+						pk = dato[2]
+						caja_pais = CajaPais.objects.get(pk=int(pk))
+						precio = caja_pais.precio
+						acum_prueba = 0
+						for x in range(0, int(cantidad)):
+							acum_prueba += 1
+							codigo_detalle = codigo_final + str(caja_pais.pk) +str(acum_prueba)
+							total = float(precio) * int(1)
+							try:
+								detalle = DetalleEnvio.objects.create(envio=envio,
+																	tipo_caja=caja_pais,
+																	precio=precio,
+																	cantidad=1,
+																	codigo_orden=acum_prueba,
+																	codigo=codigo_detalle,
+																	total=total)
+							except Exception as e:
+								#print 'ERROR EN DETALLE', e
+								return 0
+						seguimiento = SeguimientoEnvio.objects.create(codigo_envio=Envio.objects.get(pk=envio.pk),estado=EstadoEnvio.objects.get(pk=1),empresa=empresa.empresa,usuario_registro=request.user)
+						historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=envio.pk),estado=EstadoEnvio.objects.get(pk=1),usuario_registro=request.user)
+
+			except Exception as e:
+				#print (e,'errores')
+				errores['extra'] = e
+				transaction.rollback()
+				ctx = {'es_revendedor':es_revendedor,'pais':pais,'ret_data':ret_data,'errores':errores}
+				return render(request,'registrar_envio_rv.html',ctx)
+			else:
+				transaction.commit()
+				
+				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
+				ctx = {'es_revendedor':es_revendedor,'ingreso_correcto':ingreso_correcto, 'envio':envio,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio}
+				#return HttpResponseRedirect(reverse('registrar_envio')+"?ok" +"&envio="+ str(envio.pk))
+				return render(request,'registrar_envio_rv.html',ctx)
+		else:
+			#print errores,'erroresdentro de errores'
+			ctx = {'es_revendedor':es_revendedor,'pais':pais,'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio}
+			return render(request,'registrar_envio_rv.html',ctx)
+	elif request.method == 'GET':
+		ctx = {'es_revendedor':es_revendedor,
+				'pais':pais,
+				'quien_envia':quien_envia,
+				'quien_recibe':quien_recibe,
+				'tipo_contenido':tipo_contenido,
+				'tipo_envio':tipo_envio,
+				'empleado':empleado}
+		return render(request,'registrar_envio_rv.html',ctx)

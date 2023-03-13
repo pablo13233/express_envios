@@ -96,6 +96,7 @@ urlpatterns = [
     url(r'^ver_recibido_bodega_hn/', recibido_bodega_hn, name='recibido_bodega_hn'),
     url(r'^ver/cierre_anual/$', cierre_anual, name='cierre_anual'),
 	url(r'^cierre/anual/imprimir/$', cierre_anual_print, name='cierre_anual_print'),
+    url(r'^registrar/envio-rv/$', registrar_envio_rv, name='registrar_envio_rv'),
 
 ]
 # url(r'^$', inicio, name='inicio'),
