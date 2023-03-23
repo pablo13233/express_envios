@@ -4078,6 +4078,7 @@ def registrar_envio_rv(request):
 		query_envio.update({'valor_emplasticado':valor_emplasticado})
 		ret_data.update({'valor_seguro':valor_seguro})
 		query_envio.update({'valor_seguro':valor_seguro})
+		guia_revend = empleado.nombres_empleado +' '+ empleado.apellidos_empleado
 
 		if request.POST.get('valor_envio') == '':
 			errores.update({'valor_envio':'DEBE REALIZAR EL CALCULO DEL ENVIO'})
@@ -4096,15 +4097,16 @@ def registrar_envio_rv(request):
 				credito = False
 				saldo_pendiente = 0.00
 			if es_revendedor:
+				
 				if request.POST.get('guia_revendedor') != '':
-					ret_data.update({'guia_revendedor':request.POST.get('guia_revendedor')})
-					query_envio.update({'guia_revendedor':request.POST.get('guia_revendedor').upper()})
+					ret_data.update({'guia_revendedor':guia_revend})
+					query_envio.update({'guia_revendedor':guia_revend.upper()})
 					query_envio.update({'revendedor':True})
 					query_envio.update({'aprobado':False})
 				else:
 					errores['guia_revendedor'] = u'Falta ingresar la guia de revendedor'
 
-			query_envio.update({'guia_revendedor':request.POST.get('guia_revendedor').upper()})
+			query_envio.update({'guia_revendedor':guia_revend.upper()})
 			if request.POST.get('tipo_contenido', '') and request.POST.get('tipo_contenido', '') != '0':
 				ret_data['id_tipo_contenido'] = int(request.POST.get('tipo_contenido',''))
 				tipo_contenido_query = tipo_contenido.get(pk=request.POST.get('tipo_contenido',''))

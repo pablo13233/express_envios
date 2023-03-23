@@ -81,16 +81,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-2">
-                                    <div class="col-md-12">
-                                        <div class="col-md-12">
-                                            <label for="id_guia_revendedor" class="col-form-label">Codigo de guia</label>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <input type="text" class="form-control" name="guia_revendedor" id="id_guia_revendedor" value="{% if ret_data.guia_revendedor != None %}{{ret_data.guia_revendedor}}{% endif %}" placeholder="Guia de revendedor" required="">
-                                        </div>
-                                    </div>
-                                </div>
+                                
 
                                 <div class="col-md-4">
                                     <div class="col-md-12">
@@ -323,6 +314,9 @@
         <script src="{% static 'admin/js/pnotify.js' %}"></script>
         <script src="{% static 'admin/js/pnotify.buttons.js' %}"></script>
 <script>
+
+
+
 $("#btn_edit_recibe").click(function(e) {
     if ($('#id_quien_recibe').val()!= 0){
             $("#id_recibe_pk_modal_edit").val("");

@@ -72,7 +72,7 @@ class Revendedor(models.Model):
 	es_revendedor = models.BooleanField(default=True)
 	usuario_registro = models.ForeignKey(User,related_name='usuario_registro_revendedor', default= 1,on_delete=models.CASCADE)
 	def __str__(self):
-		return '{0}'.format(self.nombre_empresa)
+		return '{0} | {1}'.format(self.nombre_empresa, self.nombre_completo)
 
 class EmpresaDiaContable(models.Model):
 	codigo_empresa = models.ForeignKey(Empresa, blank=True, null=True,on_delete=models.CASCADE)
