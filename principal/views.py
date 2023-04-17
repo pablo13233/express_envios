@@ -4188,3 +4188,47 @@ def registrar_envio_rv(request):
 				'tipo_envio':tipo_envio,
 				'empleado':empleado}
 		return render(request,'registrar_envio_rv.html',ctx)
+
+
+@login_required
+def cajas_puerto_houston_pdf(request):
+	empleado = Empleado.objects.get(usuario=request.user)
+	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
+	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
+
+	envios = Envio.objects.filter(estado_envio_id = 2)
+	
+	resultados_envios = []
+	contenedor = ''
+	for e in envios:
+		detalle = {}
+		detalle['guia']= e.codigo
+		detalle['persona_envia'] = e.quien_envia.nombre_completo
+		detalle['persona_recibe'] = e.quien_recibe.nombre_completo
+		detalle['persona_envia_telefono'] = e.quien_envia.celular
+		detalle['persona_recibe_telefono'] = e.quien_recibe.celular
+		detalle['pais_destino'] = e.pais_destino.nombre
+		if e.contenedor is not None:
+			contenedor = e.contenedor.codigo_express
+
+		cajas = DetalleEnvio.objects.filter(envio_id=e.pk)
+		cajas_agrupadas = {}  # diccionario para almacenar el resultado
+		for caja in cajas:
+			descripcion = caja.tipo_caja.tipo_caja.descripcion
+			if descripcion not in cajas_agrupadas:
+				cajas_agrupadas[descripcion] = 1
+			else:
+				cajas_agrupadas[descripcion] += 1
+
+		# construimos el string resultante a partir del diccionario
+		cajas_string = ''
+		for descripcion, cantidad in cajas_agrupadas.items():
+			cajas_string += f'{descripcion}:({cantidad}), '
+		cajas_string = cajas_string[:-2]  # eliminamos la última coma y espacio
+
+		detalle['cajas'] = cajas_string
+		resultados_envios.append(detalle)
+	if request.method == 'GET':
+		return generar_pdf('cajas_puerto_pdf.html',{'envios':resultados_envios,'empresa':empresa, 'contenedor':contenedor})
+	
+	return render(request, 'cajas_puerto_pdf.html',{'envios':resultados_envios,'empresa':empresa, 'contenedor':contenedor})

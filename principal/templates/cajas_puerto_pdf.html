@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 300;
+            line-height: 1.42em;
+            color: #000000;
+        }
+
+        h1 {
+            font-size: 3em;
+            font-weight: bold;
+            line-height: 1em;
+            text-align: center;
+            color: #4DC3FA;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            display: block;
+            line-height: 1em;
+            padding-bottom: 0px;
+            color: #000000;
+        }
+
+        h2{
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #4DC3FA;
+            text-decoration: none;
+        }
+
+        .blue {
+            color: #185875;
+        }
+
+        .yellow {
+            color: #000000;
+        }
+
+        .container th {
+            font-weight: bold;
+            font-size: 1.75em;
+            text-align: left;
+            color: #000000;
+        }
+
+        .container td {
+            font-weight: normal;
+            font-size: 1.5em;
+        }
+
+        .container {
+            text-align: left;
+            overflow: hidden;
+            width: 100%;
+            margin: 0 auto;
+            display: table;
+            padding: 0 0 8em 0;
+        }
+
+        .container td,
+        .container th {
+            margin-bottom: 2%;
+            margin-top: 2%;
+            margin-left: 4px;
+            padding-top: 2px;
+            border-bottom:1px solid #9ea7af;
+            border-left:1px solid #dcdcdd;
+            border-right:1px solid #dcdcdd;
+        }
+
+        /* Background-color of the odd rows */
+        .container tr:nth-child(odd) {
+            background-color: #323C50;
+        }
+
+        /* Background-color of the even rows */
+        .container tr:nth-child(even) {
+            background-color: #2C3446;
+        }
+
+        .container th {
+            background-color: #bbbbbb;
+        }
+
+        @media (max-width: 800px) {
+
+            .container td:nth-child(4),
+            .container th:nth-child(4) {
+                display: none;
+            }
+        }
+        @page{
+            size: 11in 8.5in ;
+            margin: 1.91cm 0.64cm;;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <tbody>
+            <tr>
+                <td width="200" >
+                    <img src="{{empresa.logo_empresa.path}}" width="300px" class="img-responsive" alt="Logo">
+                </td>
+                <td>
+                <center>
+                    <p style="font-size: 20px;">DIRECCIÓN: {{empresa.direccion_empresa}}<br>TELÉFONO: {{empresa.telefono_empresa}} {% if empresa.celular_empresa %} | {{empresa.celular_empresa}} {% endif %}<br>FMC No. 3172NF <br><br>Contenedor: {{contenedor}}</p>
+                </center>  
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <table class="container">
+        <thead>
+            <tr>
+                <th>Guía</th>
+                <th>Envia</th>
+                <th>Recibe</th>
+                <th>Cajas</th>
+                <th>Pais destino</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for en in envios %}
+            <tr>
+                <td>{{en.guia}}</td>
+                <td>{{en.persona_envia}} | {{en.persona_envia_telefono}}</td>
+                <td>{{en.persona_recibe}} | {{en.persona_recibe_telefono}}</td>
+                <td>{{en.cajas}}</td>
+                <td>{{en.pais_destino}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+</body>
+
+</html>
