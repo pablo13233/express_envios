@@ -2614,7 +2614,7 @@ def top_clientes(request):
 ###cammbios fran
 @login_required
 def cajas_tipo(request):
-	cajas_pais = list(CajaPais.objects.filter(pais=request.GET.get('idpais')).values('tipo_caja__pk','tipo_caja__descripcion','precio','pk'))
+	cajas_pais = list(CajaPais.objects.filter(pais=request.GET.get('idpais')).values('tipo_caja__pk','tipo_caja__descripcion','precio','pk','empresa'))
 	#cajas_pais = CajaPais.objects.filter(pais=request.GET.get('idpais'))
 	#print cajas_pais
 	return JsonResponse(cajas_pais, safe = False)

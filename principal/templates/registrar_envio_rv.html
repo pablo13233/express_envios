@@ -703,7 +703,10 @@ function cajas() {
         dataType: "json",
         success: function(data) {
             $.each(data, function(key, val) {
-                $("#id_tipo_caja").append("<option value='"+val.tipo_caja__pk+"|"+val.tipo_caja__descripcion+"|"+val.precio+"|"+val.pk+"'>"+val.tipo_caja__descripcion+"</option>");
+                if(val.empresa === 2)
+                {
+                    $("#id_tipo_caja").append("<option value='"+val.tipo_caja__pk+"|"+val.tipo_caja__descripcion+"|"+val.precio+"|"+val.pk+"'>"+val.tipo_caja__descripcion+"</option>");
+                }
             });
         $("#id_tipo_caja").select2(); //se tiene que iniciar la clase select
         },

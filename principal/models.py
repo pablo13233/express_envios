@@ -283,6 +283,7 @@ class CajaPais(models.Model):
 	tipo_caja = models.ForeignKey(TipoCaja,blank=True,null=True,on_delete=models.CASCADE)
 	precio = models.FloatField(default=0.00)
 	usuario_registro = models.ForeignKey(User,blank=True,null=True,on_delete=models.CASCADE)
+	empresa = models.IntegerField(default=1, blank=True, null=True)
 
 	def __str__(self):
 		return '{0} | {1}'.format(self.pais,self.tipo_caja)
