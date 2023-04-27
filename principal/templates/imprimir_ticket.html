@@ -162,6 +162,9 @@
           {% endif %}
           <div class="container tpage" >
             <br>
+            <div style="text-align: right;">
+              <img src="data:image/png;base64,{{l.qr_code}}" height="180" width="180">
+            </div>
             <center>
               <div style="text-align:center;"><img width="300px" src="{{envio.empresa.logo_empresa.path}}" style="margin-top:10px;"></div>
 
@@ -200,9 +203,10 @@
                 </table>
               </div><br>
               <!--CANTIDADES DE PAGO-->
-              <div class="text-center">
+              <!-- <div class="text-center">
                 <img src="data:image/png;base64,{{l.codigo}}" height="120" width="500">
-              </div>
+              </div> -->
+              
             </center>
             <center>
               <p style="font-size:30px;font-weight: bold;">{{forloop.counter}} / {{cantT}} </p>

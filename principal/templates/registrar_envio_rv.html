@@ -874,27 +874,6 @@ $('#id_quien_recibe').on('change',datos);
                     $.each(data, function(key, val) {
                         $("#id_celular_registrar").val(val.celular);
                         $("#id_direccion_registrar").val(val.direccion);
-                        /*
-                        var pais = val.pais;
-                        var depto = val.departamento;
-                        var t = pais + depto + '';
-                        if(t.length > 1){
-                            pais = pais.split("|");
-                            depto = depto.split("|");
-                            $('#id_pais').find('option').remove();
-                            $('#id_departamento').find('option').remove();
-                            $('#id_pais').append("<option value='"+pais[0]+"'selected>"+pais[1]+"</option>");
-                            $('#id_departamento').append("<option value='"+depto[0]+"'selected>"+depto[1]+"</option>");
-                        }else{
-                            $('#id_pais').find('option').remove();
-                            $('#id_departamento').find('option').remove();
-                            $("#id_pais").append("<option value='0' >SELECCIONE</option>");
-                            $("#id_departamento").append("<option value='0' >SELECCIONE</option>");
-                            {% for p in pais %}
-                                $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-                            {% endfor %}
-                        }*/
-                        
                     });
                     $('#datos_quien_recibe').removeAttr('hidden');
                     $('#datos_quien_recibe').addClass('show');
@@ -905,18 +884,23 @@ $('#id_quien_recibe').on('change',datos);
             });
         }else{
             $("#id_li_edit").hide();
-             $("#id_celular_registrar").val("");
+            $("#id_celular_registrar").val("");
             $("#id_direccion_registrar").val("");
-            {% for p in pais %}
-                $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-            {% endfor %}
+            $("#id_pais").html(`
+                {% for p in pais %}
+                    <option value='{{p.pk}}' >{{p.nombre}} </option>"
+                {% endfor %}`
+            );
+            
             /*0departamentos();*/
         }
     };
     function Mostrar(){
-        {% for p in pais %}
-            $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-        {% endfor %}
+        $("#id_pais").html(`
+                {% for p in pais %}
+                    <option value='{{p.pk}}' >{{p.nombre}} </option>"
+                {% endfor %}`
+            );
     }
 </script>
 <script>

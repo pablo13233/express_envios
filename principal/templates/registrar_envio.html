@@ -25,7 +25,6 @@
                                 <h5><i class="icon fas fa-check-circle"></i> Envio Registrado!</h5>
                                 <input type="text" id="enviopk" name="descuento" hidden>
                                 <div id="mostrarenvio" class="row"><div class="col-md12"><a href="#" onclick="ver()">haga click aqui para ver el recibo</a></div>
-                                    <!--Haga click en el buton para ver el recibo<button class="btn float-right btn-info" onclick="ver()">Ver Recibo</button>-->
                                 </div>
                             </div>
                         {% endif %}
@@ -41,9 +40,6 @@
                                     <div class="col-md-6" style="float:inline-start">{% if errores.direccion %}- {{errores.direccion}}{% endif %}</div>
                                     <div class="col-md-6" style="float:inline-start">{% if errores.guia_revendedor %}- {{errores.guia_revendedor}}{% endif %}</div>
                                     <div class="col-md-6" style="float:inline-start">{% if errores.valor_envio %}- {{errores.valor_envio}}{% endif %}</div>
-                                    <!--<div class="col-md-6" style="float:inline-start">{% if errores.departamento %}- {{errores.departamento}}{% endif %}</div>
-                                    <div class="col-md-6" style="float:inline-start">{% if errores.departamento %}- {{errores.departamento}}{% endif %}</div>
-                                    <div class="col-md-6" style="float:inline-start">{% if errores.departamento %}- {{errores.departamento}}{% endif %}</div>-->
                                 </div>
                             </div>
                         {% endif %}                      
@@ -170,13 +166,6 @@
                                         </select>
                                     </div>
                                 </div>
-                                <!--
-                                <div class="col-md-12">
-                                    <div class="col-md-12">
-                                        <label for="exampleFormControlTextarea1">Descripcion del embarque</label>
-                                        <textarea class="form-control" id="id_descripcion_embarque" style="text-transform: uppercase;" name="descripcion_embarque" rows="3" maxlength="300" required></textarea>
-                                    </div>
-                                </div>-->
                                 <br><br>
                                 <div class="col-md-12" id="id_div_productos" style="display:none;" >
                                     <div class="card card-primary card-outline">
@@ -201,7 +190,7 @@
 
                                                         <td>
                                                             <label>Cantidad</label>
-                                                            <input type="number" class="form-control" name="cantidad_cajas" id="id_cantidad_cajas" onkeypress="return solonumeros_nada_mas(event);"  min="1" value="1">
+                                                            <input type="number" class="form-control" name="cantidad_cajas" id="id_cantidad_cajas" onkeypress="return solonumeros_nada_mas(event);"  min="1" disabled value="1">
                                                         </td>
 
                                                         <td colspan="2" width="10%">
@@ -310,26 +299,6 @@
                                 <label>Dirección: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="direccion_recibe" id="id_direccion_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
-                            <!--
-                            <p>
-                                <label>Pais:<a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
-                                <select class="select2" style="width: 100%;" id="id_pais_recibe" name="pais_recibe_modal" required>
-                                    <option value="0" >SELECCIONE</option>
-                                    {% for p in pais %}
-                                        {% ifequal p.pk ret_data.pais  %}
-                                            <option value="{{p.pk}}" >{{p.nombre}} </option>
-                                        {% else %}
-                                            <option value="{{p.pk}}">{{p.nombre}}</option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </p>
-                            <p>
-                                <label >Departamento<a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
-                            <select class="form-control select2" style="width: 100%;" id="id_departamento_recibe_modal" name="departamento_recibe_modal" required>
-                                    <option value="0" >SELECCIONE</option>
-                                </select>
-                            </p>-->
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
@@ -369,26 +338,6 @@
                                 <label>Dirección: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="direccion_recibe_edit" id="id_edit_direccion_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
-                            <!--
-                            <p>
-                                <label>Pais:<a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
-                                <select class="select2" style="width: 100%;" id="id_pais_recibe_edit" name="pais_recibe_modal_edit" required>
-                                    <option value="0" >SELECCIONE</option>
-                                    {% for p in pais %}
-                                        {% ifequal p.pk ret_data.pais  %}
-                                            <option value="{{p.pk}}" >{{p.nombre}} </option>
-                                        {% else %}
-                                            <option value="{{p.pk}}">{{p.nombre}}</option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </p>
-                            <p>
-                                <label >Departamento<a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
-                            <select class="form-control select2" style="width: 100%;" id="id_departamento_recibe_edit" name="departamento_recibe_modal_Edit" required>
-                                    <option value="0" >SELECCIONE</option>
-                                </select>
-                            </p>-->
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
@@ -513,6 +462,7 @@
         <script src="{% static 'admin/js/pnotify.js' %}"></script>
         <script src="{% static 'admin/js/pnotify.buttons.js' %}"></script>
 <script>
+var cajaAgregada = false;
 $("#btn_edit_recibe").click(function(e) {
     if ($('#id_quien_recibe').val()!= 0){
             $("#id_recibe_pk_modal_edit").val("");
@@ -1167,13 +1117,31 @@ function calcular(){
     document.getElementById("id_valor_envio").value = subtotal_global.toFixed(2);
 }
 function addcajas(){
-    
+    //verificacion de caja
+    if (cajaAgregada) {
+        // Mostrar mensaje de error y salir de la función
+        return $.notify("Solo se permite agregar una caja.",{
+            className: 'error',
+            globalPosition:"right bottom", 
+            clickToHide: true,
+            autoHide: true,
+            autoHideDelay: 5000,
+            arrowShow: true,
+            arrowSize: 5,
+            style: 'bootstrap',
+            showAnimation: 'slideDown',
+            showDuration: 400,
+            hideAnimation: 'slideUp',
+            hideDuration: 200,
+            gap: 2
+        });
+    }
     var caja = $("#id_tipo_caja").val();
-    var cantidad = $("#id_cantidad_cajas").val();
+    var cantidad = 1;
     var tablaDatos= $("#tblDatos");
     var subtotal =0;
-     if (parseInt(caja) == 0 || parseInt(cantidad)== 0){
-       $.notify("Error, debes agregar la cantidad de cajas y seleccionar el tipo",{
+    if (parseInt(caja) == 0 || parseInt(cantidad)== 0){
+        $.notify("Error, debes agregar la cantidad de cajas y seleccionar el tipo",{
                 className: 'error',
                 globalPosition:"right bottom", 
                 clickToHide: true,
@@ -1188,7 +1156,7 @@ function addcajas(){
                 hideDuration: 200,
                 gap: 2
             });
-     }else{
+    }else{
         var detalle = caja.split("|");
         var pk = detalle[0];
         var descripcion = detalle[1];
@@ -1197,7 +1165,6 @@ function addcajas(){
         var agrego = 0;
         
 
-      
        subtotal = precio * cantidad;
         var oTable = document.getElementById('tblDatos');
         var i;
@@ -1219,22 +1186,23 @@ function addcajas(){
             }
         }
         acum+= 1;
-         if (parseInt(agrego)==0){
-                  tablaDatos.append("<tr id="+acum+" ><td>"+descripcion+"</td><td id=cant"+acum+">"+cantidad+"</td><td>"+precio+"</td><td id=sub"+acum+" class='subtotal'"+acum+">"+subtotal+"</td>"+"<td hidden ><input id=cdetalle"+acum+" name='cajas' value="+pk +'|'+cantidad+'|'+pk_caja+"></></td><td><input type='button' class='btn btn-danger btn-sm' value='Eliminar' onclick='eliminar_caja("+acum+");'></td><td hidden>"+acum+"</td></tr>"); 
-           } 
-          calcular();
-     }
+        if (parseInt(agrego)==0){
+                tablaDatos.append("<tr id="+acum+" ><td>"+descripcion+"</td><td id=cant"+acum+">"+cantidad+"</td><td>"+precio+"</td><td id=sub"+acum+" class='subtotal'"+acum+">"+subtotal+"</td>"+"<td hidden ><input id=cdetalle"+acum+" name='cajas' value="+pk +'|'+cantidad+'|'+pk_caja+"></></td><td><input type='button' class='btn btn-danger btn-sm' value='Eliminar' onclick='eliminar_caja("+acum+");'></td><td hidden>"+acum+"</td></tr>"); 
+            } 
+        calcular();
+    }
+    cajaAgregada = true;
 
-   
 }
 
 function eliminar_caja(id_fila)
-  {
+{
 
     var parent = document.getElementById(id_fila).parentNode;
     parent.removeChild(document.getElementById(id_fila));
     calcular();
-  }
+    cajaAgregada = false;
+}
 //AGREGAR QUIEN RECIBE AL CAMBIAR QUIEN ENVIA
 $('#id_quien_envia').on('change',quien_recibe);
     
@@ -1287,27 +1255,6 @@ $('#id_quien_recibe').on('change',datos);
                     $.each(data, function(key, val) {
                         $("#id_celular_registrar").val(val.celular);
                         $("#id_direccion_registrar").val(val.direccion);
-                        /*
-                        var pais = val.pais;
-                        var depto = val.departamento;
-                        var t = pais + depto + '';
-                        if(t.length > 1){
-                            pais = pais.split("|");
-                            depto = depto.split("|");
-                            $('#id_pais').find('option').remove();
-                            $('#id_departamento').find('option').remove();
-                            $('#id_pais').append("<option value='"+pais[0]+"'selected>"+pais[1]+"</option>");
-                            $('#id_departamento').append("<option value='"+depto[0]+"'selected>"+depto[1]+"</option>");
-                        }else{
-                            $('#id_pais').find('option').remove();
-                            $('#id_departamento').find('option').remove();
-                            $("#id_pais").append("<option value='0' >SELECCIONE</option>");
-                            $("#id_departamento").append("<option value='0' >SELECCIONE</option>");
-                            {% for p in pais %}
-                                $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-                            {% endfor %}
-                        }*/
-                        
                     });
                     $('#datos_quien_recibe').removeAttr('hidden');
                     $('#datos_quien_recibe').addClass('show');
@@ -1318,18 +1265,22 @@ $('#id_quien_recibe').on('change',datos);
             });
         }else{
             $("#id_li_edit").hide();
-             $("#id_celular_registrar").val("");
+            $("#id_celular_registrar").val("");
             $("#id_direccion_registrar").val("");
-            {% for p in pais %}
-                $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-            {% endfor %}
+            $("#id_pais").html(`
+                {% for p in pais %}
+                    <option value='{{p.pk}}' >{{p.nombre}} </option>"
+                {% endfor %}`
+            );
             /*0departamentos();*/
         }
     };
     function Mostrar(){
-        {% for p in pais %}
-            $("#id_pais").append("<option value='{{p.pk}}' >{{p.nombre}} </option>");
-        {% endfor %}
+        $("#id_pais").html(`
+                {% for p in pais %}
+                    <option value='{{p.pk}}' >{{p.nombre}} </option>"
+                {% endfor %}`
+            );
     }
 </script>
 <script>

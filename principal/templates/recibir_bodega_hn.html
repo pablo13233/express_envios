@@ -17,23 +17,25 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row pt-2">
-                        <div class="col-6">
-                            <div class="input-group mb-3 text-uppercase">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="basic-addon1">Guia Hija: </span>
+                    <form id="trasladarForm" method="POST" action="." enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row pt-2">
+                            <div class="col-6">
+                                <div class="input-group mb-3 text-uppercase">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon1">Guia Hija: </span>
+                                    </div>
+                                    <input type="text" name="codigo" class="form-control bg-white" aria-describedby="basic-addon1" id="codigo">
+                                    <button type="submit">Agregar a la tabla</button>
                                 </div>
-                                <input type="text" class="form-control bg-white" aria-describedby="basic-addon1" id="guiaHija">
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
         <!-- contenido del camion -->
         <div class="container">
-            <form id="trasladarForm" method="POST" action="." enctype="multipart/form-data">
-                {% csrf_token %}
                 <div  class="card col-12">
                     <div class="card-header">
                         <div class="row">
@@ -46,10 +48,13 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12">
-                                <table id="camionDetalle" class="table table-bordered table-striped text-uppercase text-center">
+                                <table id="bodegaDetalle" class="table table-bordered table-striped text-uppercase text-center">
                                     <thead>
-                                        <tr>
-                                            <th scope="col">Guía hija</th>
+                                        <tr><th scope="col">Guía Padre</th>
+                                            <th scope="col">Envia</th>
+                                            <th scope="col">Recibe</th>
+                                            <th scope="col">Tamaño</th>
+                                            <th scope="col">Direccion</th>
                                             <th scope="col">Acción</th>
                                         </tr>
                                     </thead>
@@ -60,7 +65,7 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col-3">
-                                <button type="submit" class="btn float-left btn-info">Recibir</button>
+                                <button type="" class="btn float-left btn-info">Impriir</button>
                             </div>
                         </div>
                         <div class="row mt-3">
@@ -70,7 +75,6 @@
                         </div>
                     </div>
                 </div>
-            </form>
         </div>
     </div>
 
@@ -82,90 +86,159 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.js"></script>
 <script>
 
-$('#guiaHija').keypress(function(e){
-    if (e.which == 13){
-        var guia_hija = $(this).val();
+// $('#guiaHija').keypress(function(e){
+//     if (e.which == 13){
+//         var guia_hija = $(this).val();
 
-        $('#camionDetalle').append(
-            '<tr>'+
-                '<td>' + guia_hija + '</td>' +
-                '<td>' + `<a rel="eliminarRow" class="btn btn-danger btn-sm btn-flat rounded font-weight-bolder" title="Eliminar Fila">
-                    <i class="fa fa-solid fa-delete-left"></i> Eliminar</a>` + '</td>' +
-            '</tr>'
-            );
+//         $('#camionDetalle').append(
+//             '<tr>'+
+//                 '<td>' + guia_hija + '</td>' +
+//                 '<td>' + `<a rel="eliminarRow" class="btn btn-danger btn-sm btn-flat rounded font-weight-bolder" title="Eliminar Fila">
+//                     <i class="fa fa-solid fa-delete-left"></i> Eliminar</a>` + '</td>' +
+//             '</tr>'
+//             );
         
-        $.notify("Agregado a lista",{
-            className: 'success',
-            globalPosition:"right top", 
-            clickToHide: true,
-            autoHide: true,
-            autoHideDelay: 5000,
-            arrowShow: true,
-            arrowSize: 5,
-            style: 'bootstrap',
-            showAnimation: 'slideDown',
-            showDuration: 400,
-            hideAnimation: 'slideUp',
-            hideDuration: 200,
-            gap: 2
-        });
+//         $.notify("Agregado a lista",{
+//             className: 'success',
+//             globalPosition:"right top", 
+//             clickToHide: true,
+//             autoHide: true,
+//             autoHideDelay: 5000,
+//             arrowShow: true,
+//             arrowSize: 5,
+//             style: 'bootstrap',
+//             showAnimation: 'slideDown',
+//             showDuration: 400,
+//             hideAnimation: 'slideUp',
+//             hideDuration: 200,
+//             gap: 2
+//         });
         
-        $(this).val("");
-        $(this).focus();
-    }
-});
+//         $(this).val("");
+//         $(this).focus();
+//     }
+// });
 
-$('#camionDetalle tbody').on('click', 'a[rel="eliminarRow"]',function(){
-    $(this).closest('tr').remove();
-});
+var agregar_caja_url = "{% url 'cajas_a_bodega' %}"
 
-$('#trasladarForm').submit(function(event){
-    event.preventDefault(); // Previene el envío del formulario
-    var parametros = new FormData();
-    token = $('input[name="csrfmiddlewaretoken"]').val();
-    var cajas = [];
-    $('#trasladarForm table tbody tr').each(function(){
-        // Obtiene los datos de cada fila
-        cajas.push($(this).find('td:nth-child(1)').text());
-        // cajas.push({'id_caja': id_caja});
-    });
-    parametros.append('guia_Hijas', cajas);
-    parametros.append('csrfmiddlewaretoken', token);
-    // Envía los datos a la vista
-    // alert(cajas);
+$('#trasladarForm').submit(function(event) {
+    event.preventDefault();
+
+    var codigo = $('#codigo').val();
+    var csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
+
     $.ajax({
-        url: window.location.pathname,
         type: 'POST',
-        data: parametros,
-        dataType: 'json',
-        contentType: 'multipart/form-data',
-        processData: false,
-        contentType: false,
-        success: function(result){
-            if (result.result == "correcto"){
-                // console.log(result.envios);
-                $("#btn_envios_pdf").attr("disabled",false);
-                $('#trasladarForm')[0].reset();
-                $('#camionDetalle tbody tr').remove();
-                texto = "Cajas recibidas con exito.";
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Correcto',
-                    text: texto,
-                    confirmButtonText: 'OK',
+        url: agregar_caja_url,
+        data: {
+        'codigo': codigo,
+        'csrfmiddlewaretoken': csrf_token
+        },
+        success: function(data) {
+            if (data.error) {
+                $.notify(data.error,{
+                    className: 'danger',
+                    globalPosition:"right top", 
+                    clickToHide: true,
+                    autoHide: true,
+                    autoHideDelay: 5000,
+                    arrowShow: true,
+                    arrowSize: 5,
+                    style: 'bootstrap',
+                    showAnimation: 'slideDown',
+                    showDuration: 400,
+                    hideAnimation: 'slideUp',
+                    hideDuration: 200,
+                    gap: 2
                 });
-                var encoded = encodeURIComponent(JSON.stringify(result.envios));
-                window.open("{% url 'recibido_bodega_hn' %}?pdf="+ encoded);
             } else {
-                Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: result
-                    });
+                // Actualizar la tabla de cajas
+                var caja_html = '<tr><td>' + data.caja.codigo + '</td><td>' + data.caja.envia + '</td><td>' + data.caja.recibe + '</td><td>' + data.caja.tamano + '</td><td>' + data.caja.direccion +'</td></tr>';
+                $('#bodegaDetalle tbody').prepend(caja_html);
+
+                // Mostrar el mensaje de éxito
+                $.notify('Caja ' + data.caja.codigo + ' agregada a bodega',{
+                    className: 'success',
+                    globalPosition:"right top", 
+                    clickToHide: true,
+                    autoHide: true,
+                    autoHideDelay: 5000,
+                    arrowShow: true,
+                    arrowSize: 5,
+                    style: 'bootstrap',
+                    showAnimation: 'slideDown',
+                    showDuration: 400,
+                    hideAnimation: 'slideUp',
+                    hideDuration: 200,
+                    gap: 2
+                });
+
+                // Limpiar el campo de texto
+                $('#codigo').val('');
+                $('#codigo').focus();
             }
+            
+        },
+        error: function(xhr, status, error) {
+            alert('Ha ocurrido un error al agregar la caja a bodega');
         }
     });
 });
+
+$('#bodegaDetalle tbody').on('click', 'a[rel="eliminarRow"]',function(){
+    $(this).closest('tr').remove();
+});
+
+
+
+// $('#trasladarForm').submit(function(event){
+//     event.preventDefault(); // Previene el envío del formulario
+//     var parametros = new FormData();
+//     token = $('input[name="csrfmiddlewaretoken"]').val();
+//     var cajas = [];
+//     $('#trasladarForm table tbody tr').each(function(){
+//         // Obtiene los datos de cada fila
+//         cajas.push($(this).find('td:nth-child(1)').text());
+//         // cajas.push({'id_caja': id_caja});
+//     });
+//     parametros.append('guia_Hijas', cajas);
+//     parametros.append('csrfmiddlewaretoken', token);
+//     // Envía los datos a la vista
+//     // alert(cajas);
+//     $.ajax({
+//         url: window.location.pathname,
+//         type: 'POST',
+//         data: parametros,
+//         dataType: 'json',
+//         contentType: 'multipart/form-data',
+//         processData: false,
+//         contentType: false,
+//         success: function(result){
+//             if (result.result == "correcto"){
+//                 // console.log(result.envios);
+//                 $("#btn_envios_pdf").attr("disabled",false);
+//                 $('#trasladarForm')[0].reset();
+//                 $('#camionDetalle tbody tr').remove();
+//                 texto = "Cajas recibidas con exito.";
+//                 Swal.fire({
+//                     icon: 'success',
+//                     title: 'Correcto',
+//                     text: texto,
+//                     confirmButtonText: 'OK',
+//                 });
+//                 var encoded = encodeURIComponent(JSON.stringify(result.envios));
+//                 window.open("{% url 'recibido_bodega_hn' %}?pdf="+ encoded);
+//             } else {
+//                 Swal.fire({
+//                         icon: 'error',
+//                         title: 'Error',
+//                         text: result
+//                     });
+//             }
+//         }
+//     });
+// });
+
 
 </script>
 {% endblock js %}

@@ -37,7 +37,14 @@ from base64 import b64encode
 from reportlab.lib import units
 from reportlab.graphics import renderPM
 from reportlab.graphics.barcode import createBarcodeDrawing
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+from reportlab.graphics import renderPDF
+from reportlab.graphics.barcode.qr import QrCodeWidget
 from reportlab.graphics.shapes import Drawing
+import io
+import tempfile
 #from barcode import Code128   //Revisar esta importacion
 ##barcode##
 from django.db.models import Sum
@@ -63,6 +70,18 @@ def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, human
 	drawing.scale(barcode_scale, barcode_scale)
 	drawing.add(barcode, name='barcode')
 	return drawing
+
+def generate_qr_code(value, width, height):
+    qr_code = QrCodeWidget(value)
+    bounds = qr_code.getBounds()
+    qr_code_width = bounds[2] - bounds[0]
+    qr_code_height = bounds[3] - bounds[1]
+    drawing = Drawing(width, height)
+    drawing.add(qr_code)
+    drawing.scale(width/qr_code_width, height/qr_code_height)
+    buffer = io.BytesIO()
+    renderPM.drawToFile(drawing, buffer, fmt='PNG')
+    return b64encode(buffer.getvalue())
 
 def inicio_cliente(request):
 	return render(request,'inicio_cliente.html')
@@ -1074,12 +1093,11 @@ def finalizar_actividad(request):
 		return HttpResponseRedirect(reverse('actividades'))
 
 def recibo_caja_pdf(request, id):
-	print(id)
 	recibo_actividad = EmpresaActividades.objects.get(id=id) 
 	caja = ReciboCaja.objects.get(pk = recibo_actividad.recibo_entrega)
 	fecha = caja.fecha
 	barcode = get_barcode(value = id, width = 600)
-	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
+	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))
 	return generar_pdf('recibo_caja_pdf.html',{'pagesize':'A4','orientation':'landscape','caja':caja,'codigo':codigo, 'fecha':fecha})
 
 @login_required
@@ -1842,8 +1860,12 @@ def imprimir_ticket (request, id = None):
 		lista['direccion'] = d.envio.direccion_registrar
 		lista['telefono'] = d.envio.quien_recibe.celular
 		barcode = get_barcode(value = d.codigo, width = 600)
-		codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
+		codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))
 		lista['codigo'] = codigo
+		#qr
+		qr_code = generate_qr_code(d.codigo, width=180, height=180)
+		lista['qr_code'] = qr_code.decode()
+		#qr
 		dic.append(lista)
 		cantTicket += 1
 	# ctx = {'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket}
@@ -2634,7 +2656,7 @@ def modal_agregar_recibe(request):
 			else:
 				envia = Cliente.objects.get(pk=(request.POST['envia_pk']))
 				recibe = ClienteRecibe.objects.create(cliente_envia = envia, 
-													   nombre_completo = request.POST['nombre_recibe'],
+														nombre_completo = request.POST['nombre_recibe'],
 														celular = request.POST['telefono_recibe'],
 														direccion=request.POST['direccion_recibe'],
 														usuario_registro=request.user
@@ -3913,9 +3935,41 @@ def recibir_bodega(request):
 		# print('estos envios',envios_a_pdf)
 		return JsonResponse({"result":resultado,"envios":envios_a_pdf},safe=False)
 	else:
-		# cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
-		return render(request, 'recibir_bodega_hn.html',)
+		cajas = DetalleEnvio.objects.filter(fue_subida_camion=False,envio__estado_envio=4)
+		return render(request, 'recibir_bodega_hn.html',{'cajas':cajas})
 
+@login_required
+def busqueda_caja_bodega(request):
+	if request.method == 'POST':
+		try:
+			with transaction.atomic():
+				
+				codigo = request.POST['codigo']
+				caja_hija = DetalleEnvio.objects.get(codigo=codigo)
+				envio_cliente = Envio.objects.get(pk=caja_hija.envio.pk)
+				caja = Envio.objects.get(pk=caja_hija.envio.pk)
+				if caja.estado_envio_id == 5:
+					print('si entra')
+					mensaje = 'El envio ' + caja.codigo + ' ya ha sido recibida en bodega Hn'
+					return JsonResponse({'error': mensaje})
+				caja.estado_envio_id = 5
+				caja.save()
+				HistorialEnvio.objects.create(codigo_envio=envio_cliente,
+														estado_id=5,
+														usuario_registro=request.user)
+		except Exception as e:
+			print ('Error -> ', e)
+			transaction.rollback()
+		else:
+			transaction.commit()
+			
+			return JsonResponse({'mensaje': 'Caja agregada a la bodega', 'caja': {'codigo': caja.codigo,
+									'envia': caja.quien_envia.nombre_completo,
+									'recibe': caja.quien_recibe.nombre_completo,
+									'tamano': caja_hija.tipo_caja.tipo_caja.descripcion,
+									'direccion': caja.direccion_registrar}})
+
+@login_required
 def recibido_bodega_hn(request):
 	user_reg = request.user
 	envios_detalle = []
