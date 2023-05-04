@@ -99,6 +99,7 @@ urlpatterns = [
     url(r'^registrar/envio-rv/$', registrar_envio_rv, name='registrar_envio_rv'),
     url(r'^reporte/puerto-houston/$', cajas_puerto_houston_pdf, name='cajas_puerto'),
     url(r'^cajas_a_bodega/$', busqueda_caja_bodega, name='cajas_a_bodega'),
+    url(r'^cajas_caja_bodega/$', cargar_caja_camion, name='cargar_caja_camion'),
 
 ]
 # url(r'^$', inicio, name='inicio'),

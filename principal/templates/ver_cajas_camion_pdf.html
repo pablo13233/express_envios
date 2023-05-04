@@ -47,19 +47,19 @@
             color: #000000;
         }
 
-        .container th {
+        .table th {
             font-weight: bold;
             font-size: 1.75em;
             text-align: left;
             color: #000000;
         }
 
-        .container td {
+        .table td {
             font-weight: normal;
             font-size: 1.5em;
         }
 
-        .container {
+        .table {
             text-align: left;
             overflow: hidden;
             width: 100%;
@@ -68,8 +68,8 @@
             padding: 0 0 8em 0;
         }
 
-        .container td,
-        .container th {
+        .table td,
+        .table th {
             margin-bottom: 2%;
             margin-top: 2%;
             margin-left: 4px;
@@ -80,23 +80,23 @@
         }
 
         /* Background-color of the odd rows */
-        .container tr:nth-child(odd) {
+        .table tr:nth-child(odd) {
             background-color: #323C50;
         }
 
         /* Background-color of the even rows */
-        .container tr:nth-child(even) {
+        .table tr:nth-child(even) {
             background-color: #2C3446;
         }
 
-        .container th {
+        .table th {
             background-color: #bbbbbb;
         }
 
         @media (max-width: 800px) {
 
-            .container td:nth-child(4),
-            .container th:nth-child(4) {
+            .table td:nth-child(4),
+            .table th:nth-child(4) {
                 display: none;
             }
         }
@@ -113,16 +113,16 @@
     </h2>
     <h2>Motorista: <span class="yellow">{{motorista}}</span> Ayuda: <span class="yellow">{{ayuda}}</span> Fecha: <span class="yellow">{{hoy}}</span></h2>
 
-    <table class="container">
+    <table class="table">
         <thead>
             <tr>
                 <th>Guía</th>
                 <th>Nombre del Cliente</th>
                 <th>Ruta</th>
                 <th>Direccion</th>
-                <th>Telefono</th>
+                <th style="width: 100px">Telefono</th>
                 <th>Cantidad</th>
-                <th>Comentario</th>
+                <th style="width: 110px">Comentario</th>
                 <th style="width: 150px">Firma del Cliente</th>
             </tr>
         </thead>
@@ -134,13 +134,19 @@
                 {% else %}
             <tr>
                 {% endif %}
-                <td>{{en.guia}}</td>
-                <td>{{en.cliente}}</td>
-                <td>{{en.departamento}}</td>
-                <td>{{en.direccion}}</td>
-                <td>{{en.telefono}}</td>
-                <td>{{en.cajas}}</td>
-                <td>{{en.comentario}}</td>
+                <td class="text-wrap">{{en.guia}}</td>
+                <td class="text-wrap">{{en.cliente}}</td>
+                <td class="text-wrap">{{en.departamento}}</td>
+                <td class="text-wrap">{{en.direccion}}</td>
+                <td >
+                    
+                    {% for tel in en.telefono %}
+                    {{tel}}
+                    {% endfor %}
+                        
+                </td>
+                <td class="text-wrap">{{en.cajas}}</td>
+                <td class="text-wrap">{{en.comentario}}</td>
                 <td></td>
             </tr>
             {% endfor %}

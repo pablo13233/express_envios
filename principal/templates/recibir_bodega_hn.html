@@ -26,7 +26,7 @@
                                         <span class="input-group-text" id="basic-addon1">Guia Hija: </span>
                                     </div>
                                     <input type="text" name="codigo" class="form-control bg-white" aria-describedby="basic-addon1" id="codigo">
-                                    <button type="submit">Agregar a la tabla</button>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -50,11 +50,13 @@
                             <div class="col-12">
                                 <table id="bodegaDetalle" class="table table-bordered table-striped text-uppercase text-center">
                                     <thead>
-                                        <tr><th scope="col">Guía Padre</th>
-                                            <th scope="col">Envia</th>
+                                        <tr>
+                                            <th scope="col">Envía</th>
                                             <th scope="col">Recibe</th>
                                             <th scope="col">Tamaño</th>
-                                            <th scope="col">Direccion</th>
+                                            <th scope="col">Guía Padre</th>
+                                            <th scope="col">Guía Hija</th>
+                                            <th scope="col">Dirección</th>
                                             <th scope="col">Acción</th>
                                         </tr>
                                     </thead>
@@ -65,12 +67,12 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col-3">
-                                <button type="" class="btn float-left btn-info">Impriir</button>
+                                <button id="btn_imprimir" class="btn float-left btn-info">Imprimir</button>
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-8">
-                                <p class="text-muted">Las cajas se cambiaran a estado Bodega Honduras</p>
+                                <p class="text-muted">Se generara un pdf con las cajas que se han registrado</p>
                             </div>
                         </div>
                     </div>
@@ -153,7 +155,7 @@ $('#trasladarForm').submit(function(event) {
                 });
             } else {
                 // Actualizar la tabla de cajas
-                var caja_html = '<tr><td>' + data.caja.codigo + '</td><td>' + data.caja.envia + '</td><td>' + data.caja.recibe + '</td><td>' + data.caja.tamano + '</td><td>' + data.caja.direccion +'</td></tr>';
+                var caja_html = '<tr><td>' + data.caja.envia + '</td><td>' + data.caja.recibe + '</td><td>' + data.caja.tamano + '</td><td>' + data.caja.codigo + '</td><td>' + data.caja.hija + '</td><td>' + data.caja.direccion +'</td></tr>';
                 $('#bodegaDetalle tbody').prepend(caja_html);
 
                 // Mostrar el mensaje de éxito
@@ -240,5 +242,24 @@ $('#bodegaDetalle tbody').on('click', 'a[rel="eliminarRow"]',function(){
 // });
 
 
+const botonGenerarPDF = document.getElementById("btn_imprimir");
+botonGenerarPDF.addEventListener("click", function() {
+  // Obtener los códigos únicos de la tabla
+    const uniqueCodes = new Set();
+    const tableRows = document.querySelectorAll('#bodegaDetalle tr');
+    tableRows.forEach(row => {
+        const code = row.children[3].textContent.trim();
+        if (code !== "Guía Hija" && code !== "Guía Padre") { // Ignorar los nombres de las guías
+            uniqueCodes.add(code);
+        }
+    });
+    // Crear la URL de la solicitud AJAX
+    const url = "{% url 'recibido_bodega_hn' %}?codigos=" + [...uniqueCodes].map(code => `${encodeURIComponent(code)}`).join(',');
+    // Enviar la solicitud AJAX
+    const pdfBtn = document.querySelector('#btn_imprimir');
+    pdfBtn.addEventListener('click', () => {
+        window.open(url, '_blank');
+    });
+});
 </script>
 {% endblock js %}

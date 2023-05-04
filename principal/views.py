@@ -2873,9 +2873,40 @@ def ver_contenedor_enviar(request,id):
 		disponible = contenedor.pies_cubicos - float(espacio_ocupado['total'])
 	error = ''
 	if request.method == 'POST':
-		guia_hija = request.POST['guia']
-		if disponible <=0:
-			error = 'Ya no hay espacio disponible'
+		try:
+			with transaction.atomic():
+
+				guia_hija = request.POST['guia']
+				if disponible <=0:
+					error = 'Ya no hay espacio disponible'
+					data = {'contenedor':contenedor,
+							'detalle_contenedor':detalle,
+							'disponible':round(disponible,2),
+							'error':error,
+							'estados':estados,
+							'historial_contenedor':historial_contenedor,
+							'url':url}
+					return render(request, 'ver_contenedor_enviar.html',data)
+				elif request.POST['guia'] == '':
+					error = 'Debe ingresar la guía'
+					data = {'contenedor':contenedor,
+							'detalle_contenedor':detalle,
+							'disponible':round(disponible,2),
+							'error':error,
+							'estados':estados,
+							'historial_contenedor':historial_contenedor,
+							'url':url}
+					return render(request, 'ver_contenedor_enviar.html',data)
+				else:
+					detalle_save = DetalleEnvio.objects.get(codigo=guia_hija)
+					detalle_save.fue_enviada = True 
+					detalle_save.save()
+					modificar_envio = Envio.objects.filter(pk=detalle_save.envio.pk).update(contenedor=contenedor)
+					
+		except Exception as e:
+			transaction.rollback()
+			print('Error------------------> ',e)
+			error = 'No existe la guía u ocurrio un error'
 			data = {'contenedor':contenedor,
 					'detalle_contenedor':detalle,
 					'disponible':round(disponible,2),
@@ -2884,36 +2915,10 @@ def ver_contenedor_enviar(request,id):
 					'historial_contenedor':historial_contenedor,
 					'url':url}
 			return render(request, 'ver_contenedor_enviar.html',data)
-		elif request.POST['guia'] == '':
-			error = 'Debe ingresar la guía'
-			data = {'contenedor':contenedor,
-					'detalle_contenedor':detalle,
-					'disponible':round(disponible,2),
-					'error':error,
-					'estados':estados,
-					'historial_contenedor':historial_contenedor,
-					'url':url}
-			return render(request, 'ver_contenedor_enviar.html',data)
-		else:
-			try:
-				detalle_save = DetalleEnvio.objects.get(codigo=guia_hija)
-				detalle_save.fue_enviada = True 
-				detalle_save.save()
-				modificar_envio = Envio.objects.filter(pk=detalle_save.envio.pk).update(contenedor=contenedor)
-				##print reverse('ver_contenedor_enviar', args = (id, ))
-				return HttpResponseRedirect(reverse('ver_contenedor_enviar',args = (id, ))+"?ok")
-				#return JsonResponse({'save':'save','recargar': reverse('ver_contenedor_enviar',kwargs={ 'id': id }),})
-			except Exception as e:
-				error = 'No existe la guía u ocurrio un error'
-				data = {'contenedor':contenedor,
-						'detalle_contenedor':detalle,
-						'disponible':round(disponible,2),
-						'error':error,
-						'estados':estados,
-						'historial_contenedor':historial_contenedor,
-						'url':url}
-				return render(request, 'ver_contenedor_enviar.html',data)
-	else:
+		else: 
+			transaction.commit()
+			return HttpResponseRedirect(reverse('ver_contenedor_enviar',args = (id, ))+"?ok")
+	elif request.method == 'GET':
 		data = {'contenedor':contenedor,
 				'detalle_contenedor':detalle,
 				'disponible':round(disponible,2),
@@ -3648,81 +3653,47 @@ def reporte_abonos(request):
 
 @login_required
 def distribuir_cajas(request):
-	if request.method == 'POST' :
-		resultado = ""
-		detalles_faltantes = []
-		envios_faltantes = []
+	if request.method == 'GET' :
+		camiones = Camion.objects.all()
+		return render(request, 'distribuir_cajas.html',{'camiones':camiones, })
+
+@login_required
+def cargar_caja_camion(request):
+	if request.method == 'POST':
 		try:
 			with transaction.atomic():
-				id_camion = Camion.objects.get(pk=request.POST['id_camion'])
-				# print('camion -->',id_camion.id)
-				guiaHijas = request.POST['guia_Hijas']
-				guias = guiaHijas.split(",") #separamos la lista por comas
-				envios = []
-				# print('Guias Hijas --> ', guias)
-				for hija in guias:
-					# verificamos si la caja ya ha sido actualizada para evitar actualizarla de nuevo
-					# print('Hija--> ', hija)
-					subida = DetalleEnvio.objects.filter(codigo=hija)
-					for fs in subida:
-						fue_subida = fs.fue_subida_camion #obtiene si fue subida o no
-					
-					detalle_envio = DetalleEnvio.objects.get(codigo=hija)
-					if (fue_subida == True):
-						print("no")
-					else:
-						# cambiamos estado de las cajas que subieron al camion
-						detalle_save = DetalleEnvio.objects.get(codigo=hija)
-						detalle_save.fue_subida_camion = True 
-						detalle_save.save()
-					# Asignar camion al Envio
-					envio_lel = Envio.objects.filter(pk=detalle_envio.envio.pk, estado_envio_id=5)
-					for e in envio_lel:
-						codigo = e.pk
-						if codigo not in envios:
-							envios.append(codigo)
-				#se verifican si los envios tienen detalles faltantes para que no se guarde y retorna los faltantes
-				for en in envios:
-					# recorre los envios registrados de las guias hijas
-					dt = DetalleEnvio.objects.filter(envio=int(en))
-					falta = 0
-					for d in dt:
-						if d.fue_subida_camion == False:
-							if d.codigo not in detalles_faltantes:
-								detalles_faltantes.append(d.codigo)
-								falta = 1
-					if en not in envios_faltantes:
-						if falta == 1:
-							envios_faltantes.append(en)
-				if (len(detalles_faltantes) > 0):
-					resultado = "Cajas faltantes: "+ str(detalles_faltantes) + " | Envios correspondientes: " + str(envios_faltantes)
-					#retorna la transacion para que no realize cambios
-					transaction.set_rollback(True)
-					return JsonResponse(resultado,safe=False)
-				else:
-					for en in envios:
-						#se busca el id de el envio
-						envio_cliente = Envio.objects.get(pk=en)
-						#se crea el historial correspondiente
-						HistorialEnvio.objects.create(codigo_envio=envio_cliente,
-														estado_id=6,
-														usuario_registro=request.user)
-						#se actualiza el seguimiento de el envio
-						SeguimientoEnvio.objects.filter(codigo_envio=en).update(estado=6)
-						#se actualiza el estado del envio en la tabla y se actualiza el camion al que fue asignado
-						Envio.objects.filter(pk=en).update(camion=id_camion, estado_envio_id=6)
-					resultado = "correcto"
+				
+				codigo = request.POST['codigo']
+				id_camion = request.POST['codigo_camion']
+				print('codigo ', codigo)
+				caja_hija = DetalleEnvio.objects.get(codigo=codigo)
+				envio_cliente = Envio.objects.get(pk=caja_hija.envio.pk)
+				caja = Envio.objects.get(pk=caja_hija.envio.pk)
+				if caja_hija.estado_hija_id == 6 or caja_hija.fue_subida_camion == True:
+					mensaje = 'La caja ' + caja_hija.codigo + ' ya ha sido cargada un camion'
+					return JsonResponse({'error': mensaje})
+				caja.estado_envio_id = 6
+				caja.camion_id = id_camion
+				caja.save()
+				caja_hija.estado_hija_id = 6
+				caja_hija.fue_subida_camion = True
+				caja_hija.save()
+
+				historico = HistorialEnvio.objects.get_or_create(codigo_envio=envio_cliente,
+															estado_id=6,
+															usuario_registro=request.user)
 		except Exception as e:
-			print('Error ---> ',e)
+			print ('Error -> ', e)
 			transaction.rollback()
-			# camiones = Camion.objects.all()
-			# cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
-			resultado = "error"
-		return JsonResponse(resultado,safe=False)
-	else:
-		camiones = Camion.objects.all()
-		# cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
-		return render(request, 'distribuir_cajas.html',{'camiones':camiones, })
+		else:
+			transaction.commit()
+			
+			return JsonResponse({'mensaje': 'Caja agregada a la bodega', 'caja': {'codigo': caja.codigo,
+									'envia': caja.quien_envia.nombre_completo,
+									'recibe': caja.quien_recibe.nombre_completo,
+									'tamano': caja_hija.tipo_caja.tipo_caja.descripcion,
+									'direccion': caja.direccion_registrar,
+									'hija':caja_hija.codigo}})
 
 @login_required
 def ver_cajas_camion(request,id):
@@ -3736,7 +3707,8 @@ def ver_cajas_camion(request,id):
 		detalle={}
 		detalle['guia'] = envio.codigo
 		detalle['cliente'] = envio.quien_recibe.nombre_completo
-		detalle['telefono'] = envio.celular_registrar
+		telefonos = envio.celular_registrar.split('/')
+		detalle['telefono'] = telefonos
 		detalle['departamento'] = envio.departamento_destino.nombre 
 		detalle['direccion'] = envio.direccion_registrar
 		detalle['cantidad'] = DetalleEnvio.objects.filter(envio_id=envio.pk).count()
@@ -3749,11 +3721,12 @@ def ver_cajas_camion(request,id):
 		cajas = DetalleEnvio.objects.filter(envio_id=envio.pk)
 		cajas_agrupadas = {}  # diccionario para almacenar el resultado
 		for caja in cajas:
-			descripcion = caja.tipo_caja.tipo_caja.descripcion
-			if descripcion not in cajas_agrupadas:
-				cajas_agrupadas[descripcion] = 1
-			else:
-				cajas_agrupadas[descripcion] += 1
+			if caja.estado_hija_id == 6:
+				descripcion = caja.tipo_caja.tipo_caja.descripcion
+				if descripcion not in cajas_agrupadas:
+					cajas_agrupadas[descripcion] = 1
+				else:
+					cajas_agrupadas[descripcion] += 1
 
 		# construimos el string resultante a partir del diccionario
 		cajas_string = ''
@@ -3764,12 +3737,13 @@ def ver_cajas_camion(request,id):
 		detalle['cajas'] = cajas_string
 		
 		envios_detalle.append(detalle)
+		envios_detalle_ordenado = sorted(envios_detalle, key=lambda x: x['guia'])
 	if request.method == 'POST':
 		motorista = request.POST['motorista']
 		ayuda = request.POST['ayuda']
 		return generar_pdf('ver_cajas_camion_pdf.html',{
 				'camion':camion,
-				'envios':envios_detalle, 
+				'envios':envios_detalle_ordenado, 
 				'hoy':fecha, 
 				'motorista':motorista, 
 				'ayuda':ayuda,
@@ -3864,77 +3838,8 @@ def buscar_caja_transito(request):
 # ------- de puerto a bodega
 @login_required
 def recibir_bodega(request):
-	if request.method == 'POST' :
-		resultado = []
-		detalles_faltantes = []
-		envios_faltantes = []
-		# print(user_reg)
-		envios_a_pdf = []
-		try:
-			with transaction.atomic():
-				guiaHijas = request.POST['guia_Hijas']
-				guias = guiaHijas.split(",") #separamos la lista por comas
-				envios = []
-				# print('Guias Hijas --> ', guias)
-				for hija in guias:
-					# verificamos si la caja ya ha sido actualizada para evitar actualizarla de nuevo
-					# print('Hija--> ', hija)
-					
-					detalle_envio = DetalleEnvio.objects.get(codigo=hija)
-					# print(detalle_envio)
-					envio_lel = Envio.objects.filter(pk=detalle_envio.envio.pk, estado_envio_id=4)
-					for e in envio_lel:
-						codigo = e.pk
-						if codigo not in envios:
-							envios.append(codigo)
-				#se verifican si los envios tienen detalles faltantes para que no se guarde y retorna los faltantes
-				for en in envios:
-					# recorre los envios registrados de las guias hijas
-					detalles_envio = DetalleEnvio.objects.filter(envio=int(en))
-					# print(detalles_envio)
-					falta = 0
-					for det in detalles_envio:
-						if det.codigo not in guias:
-							# print(det.codigo)
-							detalles_faltantes.append(det.codigo)
-							# print(detalles_faltantes)
-							falta = 1
-					if en not in envios_faltantes:
-						if falta == 1:
-							codigo_en = Envio.objects.get(pk=en)
-							envios_faltantes.append(codigo_en.codigo)
-				# print(detalles_faltantes, envios_faltantes)
-				if (len(detalles_faltantes) > 0):
-					resultado = "Cajas faltantes: "+ str(detalles_faltantes) + " | Envios correspondientes: " + str(envios_faltantes)
-					#retorna la transacion para que no realize cambios
-					transaction.set_rollback(True)
-					return JsonResponse(resultado,safe=False)
-				else:
-					for en in envios:
-						#se busca el id de el envio
-						envio_cliente = Envio.objects.get(pk=en)
-						#se crea el historial correspondiente
-						HistorialEnvio.objects.create(codigo_envio=envio_cliente,
-														estado_id=5,
-														usuario_registro=request.user)
-						#se actualiza el seguimiento de el envio
-						SeguimientoEnvio.objects.filter(codigo_envio=en).update(estado=5)
-						#se actualiza el estado del envio en la tabla y se actualiza el camion al que fue asignado
-						Envio.objects.filter(pk=en).update(estado_envio_id=5)
-						envios_a_pdf.append(en)
-						# print("je")
-						#para el PDF
-					
-					resultado = "correcto"
-		except Exception as e:
-			print('Error ---> ',e) 
-			transaction.rollback()
-			# camiones = Camion.objects.all()
-			# cajas = DetalleEnvio.objects.filter(fue_subida_camion=True,envio__estado_envio=5)
-			resultado = "error"
-		# print('estos envios',envios_a_pdf)
-		return JsonResponse({"result":resultado,"envios":envios_a_pdf},safe=False)
-	else:
+	if request.method == 'GET' :
+
 		cajas = DetalleEnvio.objects.filter(fue_subida_camion=False,envio__estado_envio=4)
 		return render(request, 'recibir_bodega_hn.html',{'cajas':cajas})
 
@@ -3948,15 +3853,17 @@ def busqueda_caja_bodega(request):
 				caja_hija = DetalleEnvio.objects.get(codigo=codigo)
 				envio_cliente = Envio.objects.get(pk=caja_hija.envio.pk)
 				caja = Envio.objects.get(pk=caja_hija.envio.pk)
-				if caja.estado_envio_id == 5:
-					print('si entra')
-					mensaje = 'El envio ' + caja.codigo + ' ya ha sido recibida en bodega Hn'
+				if caja_hija.estado_hija_id == 5:
+					mensaje = 'La caja ' + caja_hija.codigo + ' ya ha sido recibida en bodega Hn'
 					return JsonResponse({'error': mensaje})
 				caja.estado_envio_id = 5
 				caja.save()
-				HistorialEnvio.objects.create(codigo_envio=envio_cliente,
-														estado_id=5,
-														usuario_registro=request.user)
+				caja_hija.estado_hija_id = 5
+				caja_hija.save()
+
+				historico = HistorialEnvio.objects.get_or_create(codigo_envio=envio_cliente,
+															estado_id=5,
+															usuario_registro=request.user)
 		except Exception as e:
 			print ('Error -> ', e)
 			transaction.rollback()
@@ -3967,7 +3874,8 @@ def busqueda_caja_bodega(request):
 									'envia': caja.quien_envia.nombre_completo,
 									'recibe': caja.quien_recibe.nombre_completo,
 									'tamano': caja_hija.tipo_caja.tipo_caja.descripcion,
-									'direccion': caja.direccion_registrar}})
+									'direccion': caja.direccion_registrar,
+									'hija':caja_hija.codigo}})
 
 @login_required
 def recibido_bodega_hn(request):
@@ -3977,15 +3885,13 @@ def recibido_bodega_hn(request):
 	fecha = hoy.strftime('%B %d, %Y')
 	envios = []
 	if request.method == 'GET':
-		pdf = request.GET['pdf']
-		if pdf is not None:
-			pdf_decode = unquote(pdf)
-			envios = json.loads(pdf_decode)
-			# print(envios)
-			# envios = envs.split(",")
+		try:
+			envs = request.GET.get('codigos')
+			envios = envs.split(",")
+			# print('ENTRA ',envios)
 			for envio in envios:
 				detalle={}
-				envio_d = Envio.objects.get(pk=envio)
+				envio_d = Envio.objects.get(codigo=envio)
 				detalle['guia'] = envio_d.codigo
 				detalle['cliente'] = envio_d.quien_recibe.nombre_completo
 				detalle['telefono'] = envio_d.celular_registrar
@@ -4001,11 +3907,12 @@ def recibido_bodega_hn(request):
 				cajas = DetalleEnvio.objects.filter(envio_id=envio_d.pk)
 				cajas_agrupadas = {}  # diccionario para almacenar el resultado
 				for caja in cajas:
-					descripcion = caja.tipo_caja.tipo_caja.descripcion
-					if descripcion not in cajas_agrupadas:
-						cajas_agrupadas[descripcion] = 1
-					else:
-						cajas_agrupadas[descripcion] += 1
+					if caja.estado_hija_id == 5:
+						descripcion = caja.tipo_caja.tipo_caja.descripcion
+						if descripcion not in cajas_agrupadas:
+							cajas_agrupadas[descripcion] = 1
+						else:
+							cajas_agrupadas[descripcion] += 1
 
 				# construimos el string resultante a partir del diccionario
 				cajas_string = ''
@@ -4016,13 +3923,17 @@ def recibido_bodega_hn(request):
 				detalle['cajas'] = cajas_string
 				
 				envios_detalle.append(detalle)
+				envios_detalle_ordenado = sorted(envios_detalle, key=lambda x: x['guia'])
 		
 			return generar_pdf('ver_recibido_bodega_hn_pdf.html',{
-									'envios':envios_detalle, 
+									'envios':envios_detalle_ordenado, 
 									'hoy':fecha, 
 									'registra': user_reg,
-								})
-		return HttpResponse('No se ha recibido el parámetro pdf')
+									})
+		except Exception as e:
+			print('ERROR-----------------> ',e)
+	else:
+		return HttpResponseRedirect('Metodo no permitido')
 
 @login_required
 def cierre_anual(request):

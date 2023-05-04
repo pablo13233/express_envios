@@ -298,6 +298,7 @@ class DetalleEnvio(models.Model):
 	fue_enviada = models.BooleanField(default=False) #False sin subir en contenedir / True subida en contenedor
 	total = models.FloatField(default=0.00)
 	fue_subida_camion = models.BooleanField(default=False) #False sin subir en camion / True subida en camion
+	estado_hija = models.ForeignKey(EstadoEnvio,default=1,on_delete=models.PROTECT)
 
 	def __str__(self):
 		return '{0} | {1} | {2}'.format(self.envio,self.tipo_caja,self.fue_subida_camion)
