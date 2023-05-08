@@ -80,17 +80,23 @@
                   </tr>
                 </tbody>
               </table>
-              {% if contenedor.estado.pk == 1 or contenedor.estado.pk == 2 or contenedor.estado.pk == 3 or contenedor.estado.pk == 4 %}
+              <div class="row col-12">
+                {% if contenedor.estado.pk == 1 or contenedor.estado.pk == 2 or contenedor.estado.pk == 3 or contenedor.estado.pk == 4 %}
                 <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'ver_contenedor_enviar' contenedor.pk  %}" id="addFormCajaContenedor" >
                   {% csrf_token %}
-                    <div>
-                      <label for="">GUIA</label>
-                      <input type="text" name="guia" id="id_guia" onkeypress="return runScript(event)">
-                    </div>
-                  
+                      <div class="col-6">
+                        <label for="">GUIA</label>
+                        <input type="text" name="guia" id="id_guia" onkeypress="return runScript(event)">
+                      </div>
                 </form>
-              {% endif %}
-
+                {% endif %}
+                <div class="col-3">
+                  <h4><a href="{% url 'cajas_contenedor' contenedor.pk %}" target="_blank"><i class="fa-regular fa-file-pdf fs-2"></i> Imprimir contenedor</a></h4>
+                </div>
+                <div class="col-3">
+                  <h4><a class="text-success" href="{% url 'cajas_contenedor_xls' contenedor.pk %}" target="_blank"><i class="far fa-file-spreadsheet"></i> Descargar XLS</a></h4>
+                </div>
+              </div>
                 <table id="example1" class="table table-bordered table-striped">
                     <thead>
                         <tr>

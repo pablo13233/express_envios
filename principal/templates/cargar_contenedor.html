@@ -1,5 +1,5 @@
 {% extends "base_admin.html" %}
- {% load static %}
+{% load static %}
 {% load l10n %}
 <!-- Select2 -->
 <link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
@@ -49,7 +49,6 @@
                                                 <td>{{contenedor.pies_cubicos}}</td>
                                                 <td>{{contenedor.estado.estado}}</td>
                                                 <td><a type='button' class="btn btn-primary" href="{% url 'ver_contenedor_enviar' contenedor.pk %}">Ver</a></td>
-                                               
                                             </tr>
                                         {% endfor %}
                                     </tbody>
@@ -96,7 +95,6 @@
                                             </select>
                                         </div>
                                     </div>
-                                   
                                     <div class="col-md-3">
                                         <div class="col-md-12">
                                             <label for="id_apellidos_empleado" class="col-form-label">Pie cúbico:</label>
@@ -105,8 +103,6 @@
                                             <input type="text" name="pies_cubicos" id="id_pies_cubicos" required class="form-control" maxlength="100" autofocus onkeypress="return solonumeros_nada_mas(event);" />
                                         </div>
                                     </div>
-                                   
-                                   
                                 </div>
                                 <button type="submit" class="btn float-right btn-info">Agregar</button>
                             </form>
@@ -147,15 +143,6 @@
   $(function () {
     $("#contenedores").DataTable({
         responsive: true
-    });
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      responsive: true
     });
   });
 </script>

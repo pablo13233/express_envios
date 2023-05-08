@@ -97,9 +97,10 @@ urlpatterns = [
     url(r'^ver/cierre_anual/$', cierre_anual, name='cierre_anual'),
 	url(r'^cierre/anual/imprimir/$', cierre_anual_print, name='cierre_anual_print'),
     url(r'^registrar/envio-rv/$', registrar_envio_rv, name='registrar_envio_rv'),
-    url(r'^reporte/puerto-houston/$', cajas_puerto_houston_pdf, name='cajas_puerto'),
+    url(r'^reporte/cajas-contenedor/(?P<id>\d+)/$', cajas_contenedor_pdf, name='cajas_contenedor'),
     url(r'^cajas_a_bodega/$', busqueda_caja_bodega, name='cajas_a_bodega'),
     url(r'^cajas_caja_bodega/$', cargar_caja_camion, name='cargar_caja_camion'),
+    url(r'^reporte/cajas-contenedor-xls/(?P<id>\d+)/$', cajas_contenedor_xls, name='cajas_contenedor_xls'),
 
 ]
 # url(r'^$', inicio, name='inicio'),

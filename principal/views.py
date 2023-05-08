@@ -59,6 +59,7 @@ import calendar
 from urllib.parse import unquote
 import json
 import numpy as np
+from openpyxl import Workbook
 #from htmlmin.decorators import minified_response
 ###############################################################################
 def get_barcode(value, width, barWidth = 0.05 * units.inch, fontSize = 30, humanReadable = True):
@@ -2754,7 +2755,7 @@ def modal_editar_tipo_caja(request):
 @login_required()
 def cargar_contenedor(request):
 	pais = Pais.objects.all()
-	contenedores = Contenedor.objects.all()
+	contenedores = Contenedor.objects.all().order_by('-pk')
 	if request.method == 'POST':
 		if request.POST['codigo_original'] == '' or request.POST['codigo_express'] == '' or request.POST['pies_cubicos'] == '':
 			return JsonResponse({'option': 'error','detalle_error':'DEBES INGRESAR TODOS LOS DATOS'})
@@ -2763,14 +2764,15 @@ def cargar_contenedor(request):
 				return JsonResponse({'option': 'error','detalle_error':'DEBES INGRESAR PIES CUBICOS'})
 			else:
 				contenedor = Contenedor.objects.create(codigo_original=request.POST['codigo_original'],
-														codigo_express=request.POST['codigo_express'],
-														pais_destino=Pais.objects.get(pk=int(request.POST['pais_destino'])),
-													    pies_cubicos=request.POST['pies_cubicos'],
-													    estado=EstadoEnvio.objects.get(pk=1))
+															codigo_express=request.POST['codigo_express'],
+															pais_destino=Pais.objects.get(pk=int(request.POST['pais_destino'])),
+															pies_cubicos=request.POST['pies_cubicos'],
+													    	estado=EstadoEnvio.objects.get(pk=1),
+														)
 				historial_contenedor = HistorialContenedor.objects.create(contenedor=contenedor,
-																		  estado=EstadoEnvio.objects.get(pk=1),
-																		  comentario='INGRESO A BODEGA DE HOUSTON',
-																		  usuario_registro=request.user)
+																			estado=EstadoEnvio.objects.get(pk=1),
+																			comentario='INGRESO A BODEGA DE HOUSTON',
+																			usuario_registro=request.user)
 				#return HttpResponseRedirect(reverse('ver_contenedor_enviar',kwargs={ 'id': contenedor.pk }))
 				return JsonResponse({'option': 'save','url':reverse('ver_contenedor_enviar',kwargs={ 'id': contenedor.pk })})
 	else:
@@ -4156,15 +4158,15 @@ def registrar_envio_rv(request):
 
 
 @login_required
-def cajas_puerto_houston_pdf(request):
+def cajas_contenedor_pdf(request,id):
 	empleado = Empleado.objects.get(usuario=request.user)
 	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
 	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
-
-	envios = Envio.objects.filter(estado_envio_id = 2)
+	
+	envios = Envio.objects.filter(contenedor_id = id)
 	
 	resultados_envios = []
-	contenedor = ''
+	contenedor = Contenedor.objects.get(pk = id)
 	for e in envios:
 		detalle = {}
 		detalle['guia']= e.codigo
@@ -4173,8 +4175,6 @@ def cajas_puerto_houston_pdf(request):
 		detalle['persona_envia_telefono'] = e.quien_envia.celular
 		detalle['persona_recibe_telefono'] = e.quien_recibe.celular
 		detalle['pais_destino'] = e.pais_destino.nombre
-		if e.contenedor is not None:
-			contenedor = e.contenedor.codigo_express
 
 		cajas = DetalleEnvio.objects.filter(envio_id=e.pk)
 		cajas_agrupadas = {}  # diccionario para almacenar el resultado
@@ -4193,7 +4193,71 @@ def cajas_puerto_houston_pdf(request):
 
 		detalle['cajas'] = cajas_string
 		resultados_envios.append(detalle)
+		envios_detalle_ordenado = sorted(resultados_envios, key=lambda x: x['guia'])
 	if request.method == 'GET':
-		return generar_pdf('cajas_puerto_pdf.html',{'envios':resultados_envios,'empresa':empresa, 'contenedor':contenedor})
+		return generar_pdf('cajas_contenedor_pdf.html',{'envios':envios_detalle_ordenado,'empresa':empresa, 'contenedor':contenedor})
 	
-	return render(request, 'cajas_puerto_pdf.html',{'envios':resultados_envios,'empresa':empresa, 'contenedor':contenedor})
+	return render(request, 'cajas_contenedor_pdf.html',{'envios':envios_detalle_ordenado,'empresa':empresa, 'contenedor':contenedor})
+
+@login_required
+def cajas_contenedor_xls(request,id):
+	# Crear un nuevo archivo de Excel
+	workbook = Workbook()
+	
+	envios = Envio.objects.filter(contenedor_id = id).order_by('codigo')
+	
+	contenedor = Contenedor.objects.get(pk = id)
+	# Seleccionar la hoja activa
+	sheet = workbook.active
+	#cabeceras
+	sheet['A1'] = 'Guia'
+	sheet['B1'] = 'Envia'
+	sheet['C1'] = 'Recibe'
+	sheet['D1'] = 'Pais Destino'
+	sheet['E1'] = 'Departamento'
+	sheet['F1'] = 'Direccion'
+	sheet['G1'] = 'Cajas'
+
+	for index,e in enumerate(envios):
+		row = index + 2 #para empezar a escribir en la segunda fila
+		sheet[f'A{row}'] = e.codigo
+		sheet[f'B{row}'] = e.quien_envia.nombre_completo + "|" + e.quien_envia.celular
+		sheet[f'C{row}'] = e.quien_recibe.nombre_completo + "|" + e.quien_recibe.celular
+		sheet[f'D{row}'] = e.pais_destino.nombre
+		sheet[f'E{row}'] = e.departamento_destino.nombre
+		sheet[f'F{row}'] = e.quien_recibe.direccion
+
+		cajas = DetalleEnvio.objects.filter(envio_id=e.pk)
+		cajas_agrupadas = {}  # diccionario para almacenar el resultado
+		for caja in cajas:
+			descripcion = caja.tipo_caja.tipo_caja.descripcion
+			if descripcion not in cajas_agrupadas:
+				cajas_agrupadas[descripcion] = 1
+			else:
+				cajas_agrupadas[descripcion] += 1
+
+		# construimos el string resultante a partir del diccionario
+		cajas_string = ''
+		for descripcion, cantidad in cajas_agrupadas.items():
+			cajas_string += f'{descripcion}:({cantidad}), '
+		cajas_string = cajas_string[:-2]  # eliminamos la última coma y espacio
+
+		sheet[f'G{row}'] = cajas_string
+
+	for column_cells in sheet.columns:
+		length = max(len(str(cell.value)) for cell in column_cells)
+		sheet.column_dimensions[column_cells[0].column_letter].width = length
+	# Generar un nombre de archivo único
+	hoy = timezone.now()
+	fecha = hoy.strftime('%Y_%B%d_%H%M%S')
+	filename = f'envios_{contenedor.codigo_express}_{fecha}.xlsx'
+	# Guardar el archivo de Excel
+	workbook.save(filename)
+
+	# Crear una respuesta HTTP con el archivo adjunto
+	with open(filename, 'rb') as excel_file:
+		response = HttpResponse(excel_file.read(),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+		response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+	return response

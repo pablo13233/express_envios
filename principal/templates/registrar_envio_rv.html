@@ -208,6 +208,27 @@
                                             </tbody>
                                         </table>
                                 </div>
+                                <div class="col-md-2 " onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 46 && event.charCode <= 57" min="0.0">
+                                    <div class="col-md-12">
+                                        <label for="id_valor_declarado" class="col-form-label">Valor declarado:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="valor_declarado" id="id_valor_declarado">
+                                    </div>
+                                </div>
+                                <div hidden class="col-md-2 " onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 46 && event.charCode <= 57" min="0.0">
+                                    <div class="col-md-12">
+                                        <label for="id_valor_seguro" class="col-form-label">Seguro:</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" name="valor_seguro" id="id_valor_seguro">
+                                    </div>
+                                </div>
+                                <div class="col-md-2 form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="seguro_check">
+                                    <label class="form-check-label" for="defaultCheck1"> Seguro?</label>
+                                </div>
+                                
                                 <div hidden >
                                     <div class="col-sm-12">
                                         <input type="text" class="form-control" name="valor_envio" id="id_valor_envio" required readonly="true" value="0" >
