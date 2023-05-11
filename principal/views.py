@@ -1874,11 +1874,14 @@ def imprimir_ticket (request, id = None):
 		#qr
 		qr_code = generate_qr_code(d.codigo, width=180, height=180)
 		lista['qr_code'] = qr_code.decode()
+		guia_estafeta = ''
 		if d.envio.comentario.strip():
 			partes = d.envio.comentario.split('|')
 			for parte in partes:
 				if 'Guia Estafeta:' in parte:
 					guia_estafeta = parte.split(':')[1].strip()
+				else:
+					guia_estafeta = d.envio.comentario
 			lista['comentario'] = guia_estafeta
 		#qr
 		dic.append(lista)
