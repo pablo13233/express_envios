@@ -219,10 +219,11 @@
                   </tbody>
                 </table>
               </div><br>
-              <!--CANTIDADES DE PAGO-->
-              <!-- <div class="text-center">
-                <img src="data:image/png;base64,{{l.codigo}}" height="120" width="500">
-              </div> -->
+              <td>
+                {% if l.comentario %}
+                  <p style="font-size:20px;font-weight: bold;">Guia Estafeta: {{l.comentario}}</p>
+                {% endif %}
+              </td>
               
             </center>
             <center>
