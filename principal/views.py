@@ -203,9 +203,16 @@ def trasladar_post(request):
 			with transaction.atomic():
 				for e in envios:
 					envio_cliente = Envio.objects.get(pk=e)
+					detalle_envio_qs = DetalleEnvio.objects.filter(envio=envio_cliente)
 					estado_envio_q = EstadoEnvio.objects.get(pk=estado)
 					envio_cliente.estado_envio =estado_envio_q
+					
+					for detalle_envio in detalle_envio_qs:
+						detalle_envio.estado_hija = estado_envio_q
+						detalle_envio.save()
+
 					envio_cliente.save()
+
 					empresa = Envio.objects.get(pk=e)
 					estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
 					# print(empresa.guia_revendedor)
@@ -1859,6 +1866,7 @@ def imprimir_ticket (request, id = None):
 		lista['destinatario'] = d.envio.quien_recibe
 		lista['departamento'] = d.envio.departamento_destino.nombre
 		lista['direccion'] = d.envio.direccion_registrar
+		lista['pais'] = d.envio.pais_destino.nombre
 		lista['telefono'] = d.envio.quien_recibe.celular
 		barcode = get_barcode(value = d.codigo, width = 600)
 		codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))
@@ -1866,6 +1874,12 @@ def imprimir_ticket (request, id = None):
 		#qr
 		qr_code = generate_qr_code(d.codigo, width=180, height=180)
 		lista['qr_code'] = qr_code.decode()
+		if d.envio.comentario.strip():
+			partes = d.envio.comentario.split('|')
+			for parte in partes:
+				if 'Guia Estafeta:' in parte:
+					guia_estafeta = parte.split(':')[1].strip()
+			lista['comentario'] = guia_estafeta
 		#qr
 		dic.append(lista)
 		cantTicket += 1
@@ -2793,10 +2807,10 @@ def trasladar_guia(request,id_envio,guia_hija):
 				estado = EstadoEnvio.objects.get(pk=int(request.POST['estado_envio_guia']))
 				#print estado,'estado'
 				update = Envio.objects.filter(pk=id_envio).update(contenedor='',estado_envio=estado)
-				detalle = DetalleEnvio.objects.filter(codigo=guia_hija).update(fue_enviada=False)
+				detalle = DetalleEnvio.objects.filter(codigo=guia_hija).update(fue_enviada=False, estado_hija=estado)
 				historial = HistorialEnvio.objects.create(codigo_envio=envio,
-											          estado=estado,
-													  usuario_registro=request.user)
+														estado=estado,
+														usuario_registro=request.user)
 				seguimiento = SeguimientoEnvio.objects.create(codigo_envio=envio,estado=estado,empresa=empresa,comentario='REVERSION',usuario_registro=request.user)
 				#print 'guardo todo'
 			except Exception as e:
@@ -2805,7 +2819,7 @@ def trasladar_guia(request,id_envio,guia_hija):
 		else:
 			#print 'opcion 2'
 			estado = EstadoEnvio.objects.get(pk=int(request.POST['estado_envio_guia']))
-			detalle = DetalleEnvio.objects.filter(codigo=guia_hija).update(fue_enviada=True)
+			detalle = DetalleEnvio.objects.filter(codigo=guia_hija).update(fue_enviada=True, estado_hija=estado)
 			historial = HistorialEnvio.objects.create(codigo_envio=envio,
 													estado=estado,
 													usuario_registro=request.user)
@@ -2978,100 +2992,111 @@ def ver_camion_enviar(request,id):
 @login_required
 def trasladar_contenedor(request):
 	if request.method == 'POST':
-		estado = request.POST.get('estado_envio')
-		pk_contenedor = request.POST.get('contenedor_pk')
-		
-		contenedor = Contenedor.objects.get(pk=pk_contenedor)
-		acum = 0
-		if int(estado) == 2:
-			#esta validacion solamente se hace cuando se va trasladar de la bodega de houston a puerto
-			#para evitar enviar guias sin todas sus cajas
-			for envios in Envio.objects.filter(contenedor=contenedor):
-				for detalle_envio in DetalleEnvio.objects.filter(envio=envios):
-					if detalle_envio.fue_enviada == False:
-						acum += 1
-						#se valida que todo el detalle de cada envio este subida en el contenedor:
-		tipo_error = 0
-		detalle_error = ''
-		if acum>0:
-			tipo_error = 1
-			detalle_error = 'HAY GUIAS CON CAJAS FALTANTES'
-			#return JsonResponse({'option': 'error','detalle_error':'HAY GUIAS CON CAJAS FALTANTES','tipo_error':1})
-		#else:
-		estado_db = EstadoEnvio.objects.get(pk=request.POST.get('estado_envio'))
-		error_ = 0
 		try:
-			historial_contenedor = HistorialContenedor.objects.create(contenedor=contenedor,
-																	  estado=estado_db,
-																	  comentario='Traslador a '+str(estado_db.estado),
-																	  usuario_registro=request.user)
-			contenedor.estado =estado_db
-			contenedor.save()
-		except Exception as e:
-			#print e, "error al crear historial de contenedor"
-			return JsonResponse({'option': 'error','detalle_error':'ERROR DE SISTEMA','tipo_error':0}) 
-
-		for e in Envio.objects.filter(contenedor=contenedor):
-			envio_cliente = Envio.objects.get(pk=e.pk)
-			
-			empresa = Envio.objects.get(pk=e.pk)
-			estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
-			###UPDATE EEHN
-			envio = SeguimientoEnvio.objects.filter(codigo_envio=e.pk).update(estado=estado_db)
-			try:
-				historial = HistorialEnvio.objects.create(codigo_envio=envio_cliente,
-														  estado=estado_db,
-														   usuario_registro=request.user)
+			with transaction.atomic():
+				estado = request.POST.get('estado_envio')
+				pk_contenedor = request.POST.get('contenedor_pk')
 				
-			except Exception as e:
-				#print e,"ERROR AL CREAR SEGUIMIENTO DE ENVIO"
-				return 0
-			envio_cliente.estado_envio = EstadoEnvio.objects.get(pk=estado)
-			envio_cliente.save()
-			###UPDATE KRAKEN
-			#OBTENER ENVIO EN kraken_cargo
-			es_kraken = False
-			kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor)
-			#print kraken_envio.count(),'kraken_envio'
-			if kraken_envio.count() >= 1:
-				es_kraken = True
-			
-			if es_kraken:
-				estadoeehn = EstadoEnvio.objects.get(pk=estado)
-				#print estadoeehn.estado, 'estadoeehn'
-				estado_kraken = ''
-				pk = 0
-				if estadoeehn.pk == 1:
-					estado_kraken = 'BODEGA EEUU'
-					pk = 8
-				elif estadoeehn.pk == 2:
-					estado_kraken = 'PUERTO EEUU'
-					pk = 9
-				elif estadoeehn.pk == 3:
-					estado_kraken = 'TRANSITO MARITIMO'
-					pk = 10
-				elif estadoeehn.pk == 4:
-					estado_kraken = 'PUERTO HONDURAS'
-					pk = 11
-				elif estadoeehn.pk == 5:
-					estado_kraken = 'BODEGA HONDURAS'
-					pk = 12
-				elif estadoeehn.pk == 6:
-					estado_kraken = 'EN TRANSITO PARA ENTREGA'
-					pk = 13
-				elif estadoeehn.pk == 7:
-					estado_kraken = 'ENTREGADO'
-					pk = 14
-				estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
-				#print estadokraken.estado, 'estadokraken'
-				#print envio_cliente.guia_revendedor,'guia revendedor'
-				seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
-				historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
-				envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
-				hoy = timezone.now()
-		#return HttpResponseRedirect(reverse('ver_contenedor_enviar',args = (pk_contenedor, )))
-		return JsonResponse({'option': 'save','url': reverse('ver_contenedor_enviar',args = (pk_contenedor, )),'tipo_error':tipo_error,'detalle_error':detalle_error})
-					 
+				contenedor = Contenedor.objects.get(pk=pk_contenedor)
+				acum = 0
+				if int(estado) == 2:
+					#esta validacion solamente se hace cuando se va trasladar de la bodega de houston a puerto
+					#para evitar enviar guias sin todas sus cajas
+					for envios in Envio.objects.filter(contenedor=contenedor):
+						for detalle_envio in DetalleEnvio.objects.filter(envio=envios):
+							if detalle_envio.fue_enviada == False:
+								acum += 1
+								#se valida que todo el detalle de cada envio este subida en el contenedor:
+				tipo_error = 0
+				detalle_error = ''
+				if acum>0:
+					tipo_error = 1
+					detalle_error = 'HAY GUIAS CON CAJAS FALTANTES'
+					#return JsonResponse({'option': 'error','detalle_error':'HAY GUIAS CON CAJAS FALTANTES','tipo_error':1})
+				#else:
+				estado_db = EstadoEnvio.objects.get(pk=request.POST.get('estado_envio'))
+				error_ = 0
+				try:
+					historial_contenedor = HistorialContenedor.objects.create(contenedor=contenedor,
+																				estado=estado_db,
+																				comentario='Traslador a '+str(estado_db.estado),
+																				usuario_registro=request.user)
+					contenedor.estado =estado_db
+					contenedor.save()
+				except Exception as e:
+					#print e, "error al crear historial de contenedor"
+					return JsonResponse({'option': 'error','detalle_error':'ERROR DE SISTEMA','tipo_error':0}) 
+
+				for e in Envio.objects.filter(contenedor=contenedor):
+					envio_cliente = Envio.objects.get(pk=e.pk)
+					detalle_envio = DetalleEnvio.objects.filter(envio=envio_cliente)
+
+					empresa = Envio.objects.get(pk=e.pk)
+					estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
+					###UPDATE EEHN
+					envio = SeguimientoEnvio.objects.filter(codigo_envio=e.pk).update(estado=estado_db)
+					try:
+						historial = HistorialEnvio.objects.create(codigo_envio=envio_cliente,
+																	estado=estado_db,
+																	usuario_registro=request.user)
+						
+					except Exception as e:
+						#print e,"ERROR AL CREAR SEGUIMIENTO DE ENVIO"
+						return 0
+					envio_cliente.estado_envio = EstadoEnvio.objects.get(pk=estado)
+					for de in detalle_envio:
+						de.estado_hija = EstadoEnvio.objects.get(pk=estado)
+						de.save()
+					envio_cliente.save()
+					
+					###UPDATE KRAKEN
+					#OBTENER ENVIO EN kraken_cargo
+					es_kraken = False
+					kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = empresa.guia_revendedor)
+					#print kraken_envio.count(),'kraken_envio'
+					if kraken_envio.count() >= 1:
+						es_kraken = True
+					
+					if es_kraken:
+						estadoeehn = EstadoEnvio.objects.get(pk=estado)
+						#print estadoeehn.estado, 'estadoeehn'
+						estado_kraken = ''
+						pk = 0
+						if estadoeehn.pk == 1:
+							estado_kraken = 'BODEGA EEUU'
+							pk = 8
+						elif estadoeehn.pk == 2:
+							estado_kraken = 'PUERTO EEUU'
+							pk = 9
+						elif estadoeehn.pk == 3:
+							estado_kraken = 'TRANSITO MARITIMO'
+							pk = 10
+						elif estadoeehn.pk == 4:
+							estado_kraken = 'PUERTO HONDURAS'
+							pk = 11
+						elif estadoeehn.pk == 5:
+							estado_kraken = 'BODEGA HONDURAS'
+							pk = 12
+						elif estadoeehn.pk == 6:
+							estado_kraken = 'EN TRANSITO PARA ENTREGA'
+							pk = 13
+						elif estadoeehn.pk == 7:
+							estado_kraken = 'ENTREGADO'
+							pk = 14
+						estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
+						#print estadokraken.estado, 'estadokraken'
+						#print envio_cliente.guia_revendedor,'guia revendedor'
+						seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
+						historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
+						envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
+						hoy = timezone.now()
+		except Exception as e:
+			print('Error en contenedor --> ',e)
+			transaction.rollback()
+		else:
+			transaction.commit()
+			return JsonResponse({'option': 'save','url': reverse('ver_contenedor_enviar',args = (pk_contenedor, )),'tipo_error':tipo_error,'detalle_error':detalle_error})
+
 	elif request.method == 'GET':
 		return render(request, '404.html')
 
@@ -3680,7 +3705,8 @@ def cargar_caja_camion(request):
 				caja_hija.estado_hija_id = 6
 				caja_hija.fue_subida_camion = True
 				caja_hija.save()
-
+				
+				seguimiento = SeguimientoEnvio.objects.filter(codigo_envio=envio_cliente).update(estado=EstadoEnvio.objects.get(pk=6))
 				historico = HistorialEnvio.objects.get_or_create(codigo_envio=envio_cliente,
 															estado_id=6,
 															usuario_registro=request.user)
@@ -3739,8 +3765,9 @@ def ver_cajas_camion(request,id):
 		detalle['cajas'] = cajas_string
 		
 		envios_detalle.append(detalle)
-		envios_detalle_ordenado = sorted(envios_detalle, key=lambda x: x['guia'])
+		
 	if request.method == 'POST':
+		envios_detalle_ordenado = sorted(envios_detalle, key=lambda x: x['guia'])
 		motorista = request.POST['motorista']
 		ayuda = request.POST['ayuda']
 		return generar_pdf('ver_cajas_camion_pdf.html',{
@@ -3762,12 +3789,18 @@ def entregar_caja(request,envio):
 			envio_cliente = Envio.objects.get(pk=e.pk)
 			empresa = Envio.objects.get(pk=e.pk)
 			estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
+			#detalle de cajas
+			detalle_envio = DetalleEnvio.objects.filter(envio = envio_cliente)
+			for de in detalle_envio:
+						de.estado_hija = estado_final
+						de.save()
 			###UPDATE EEHN
 			# Actualiza el seguimiento
 			SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e.pk)).update(estado=estado)
 			#crea el historico
 			HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e.pk),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
 			envio_cliente.estado_envio = estado_final
+
 			envio_cliente.save()
 			hoy = timezone.now()
 			return HttpResponseRedirect(reverse('enviar_transito'))
@@ -3798,7 +3831,7 @@ def buscar_caja_transito(request):
 					for d in guia_detalle:
 						id_envio_detalle = d.envio.codigo
 					guia_envio = id_envio_detalle
-				seguimiento = SeguimientoEnvio.objects.filter(codigo_envio__codigo= guia_envio,estado=6).order_by('-id')[0]
+				seguimiento = SeguimientoEnvio.objects.filter(codigo_envio= Envio.objects.get(codigo=guia_envio),estado=6).order_by('-id')[0]
 				detalle = DetalleEnvio.objects.filter(envio__codigo=seguimiento.codigo_envio.codigo)
 				lista_detalle = []
 				if detalle:
@@ -3813,7 +3846,7 @@ def buscar_caja_transito(request):
 							dic['enviada'] = 'SI'
 						else:
 							dic['enviada'] = 'NO'
-						lista_detalle.append(dic) 
+						lista_detalle.append(dic)
 				if seguimiento.codigo_envio.contenedor:
 					contendor = str(seguimiento.codigo_envio.contenedor.codigo_original)+'|'+str(seguimiento.codigo_envio.contenedor.codigo_express)
 				else:
@@ -3863,6 +3896,7 @@ def busqueda_caja_bodega(request):
 				caja_hija.estado_hija_id = 5
 				caja_hija.save()
 
+				seguimiento = SeguimientoEnvio.objects.filter(codigo_envio=envio_cliente).update(estado=EstadoEnvio.objects.get(pk=5))
 				historico = HistorialEnvio.objects.get_or_create(codigo_envio=envio_cliente,
 															estado_id=5,
 															usuario_registro=request.user)
@@ -3890,7 +3924,6 @@ def recibido_bodega_hn(request):
 		try:
 			envs = request.GET.get('codigos')
 			envios = envs.split(",")
-			# print('ENTRA ',envios)
 			for envio in envios:
 				detalle={}
 				envio_d = Envio.objects.get(codigo=envio)
@@ -4047,6 +4080,11 @@ def registrar_envio_rv(request):
 		query_envio.update({'valor_seguro':valor_seguro})
 		guia_revend = empleado.nombres_empleado +' '+ empleado.apellidos_empleado
 
+		if request.POST.get('valor_seguro') != '':
+			valor_seguro = request.POST.get('valor_seguro')
+			ret_data.update({'valor_seguro':valor_seguro})
+			query_envio.update({'valor_seguro':valor_seguro})
+
 		if request.POST.get('valor_envio') == '':
 			errores.update({'valor_envio':'DEBE REALIZAR EL CALCULO DEL ENVIO'})
 		else:
@@ -4055,7 +4093,7 @@ def registrar_envio_rv(request):
 		if not errores:
 			valor = float(request.POST.get('valor_envio'))
 			total = valor + float(valor_adicional) + float(valor_emplasticado) + float(valor_seguro)
-			pago_recibido = float(request.POST.get('pago_recibido'))
+			pago_recibido = total
 			
 			if pago_recibido < total:
 				credito = True
@@ -4063,6 +4101,8 @@ def registrar_envio_rv(request):
 			else:
 				credito = False
 				saldo_pendiente = 0.00
+				ret_data.update({'pago_recibido':pago_recibido})
+				query_envio.update({'pago_recibido':pago_recibido})
 			if es_revendedor:
 				
 				if request.POST.get('guia_revendedor') != '':
@@ -4089,13 +4129,14 @@ def registrar_envio_rv(request):
 			else:
 				tipo_envio_query = TipoEnvio.objects.get(pk=1)
 				query_envio['tipo_envio'] = tipo_envio_query
+			comentario = "Valor declarado: " + str(request.POST.get('valor_declarado')) +" | Guia Estafeta: "+ request.POST.get('guia_referencia').upper()+" | "+ request.POST.get('comentario').upper()
 
 			query_envio.update({'total':total,'usuario_registro':request.user,
 								'usuario_aprobo':request.user,
 								'credito':credito,
 								'valor_emplasticado':valor_emplasticado,
 								'saldo_pendiente':saldo_pendiente,
-								'comentario':request.POST.get('comentario').upper(),
+								'comentario': comentario,
 								'estado_envio':EstadoEnvio.objects.get(pk=1)})
 			try:
 				with transaction.atomic():
@@ -4124,13 +4165,13 @@ def registrar_envio_rv(request):
 																	codigo=codigo_detalle,
 																	total=total)
 							except Exception as e:
-								#print 'ERROR EN DETALLE', e
+								print("Error registro caja detalle revendedor: --> ", e)
 								return 0
 						seguimiento = SeguimientoEnvio.objects.create(codigo_envio=Envio.objects.get(pk=envio.pk),estado=EstadoEnvio.objects.get(pk=1),empresa=empresa.empresa,usuario_registro=request.user)
 						historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=envio.pk),estado=EstadoEnvio.objects.get(pk=1),usuario_registro=request.user)
 
 			except Exception as e:
-				#print (e,'errores')
+				print("Error registro revendedor: --> ", e)
 				errores['extra'] = e
 				transaction.rollback()
 				ctx = {'es_revendedor':es_revendedor,'pais':pais,'ret_data':ret_data,'errores':errores}
@@ -4259,5 +4300,129 @@ def cajas_contenedor_xls(request,id):
 		response = HttpResponse(excel_file.read(),
                                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 		response['Content-Disposition'] = f'attachment; filename="{filename}"'
-
+	os.remove(filename)
 	return response
+
+@login_required
+def estado_cajas_contenedor_pdf(request,id):
+	empleado = Empleado.objects.get(usuario=request.user)
+	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
+	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
+	
+	envios = Envio.objects.filter(contenedor_id = id)
+	
+	resultados_envios = []
+	contenedor = Contenedor.objects.get(pk = id)
+
+	
+	for e in envios:
+		detalle = {}
+		detalle_envio = DetalleEnvio.objects.filter(envio_id = e.pk)
+		for de in detalle_envio:
+			detalle['guia'] = e.codigo
+			detalle['persona_envia'] = e.quien_envia.nombre_completo
+			detalle['persona_recibe'] = e.quien_recibe.nombre_completo
+			detalle['persona_envia_telefono'] = e.quien_envia.celular
+			detalle['persona_recibe_telefono'] = e.quien_recibe.celular
+			detalle['pais_destino'] = e.pais_destino.nombre
+			detalle['estado_padre'] = e.estado_envio.estado
+			detalle['hija'] = de.codigo
+			detalle['tamano'] = de.tipo_caja.tipo_caja.descripcion
+			detalle['cantidad'] = de.cantidad
+			detalle['estado_hija'] = de.estado_hija.estado
+			resultados_envios.append(detalle)
+		
+		
+		envios_detalle_ordenado = sorted(resultados_envios, key=lambda x: x['guia'])
+	if request.method == 'GET':
+		return generar_pdf('estado_cajas_contenedor_pdf.html',{'envios':envios_detalle_ordenado,'empresa':empresa, 'contenedor':contenedor})
+	
+	return render(request, 'estado_cajas_contenedor_pdf.html',{'envios':envios_detalle_ordenado,'empresa':empresa, 'contenedor':contenedor})
+# Reversiones de estado en honduras
+@login_required
+def reversion_estado_honduras(request):
+	tiene_datos = 0
+	estados = EstadoEnvio.objects.filter(pk__in=(4,5,6))
+	data = []
+	if request.is_ajax():
+		try:
+			with transaction.atomic():
+				guia = request.GET.get('guia')
+				
+				if Envio.objects.get(codigo=guia):
+					guia_envio = guia
+				
+				envio_detalle = Envio.objects.get(codigo=guia_envio) #guardo el envio
+				seguimiento = SeguimientoEnvio.objects.filter(codigo_envio=envio_detalle.pk).order_by('-id')[0] #busca el seguimiento para actualizarlo
+				detalle = DetalleEnvio.objects.filter(envio__codigo=seguimiento.codigo_envio.codigo) #para buscas las cajas del envio
+				lista_detalle = []
+				if detalle:
+					tiene_datos = 1
+					for d in detalle:
+						dic = {}
+						dic['cantidad'] = d.cantidad
+						dic['caja'] = d.tipo_caja.tipo_caja.descripcion 
+						dic['precio'] = d.precio
+						dic['total'] = d.total
+						lista_detalle.append(dic)
+				
+				data = {'pk':seguimiento.pk,
+						'codigo':seguimiento.codigo_envio.codigo,
+						'envia':seguimiento.codigo_envio.quien_envia.nombre_completo,
+						'recibe':seguimiento.codigo_envio.quien_recibe.nombre_completo,
+						'estado':seguimiento.estado.estado,
+						'fechahora':str(seguimiento.fechahora),
+						'tiene_datos':tiene_datos,
+						'lista_detalle':lista_detalle,
+						'url' : reverse('entregar_caja', kwargs={'envio':guia_envio})}
+		except Exception as e:
+			print('Error ---> ',e)
+			transaction.rollback()
+			data = {'tiene_datos':0}
+		
+		return HttpResponse(simplejson.dumps(data), content_type='application/javascript')
+	return render(request, 'revercion_estados_honduras.html',{'estados':estados})
+
+@login_required()
+def trasladar_guia_hn(request):
+	if request.method== 'POST':
+		empleado = str(request.user)
+		id_envio = str(request.POST['codigo_guia'])
+		estado_nuevo = int(request.POST['estado_envio_guia'])
+		hoy = timezone.now()
+		fecha = hoy.strftime('%B %d, %Y')
+		try:
+			with transaction.atomic():
+				envio = Envio.objects.get(codigo=id_envio)
+				empresa = Empresa.objects.get(pk=envio.empresa.pk)
+				
+				estado = EstadoEnvio.objects.get(pk=estado_nuevo)
+				#actualziar el envio
+				if estado_nuevo > envio.estado_envio_id:
+					return HttpResponse(status=400)
+				else:
+					if envio.estado_envio_id == 6:
+						envio.camion = None
+					envio.estado_envio = estado
+					envio.save()
+					coment = 'Se reverso a '+estado.estado+' a la fecha '+fecha+' por '+empleado
+					seguimiento_update = SeguimientoEnvio.objects.filter(codigo_envio=envio.pk).update(estado=estado,comentario=coment)
+					historial = HistorialEnvio.objects.filter(codigo_envio=envio, estado_id__gt=estado_nuevo)
+					historial.delete()
+				#####
+				#actualizacion de detalle del envio
+				if estado_nuevo < 6:
+					detalle = DetalleEnvio.objects.filter(envio=envio).update(estado_hija=estado, fue_subida_camion = False)
+				else:
+					detalle = DetalleEnvio.objects.filter(envio=envio).update( estado_hija=estado)
+				
+		except Exception as e:
+			print('Reversion estado Hn error ---> ',e)
+			transaction.rollback()
+			return 0
+		else:
+			transaction.commit()
+			return HttpResponseRedirect(reverse('reversion_estado_honduras'))	
+		
+	elif request.method == 'GET':
+		return HttpResponseRedirect(reverse('reversion_estado_honduras'))

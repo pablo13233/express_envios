@@ -38,7 +38,9 @@
             color: #4DC3FA;
             text-decoration: none;
         }
-
+        table.container td {
+            white-space: nowrap;
+        }
         .blue {
             color: #185875;
         }
@@ -57,12 +59,13 @@
         .container td {
             font-weight: normal;
             font-size: 1.5em;
+            width: auto;
         }
 
         .container {
             text-align: left;
             overflow: hidden;
-            width: 100%;
+            width: max-content;
             margin: 0 auto;
             display: table;
             padding: 0 0 8em 0;
@@ -72,8 +75,8 @@
         .container th {
             margin-bottom: 2%;
             margin-top: 2%;
-            margin-left: 4px;
-            padding-top: 2px;
+            margin-left: 2px;
+            padding-top: 1px;
             border-bottom:1px solid #9ea7af;
             border-left:1px solid #dcdcdd;
             border-right:1px solid #dcdcdd;
@@ -91,6 +94,9 @@
 
         .container th {
             background-color: #bbbbbb;
+        }
+        td.ajustar {
+            white-space: nowrap;
         }
 
         @media (max-width: 800px) {
@@ -116,7 +122,10 @@
                 </td>
                 <td>
                 <center>
-                    <p style="font-size: 20px;">DIRECCIÓN: {{empresa.direccion_empresa}}<br>TELÉFONO: {{empresa.telefono_empresa}} {% if empresa.celular_empresa %} | {{empresa.celular_empresa}} {% endif %}<br>FMC No. 3172NF <br><br>Contenedor: {{contenedor.codigo_express}}</p>
+                    <p style="font-size: 20px;">DIRECCIÓN: {{empresa.direccion_empresa}}<br>TELÉFONO: {{empresa.telefono_empresa}} {% if empresa.celular_empresa %} | {{empresa.celular_empresa}} {% endif %}
+                        <br>FMC No. 3172NF 
+                        <br><br>Reporte de estado de cajas del contenedor:  <br>{{contenedor.codigo_express}}
+                    </p>
                 </center>  
                 </td>
             </tr>
@@ -129,21 +138,30 @@
                 <th>Guía</th>
                 <th>Envia</th>
                 <th>Recibe</th>
-                <th>Cajas</th>
                 <th>Pais destino</th>
+                <th>Estado Envio</th>
+                <th>Guia Hija</th>
+                <th>Tamaño</th>
+                <th>Cantidad</th>
+                <th>Estado Caja</th>
             </tr>
         </thead>
         <tbody>
             {% for en in envios %}
             <tr>
-                <td>{{en.guia}}</td>
-                <td>{{en.persona_envia}} | {{en.persona_envia_telefono}}</td>
-                <td>{{en.persona_recibe}} | {{en.persona_recibe_telefono}}</td>
-                <td>{{en.cajas}}</td>
-                <td>{{en.pais_destino}}</td>
+                <td class="ajustar">{{en.guia}}</td>
+                <td class="ajustar">{{en.persona_envia}}</td>
+                <td class="ajustar">{{en.persona_recibe}}</td>
+                <td class="ajustar">{{en.pais_destino}}</td>
+                <td class="ajustar">{{en.estado_padre}}</td>
+                <td style="width: 128px;">{{en.hija}}</td>
+                <td class="ajustar">{{en.tamano}}</td>
+                <td style="width: 85px;">{{en.cantidad}}</td>
+                <td class="ajustar">{{en.estado_hija}}</td>
             </tr>
             {% endfor %}
         </tbody>
+    </table>
 </body>
 
 </html>

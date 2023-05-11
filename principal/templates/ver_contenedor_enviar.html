@@ -69,17 +69,31 @@
                     <td>{{contenedor.pies_cubicos}}</td>
                   </tr>
 
-                   <tr>
+                  <tr>
                     <th scope="row">ESTADO:</th>
                     <td>{{contenedor.estado}}</td>
                   </tr>
 
-                   <tr>
+                  <tr>
                     <th scope="row">PIES CÚBICOS DISPONIBLES:</th>
                     <td>{{disponible}}</td>
                   </tr>
                 </tbody>
               </table>
+              <div class="row col-12">
+                <div class="col-3 text-center">
+                  <h4><a class="text-primary" href="{% url 'cajas_contenedor' contenedor.pk %}" target="_blank"><i class="fa-regular fa-file-pdf fs-2"></i> Imprimir contenedor</a></h4>
+                </div>
+                <div class="col-3 text-center">
+                  <h4><a class="text-success" href="{% url 'cajas_contenedor_xls' contenedor.pk %}" target="_blank"><i class="far fa-file-spreadsheet"></i> Descargar XLS</a></h4>
+                </div>
+                <div class="col-3 text-center">
+                  <h4><a class="text-warning" href="{% url 'estado_cajas_contenedor' contenedor.pk %}" target="_blank"><i class="fa-regular fa-file-pdf"></i> Estado Cajas</a></h4>
+                </div>
+                <div class="col-3 text-center">
+                  <h4><a class="text-primary" href="{% url 'lista_guias_faltante' contenedor.pk %}" target="_blank"><i class="fa-regular fa-boxes"></i> Cajas faltantes</a></h4>
+                </div>
+              </div>
               <div class="row col-12">
                 {% if contenedor.estado.pk == 1 or contenedor.estado.pk == 2 or contenedor.estado.pk == 3 or contenedor.estado.pk == 4 %}
                 <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'ver_contenedor_enviar' contenedor.pk  %}" id="addFormCajaContenedor" >
@@ -90,12 +104,6 @@
                       </div>
                 </form>
                 {% endif %}
-                <div class="col-3">
-                  <h4><a href="{% url 'cajas_contenedor' contenedor.pk %}" target="_blank"><i class="fa-regular fa-file-pdf fs-2"></i> Imprimir contenedor</a></h4>
-                </div>
-                <div class="col-3">
-                  <h4><a class="text-success" href="{% url 'cajas_contenedor_xls' contenedor.pk %}" target="_blank"><i class="far fa-file-spreadsheet"></i> Descargar XLS</a></h4>
-                </div>
               </div>
                 <table id="example1" class="table table-bordered table-striped">
                     <thead>

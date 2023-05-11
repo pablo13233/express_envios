@@ -45,112 +45,129 @@
       <div class="col-1"></div>
       <div class="col-10">
         <div class="container ticket">
+          <!-- Revendedor -->
           {% if envio.revendedor %}
-          {% if lista %}
+            {% if lista %}
 
-          {% for l in lista  %}
-          <div class="row page1"></div>
-          <div class="container tpage">
-            <center>
-              <div style="text-align:center;"><img width="750px" height="250px" src="{{revendedor.logo.path}}" style="margin-top:10px;"></div>
+              {% for l in lista  %}
+              <div class="row page1"></div>
+              <div class="container tpage">
+                <center>
+                  <div style="text-align:center;"><img width="750px" height="250px" src="{{revendedor.logo.path}}" style="margin-top:10px;"></div>
 
-              <p style="font-size: 20px;">DIRECCIÓN: {{revendedor.direccion}}<br>TELÉFONO:
-                {{revendedor.telefono}} {% if revendedor.celular_empresa %} |
-                {{revendedor.celular_empresa}} {% endif %}<br></p>
-            </center>
-            <table width="100%">
-              <thead>
-                <tr>
-                  <th style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">Guia: {{l.guia_padre}}
-                  </th>
-                </tr>
-              </thead>
-            </table>
-            <center>
-              <div>
-                <table class="tablas" width="100%"  cellspacing="3" cellpadding="3" >
+                  <p style="font-size: 20px;">DIRECCIÓN: {{revendedor.direccion}}<br>TELÉFONO:
+                    {{revendedor.telefono}} {% if revendedor.celular_empresa %} |
+                    {{revendedor.celular_empresa}} {% endif %}<br></p>
+                </center>
+                <table width="100%">
+                  <thead>
+                    <tr>
+                      <th style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">Guia: {{l.guia_padre}}
+                      </th>
+                    </tr>
+                  </thead>
+                </table>
+                <center>
+                  <div>
+                    <table class="tablas" width="100%"  cellspacing="3" cellpadding="3" >
+                      <tbody>
+                        <tr>
+                          <td style="font-size:22px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">DATOS CONSIGNATARIO:</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.destinatario}}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">Producto: {{l.producto}}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size:25px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.pais}} | {{l.departamento}} | {{l.direccion}}</td>
+                        </tr>
+                        <tr>
+                          <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.telefono}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div><br>
+                  <!--CANTIDADES DE PAGO-->
+                  <!-- <div class="text-center">
+                    <img src="data:image/png;base64,{{l.codigo}}" height="120" width="500">
+                  </div> -->
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>
+                          {% if l.comentario %}
+                            <p style="font-size:20px;font-weight: bold;">Guia Estafeta: {{l.comentario}}</p>
+                          {% endif %}
+                        </td>
+                        <td>
+                          <img src="data:image/png;base64,{{l.qr_code}}" height="180" width="180">
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </center>
+                <center>
+                  <p style="font-size:30px;font-weight: bold;">{{forloop.counter}} / {{cantT}} </p>
+                </center>
+              </div>
+
+              {% endfor %}
+            {% else %}
+              <div class="row page1"></div>
+              <div class="container tpage">
+                <div style="text-align:center;"><img width="125px" src="{{revendedor.logo.path}}"></div>
+                <table>
                   <tbody>
                     <tr>
-                      <td style="font-size:22px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">DATOS CONSIGNATARIO:</td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.destinatario}}</td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">Producto: {{l.producto}}</td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:25px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.departamento}} | {{l.direccion}}</td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.telefono}}</td>
+                      <td>
+                        <center>
+                          <span style="font-size: 30px;">{{revendedor.nombre_empresa}}</span><br>
+                          <span style="font-size: 15px;">{{revendedor.direccion}}<br>TELÉFONO:
+                            {{revendedor.telefono_empresa}}
+                            / {{revendedor.celular_empresa}}</span><br><span style="font-size: 20px;"></span>
+                        </center>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
-              </div><br>
-              <!--CANTIDADES DE PAGO-->
-              <div class="text-center">
-                <img src="data:image/png;base64,{{l.codigo}}" height="120" width="500">
+                <table width="100%">
+                  <tbody>
+                    <tr>
+                      <td style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">Guia: {{envio.codigo}}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table width="100%" border="1" cellspacing="3" cellpadding="3">
+                  <tbody>
+                    <tr>
+                      <td style="font-size:15px;font-weight: bold;">DATOS CONSIGNATARIO:</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:25px;font-weight: bold;">{{envio.quien_recibe}} {{envio.quien_recibev}}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:20px;font-weight: bold;">{{envio.departamento_destino}},
+                        {{envio.direccion_registrar}}</td>
+                    </tr>
+                    <tr>
+                      <td style="font-size:30px;font-weight: bold;">{{envio.telefonos}}</td>
+                    </tr>
+                  </tbody>
+                </table><br>
+                <!--CANTIDADES DE PAGO-->
+                <!-- <center><img src="data:image/png;base64,{{codigo}}" height="60" width="250"></center> -->
+                <div style="text-align: right;">
+                  <img src="data:image/png;base64,{{l.qr_code}}" height="180" width="180">
+                </div>
+                <center>
+                  <p style="font-size:30px;font-weight: bold;">{{forloop.counter}} / {{cantT}} </p>
+                </center>
               </div>
-            </center>
-            <center>
-              <p style="font-size:30px;font-weight: bold;">{{forloop.counter}} / {{cantT}} </p>
-            </center>
-          </div>
-
-          {% endfor %}
-          {% else %}
-          <div class="row page1"></div>
-          <div class="container tpage">
-            <div style="text-align:center;"><img width="125px" src="{{revendedor.logo.path}}"></div>
-            <table>
-              <tbody>
-                <tr>
-                  <td>
-                    <center>
-                      <span style="font-size: 30px;">{{revendedor.nombre_empresa}}</span><br>
-                      <span style="font-size: 15px;">{{revendedor.direccion}}<br>TELÉFONO:
-                        {{revendedor.telefono_empresa}}
-                        / {{revendedor.celular_empresa}}</span><br><span style="font-size: 20px;"></span>
-                    </center>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <table width="100%">
-              <tbody>
-                <tr>
-                  <td style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">Guia: {{envio.codigo}}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <table width="100%" border="1" cellspacing="3" cellpadding="3">
-              <tbody>
-                <tr>
-                  <td style="font-size:15px;font-weight: bold;">DATOS CONSIGNATARIO:</td>
-                </tr>
-                <tr>
-                  <td style="font-size:25px;font-weight: bold;">{{envio.quien_recibe}} {{envio.quien_recibev}}</td>
-                </tr>
-                <tr>
-                  <td style="font-size:20px;font-weight: bold;">{{envio.departamento_destino}},
-                    {{envio.direccion_registrar}}</td>
-                </tr>
-                <tr>
-                  <td style="font-size:30px;font-weight: bold;">{{envio.telefonos}}</td>
-                </tr>
-              </tbody>
-            </table><br>
-            <!--CANTIDADES DE PAGO-->
-            <center><img src="data:image/png;base64,{{codigo}}" height="60" width="250"></center>
-            <center>
-              <p style="font-size:30px;font-weight: bold;">{{forloop.counter}} / {{cantT}} </p>
-            </center>
-          </div>
-
-          {% endif %}
-
+            {% endif %}
+            <!-- FIN Revendedor -->
           {% else %}
           {% if lista %}
           {% for l in lista  %}
@@ -194,7 +211,7 @@
                       <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">Producto: {{l.producto}}</td>
                     </tr>
                     <tr>
-                      <td style="font-size:25px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.departamento}} | {{l.direccion}}</td>
+                      <td style="font-size:25px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.pais}} | {{l.departamento}} | {{l.direccion}}</td>
                     </tr>
                     <tr>
                       <td style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">{{l.telefono}}</td>
