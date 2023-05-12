@@ -462,7 +462,6 @@
         <script src="{% static 'admin/js/pnotify.js' %}"></script>
         <script src="{% static 'admin/js/pnotify.buttons.js' %}"></script>
 <script>
-var cajaAgregada = false;
 $("#btn_edit_recibe").click(function(e) {
     if ($('#id_quien_recibe').val()!= 0){
             $("#id_recibe_pk_modal_edit").val("");
@@ -1117,25 +1116,7 @@ function calcular(){
     document.getElementById("id_valor_envio").value = subtotal_global.toFixed(2);
 }
 function addcajas(){
-    //verificacion de caja
-    if (cajaAgregada) {
-        // Mostrar mensaje de error y salir de la función
-        return $.notify("Solo se permite agregar una caja.",{
-            className: 'error',
-            globalPosition:"right bottom", 
-            clickToHide: true,
-            autoHide: true,
-            autoHideDelay: 5000,
-            arrowShow: true,
-            arrowSize: 5,
-            style: 'bootstrap',
-            showAnimation: 'slideDown',
-            showDuration: 400,
-            hideAnimation: 'slideUp',
-            hideDuration: 200,
-            gap: 2
-        });
-    }
+    
     var caja = $("#id_tipo_caja").val();
     var cantidad = $("#id_cantidad_cajas").val();
     var tablaDatos= $("#tblDatos");
@@ -1191,7 +1172,6 @@ function addcajas(){
             } 
         calcular();
     }
-    cajaAgregada = true;
 
 }
 
