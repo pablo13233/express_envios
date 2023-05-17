@@ -67,9 +67,9 @@
                                         <label>Recibe: 
                                     </label>
 
-                                        <a title="Agregar" style="margin-left: 5px" id="btn_add_recibe" data-toggle="modal" data-target="#add_recibe" data-backdrop="static" data-keyboard="false"><i style="font-size: 20px; color: green" class="fa fa-plus"></i></a>
+                                        <a title="Agregar" style="margin-left: 5px" id="btn_add_recibe" data-toggle="modal" data-target="#add_recibe" data-backdrop="static" data-keyboard="false"><i style="font-size: 20px; color: green" class="fas fa-plus"></i></a>
 
-                                        <a title="Editar" style="margin-left: 5px" id="btn_edit_recibe" data-toggle="modal" data-target="#edit_recibe" data-backdrop="static" data-keyboard="false"><i id="id_li_edit" style="font-size: 20px; color:blue;display: none; " class="fa fa-edit"></i></a>
+                                        <a title="Editar" style="margin-left: 5px" id="btn_edit_recibe" data-toggle="modal" data-target="#edit_recibe" data-backdrop="static" data-keyboard="false"><i id="id_li_edit" style="font-size: 20px; color:blue;display: none; " class="fas fa-edit"></i></a>
 
                                         <select class="form-control select2" style="width: 100%;" id="id_quien_recibe" name="quien_recibe">
                                             <option value="0" >SELECCIONE REMITENTE PRIMERO</option>
@@ -179,9 +179,9 @@
                                                     <tr>
                                                         <td>
                                                             <label>Tipo de caja</label>
-                                                            <a title="Agregar" style="margin-left: 5px" id="btn_add_caja" data-toggle="modal" data-target="#add_caja" data-backdrop="static" data-keyboard="false"><i style="font-size: 20px; color: green" class="fa fa-plus"></i></a>
+                                                            <a title="Agregar" style="margin-left: 5px" id="btn_add_caja" data-toggle="modal" data-target="#add_caja" data-backdrop="static" data-keyboard="false"><i style="font-size: 20px; color: green" class="fas fa-plus"></i></a>
 
-                                                            <a title="Editar" style="margin-left: 5px" id="btn_edit_tipo_caja" data-toggle="modal" data-target="#edit_caja" data-backdrop="static" data-keyboard="false"><i id="id_li_edit_caja" style="font-size: 20px; color:blue;display: none; " class="fa fa-edit"></i></a>
+                                                            <a title="Editar" style="margin-left: 5px" id="btn_edit_tipo_caja" data-toggle="modal" data-target="#edit_caja" data-backdrop="static" data-keyboard="false"><i id="id_li_edit_caja" style="font-size: 20px; color:blue;display: none; " class="fas fa-edit"></i></a>
 
                                                             <select class="form-control select2" style="width: 100%;" id="id_tipo_caja" name="tipo_caja">
                                                             <option value="0" >SELECCIONE</option>
@@ -286,23 +286,23 @@
                             {% csrf_token %}
                             <input type="hidden" id="id_envia_pk" value="0" name="envia_pk">
                             <p>
-                                <label>Nombre: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Nombre: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="nombre_recibe" id="id_nombre_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Celular: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Celular: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="telefono_recibe" id="id_telefono_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Dirección: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Dirección: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="direccion_recibe" id="id_direccion_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
-                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fas fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fas fa-check"></i></span>Guardar</button>
                         </div>
                     </form>
                 </div>
@@ -325,23 +325,23 @@
                             {% csrf_token %}
                             <input type="hidden" id="id_recibe_pk_modal_edit" value="" name="recibe_pk_modal_Edit" >
                             <p>
-                                <label>Nombre: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Nombre: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="nombre_recibe_edit" id="id_edit_nombre_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Celular: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Celular: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="telefono_recibe_edit" id="id_edit_telefono_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Dirección: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Dirección: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="direccion_recibe_edit" id="id_edit_direccion_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
-                            <button type="submit" class="btn btn-labeled bg-olive" id="guardar_recibo"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fas fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive" id="guardar_recibo"><span class="btn-label"><i class="fas fa-check"></i></span>Guardar</button>
                         </div>
                     </form>
                 </div>
@@ -362,39 +362,39 @@
                             {% csrf_token %}
                             <input type="hidden" id="id_pais_caja" value="0" name="pais_caja">
                             <p>
-                                <label>Descripción: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Descripción: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="descripcion_caja" id="id_descripcion_caja" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Largo: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Largo: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="largo" id="id_largo" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos()" value="0"/>
                             </p>
 
                             <p>
-                                <label>Ancho: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Ancho: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="ancho" id="id_ancho" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos()" value="0"/>
                             </p>
 
                             <p>
-                                <label>Alto: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Alto: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="alto" id="id_alto" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos()" value="0"/>
                             </p>
 
                             <p>
-                                <label>Pie cúbico: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Pie cúbico: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="pie_cubico" id="id_pie_cubico" required class="form-control" maxlength="100" autofocus readonly="true" />
                             </p>
 
                             <p>
-                                <label>Precio: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Precio: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="precio_caja" id="id_precio_caja" required class="form-control" maxlength="100" autofocus onkeypress="return solonumeros_nada_mas(event);" />
                             </p>
                         
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
-                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fas fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fas fa-check"></i></span>Guardar</button>
                         </div>
                     </form>
                 </div>
@@ -415,39 +415,39 @@
                             {% csrf_token %}
                             <input type="hidden" id="pk_caja_edit" value="0" name="pk_caja_edit">
                                <p>
-                                <label>Descripción: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Descripción: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="descripcion_caja_edi" id="id_descripcion_caja_edit" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                              <p>
-                                <label>Largo: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Largo: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="largo_edi" id="id_largo_edit" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos_edit()" value="0"/>
                             </p>
 
                              <p>
-                                <label>Ancho: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Ancho: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="ancho_edi" id="id_ancho_edit" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos_edit()" value="0"/>
                             </p>
 
                             <p>
-                                <label>Alto: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Alto: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="alto_edi" id="id_alto_edit" required class="form-control" maxlength="100" autofocus onchange="calculo_cubicos_edit()" value="0"/>
                             </p>
 
                             <p>
-                                <label>Pie cúbico: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Pie cúbico: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="pie_cubico_edi" id="id_pie_cubico_edit" required class="form-control" maxlength="100" autofocus readonly="true" />
                             </p>
 
                             <p>
-                                <label>Precio: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Precio: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="precio_caja_edi" id="id_precio_caja_edit" required class="form-control" maxlength="100" autofocus onkeypress="return solonumeros_nada_mas(event);" />
                             </p>
                            
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
-                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fas fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fas fa-check"></i></span>Guardar</button>
                         </div>
                     </form>
                 </div>

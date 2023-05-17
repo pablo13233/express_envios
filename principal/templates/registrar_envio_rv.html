@@ -72,9 +72,9 @@
                                         <label>Recibe: 
                                     </label>
 
-                                        <a title="Agregar" style="margin-left: 5px" id="btn_add_recibe" data-toggle="modal" data-target="#add_recibe" data-backdrop="static" data-keyboard="false"><i style="font-size: 20px; color: green" class="fa fa-plus"></i></a>
+                                        <a title="Agregar" style="margin-left: 5px" id="btn_add_recibe" data-toggle="modal" data-target="#add_recibe" data-backdrop="static" data-keyboard="false"><i style="font-size: 20px; color: green" class="fas fa-plus"></i></a>
 
-                                        <a title="Editar" style="margin-left: 5px" id="btn_edit_recibe" data-toggle="modal" data-target="#edit_recibe" data-backdrop="static" data-keyboard="false"><i id="id_li_edit" style="font-size: 20px; color:blue;display: none; " class="fa fa-edit"></i></a>
+                                        <a title="Editar" style="margin-left: 5px" id="btn_edit_recibe" data-toggle="modal" data-target="#edit_recibe" data-backdrop="static" data-keyboard="false"><i id="id_li_edit" style="font-size: 20px; color:blue;display: none; " class="fas fa-edit"></i></a>
 
                                         <select class="form-control select2" style="width: 100%;" id="id_quien_recibe" name="quien_recibe">
                                             <option value="0" >SELECCIONE REMITENTE PRIMERO</option>
@@ -272,23 +272,23 @@
                             {% csrf_token %}
                             <input type="hidden" id="id_envia_pk" value="0" name="envia_pk">
                             <p>
-                                <label>Nombre: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Nombre: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="nombre_recibe" id="id_nombre_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Celular: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Celular: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="telefono_recibe" id="id_telefono_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Dirección: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Dirección: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="direccion_recibe" id="id_direccion_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
-                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fas fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i class="fas fa-check"></i></span>Guardar</button>
                         </div>
                     </form>
                 </div>
@@ -309,23 +309,23 @@
                             {% csrf_token %}
                             <input type="hidden" id="id_recibe_pk_modal_edit" value="" name="recibe_pk_modal_Edit" >
                             <p>
-                                <label>Nombre: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Nombre: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="nombre_recibe_edit" id="id_edit_nombre_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Celular: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Celular: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="telefono_recibe_edit" id="id_edit_telefono_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
 
                             <p>
-                                <label>Dirección: <a class="a_obligatorio fa fa-asterisk" style="color:red"></a></label>
+                                <label>Dirección: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
                                 <input type="text" name="direccion_recibe_edit" id="id_edit_direccion_recibe_modal" required class="form-control" maxlength="100" autofocus/>
                             </p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fa fa-times"></i></span>Cancelar</button>
-                            <button type="submit" class="btn btn-labeled bg-olive" id="guardar_recibo"><span class="btn-label"><i class="fa fa-check"></i></span>Guardar</button>
+                            <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span class="btn-label"><i class="fas fa-times"></i></span>Cancelar</button>
+                            <button type="submit" class="btn btn-labeled bg-olive" id="guardar_recibo"><span class="btn-label"><i class="fas fa-check"></i></span>Guardar</button>
                         </div>
                     </form>
                 </div>

@@ -1890,12 +1890,19 @@ def imprimir_ticket (request, id = None):
 		cantTicket += 1
 	# ctx = {'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket}
 	# return render(request,'imprimir_ticket.html',ctx)
-	return generar_pdf('imprimir_ticket.html',
-						{'pagesize':'A4',
-						'orientation':'landscape',
+	if revendedor:
+		return generar_pdf('imprimir_ticket_rv.html',
+						{
 						'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket
 						}
-	)
+		)
+	else:
+		return generar_pdf('imprimir_ticket.html',
+							{'pagesize':'A4',
+							'orientation':'landscape',
+							'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket
+							}
+		)
 
 @login_required
 def cerrar_ticket(request):
