@@ -1855,6 +1855,7 @@ def imprimir_ticket (request, id = None):
 		revendedor = ''
 	# barcode = get_barcode(value = envio.codigo, width = 600)
 	# codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))
+	empleado = Empleado.objects.get(usuario=request.user)
 	cantTicket = 0
 	detalle = DetalleEnvio.objects.filter(envio=envio)
 	dic = []
@@ -1891,9 +1892,10 @@ def imprimir_ticket (request, id = None):
 	# ctx = {'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket}
 	# return render(request,'imprimir_ticket.html',ctx)
 	if revendedor:
+		print(empleado.nombres_empleado)
 		return generar_pdf('imprimir_ticket_rv.html',
 						{
-						'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket
+						'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket,'empleado':empleado,
 						}
 		)
 	else:

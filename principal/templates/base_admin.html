@@ -511,14 +511,28 @@
                             <p class="ml-1" style="font-size: 16px;">Envios/Entregas<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{% url 'registrar_envio_rv' %}" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
-                                </a>
-                            </li>
-                            <div class="dropdown-divider"></div>
-                        </ul>
+                        
+                        {% if get_empleado.nombres_empleado == 'ESTAFETA USA' or  get_empleado.nombres_empleado == 'ESTAFETA' %}
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{% url 'registrar_envio_rv' %}" class="nav-link">
+                                        <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
+                                    </a>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                            </ul>
+                        {% else %}
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{% url 'registrar_envio' %}" class="nav-link">
+                                        <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
+                                    </a>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                            </ul>
+                        {% endif %}
+                            
+                        
                     </li>
 
                     {% if request.user.pk == 15 %}
