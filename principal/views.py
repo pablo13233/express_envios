@@ -1879,20 +1879,35 @@ def imprimir_ticket (request, id = None):
 		if d.envio.comentario:
 			if d.envio.comentario.strip():
 				partes = d.envio.comentario.split('|')
+				print('lista partes: ', partes)
+				guia_estafeta = None
+				valor_declarado = None
+				comentario = None
+
 				for parte in partes:
 					if 'Guia Estafeta:' in parte:
 						guia_estafeta = parte.split(':')[1].strip()
-						lista['comentario'] = guia_estafeta
-					else:
-						guia_estafeta = ''
-				
+					elif 'Valor declarado' in parte:
+						valor_declarado = parte.split(':')[1].strip()
+					elif parte.strip() != ' ':
+						comentario = parte.strip()
+
+				lista['comentario'] = ''
+
+				if guia_estafeta:
+					lista['comentario'] += f" - Guia Estafeta: {guia_estafeta}"
+
+				if valor_declarado:
+					lista['comentario'] += f" - Valor declarado: {valor_declarado}"
+
+				if comentario:
+					lista['comentario'] += f" - Comentario: {comentario}"
 		#qr
 		dic.append(lista)
 		cantTicket += 1
 	# ctx = {'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket}
 	# return render(request,'imprimir_ticket.html',ctx)
 	if revendedor:
-		print(empleado.nombres_empleado)
 		return generar_pdf('imprimir_ticket_rv.html',
 						{
 						'envio':envio,'codigo':codigo,'revendedor':revendedor,'lista':dic,'cantT':cantTicket,'empleado':empleado,
@@ -4143,7 +4158,8 @@ def registrar_envio_rv(request):
 			else:
 				tipo_envio_query = TipoEnvio.objects.get(pk=1)
 				query_envio['tipo_envio'] = tipo_envio_query
-			comentario = "Valor declarado: " + str(request.POST.get('valor_declarado')) +" | Guia Estafeta: "+ request.POST.get('guia_referencia').upper()+" | "+ request.POST.get('comentario').upper()
+				
+			comentario = "Valor declarado: " + str(request.POST.get('valor_declarado')) + " | "+ request.POST.get('comentario').upper()
 
 			query_envio.update({'total':total,'usuario_registro':request.user,
 								'usuario_aprobo':request.user,
