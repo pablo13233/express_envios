@@ -29,6 +29,7 @@
 
         img {
             max-width: inherit;
+            border: 3px solid black;
         }
         
         @page {
@@ -48,9 +49,8 @@
 <body>
     <div class="container" onload="printPage()">
         <div class="row">
-            <div class="col-1"></div>
             <div class="col-10">
-                <div class="container ticket">
+                <div class="ticket">
                     
                     {% if empleado.nombres_empleado == 'ESTAFETA USA' or  empleado.nombres_empleado == 'ESTAFETA' %}
                         <!-- Estafeta -->
@@ -58,16 +58,15 @@
                             {% if lista %}
 
                                 {% for l in lista %}
-                                <div class="row page1"></div>
-                                <div class="container tpage">
+                                <div class="tpage">
                                     <table>
                                         <tbody style="text-align:center;">
                                             <tr>
                                                 <td><img width="481px" height="87px"src="{{revendedor.logo.path}}" style="margin-top:10px;"></td>
-                                                <td><img src="data:image/png;base64,{{l.qr_code}}" height="150" width="150"></td>
+                                                <td ><img src="data:image/png;base64,{{l.qr_code}}" height="150" width="150"></td>
                                             </tr>
                                             <tr>
-                                                <td >
+                                                <td>
                                                     <table>
                                                         <tr>
                                                             <td style="font-size: 20px;">
@@ -77,12 +76,12 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="font-size:50px;font-weight: bold;text-align:center;color:#ff4444">
+                                                            <td style="font-size:40px;font-weight: bold;text-align:center;color:#ff4444">
                                                                 Guia: {{l.guia_padre}}
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td style="font-size:20px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                            <td style="font-size:16px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
                                                                 {{l.comentario}}
                                                             </td>
                                                         </tr>
@@ -96,7 +95,6 @@
                                                 </td>
                                                 <td>
                                                     <table class="tablas" width="100%" cellspacing="3" cellpadding="3">
-                                                        <tbody>
                                                             <tr>
                                                                 <td
                                                                     style="font-size:16px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
@@ -104,12 +102,12 @@
                                                             </tr>
                                                             <tr>
                                                                 <td
-                                                                    style="font-size:22px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                    style="font-size:20px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
                                                                     {{l.destinatario}}</td>
                                                             </tr>
                                                             <tr>
                                                                 <td
-                                                                    style="font-size:22px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                    style="font-size:20px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
                                                                     Producto: {{l.producto}}</td>
                                                             </tr>
                                                             <tr>
@@ -119,10 +117,9 @@
                                                             </tr>
                                                             <tr>
                                                                 <td
-                                                                    style="font-size:22px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                    style="font-size:20px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
                                                                     {{l.telefono}}</td>
                                                             </tr>
-                                                        </tbody>
                                                     </table>
                                                 </td>
                                             </tr>

@@ -1879,7 +1879,6 @@ def imprimir_ticket (request, id = None):
 		if d.envio.comentario:
 			if d.envio.comentario.strip():
 				partes = d.envio.comentario.split('|')
-				print('lista partes: ', partes)
 				guia_estafeta = None
 				valor_declarado = None
 				comentario = None
@@ -4108,7 +4107,6 @@ def registrar_envio_rv(request):
 		ret_data.update({'valor_seguro':valor_seguro})
 		query_envio.update({'valor_seguro':valor_seguro})
 		guia_revend = empleado.nombres_empleado +' '+ empleado.apellidos_empleado
-
 		if request.POST.get('valor_seguro') != '':
 			valor_seguro = request.POST.get('valor_seguro')
 			ret_data.update({'valor_seguro':valor_seguro})
@@ -4143,6 +4141,7 @@ def registrar_envio_rv(request):
 					errores['guia_revendedor'] = u'Falta ingresar la guia de revendedor'
 
 			query_envio.update({'guia_revendedor':guia_revend.upper()})
+
 			if request.POST.get('tipo_contenido', '') and request.POST.get('tipo_contenido', '') != '0':
 				ret_data['id_tipo_contenido'] = int(request.POST.get('tipo_contenido',''))
 				tipo_contenido_query = tipo_contenido.get(pk=request.POST.get('tipo_contenido',''))
