@@ -31,14 +31,22 @@
             max-width: inherit;
             border: 3px solid black;
         }
-        
-        @page {
-            size: 220mm 140mm; /* ancho de media página A4, altura de página completa A4 */
-            margin: 5mm; /* margen de 5mm en todos los lados */
-        }
-        
-        
     </style>
+    {% if empleado.nombres_empleado == 'ESTAFETA USA' or  empleado.nombres_empleado == 'ESTAFETA' %}
+        <style type="text/css">
+            @page {
+                size: 220mm 140mm; /* ancho de media página A4, altura de página completa A4 */
+                margin: 5mm; /* margen de 5mm en todos los lados */
+            }
+        </style>
+    {% else %}
+        <style type="text/css">
+            @page {
+                size: A4 landscape; /* ancho de media página A4, altura de página completa A4 */
+                margin: 5mm; /* margen de 5mm en todos los lados */
+            }
+        </style>
+    {% endif %}
     <script>
         function printPage() {
             window.print();
@@ -135,74 +143,75 @@
                         {% if envio.revendedor %}
                             {% if lista %}
                                 {% for l in lista %}
-                                <div class="row page1"></div>
                                 <div class="container tpage">
                                     <center>
-                                        <table>
+                                        <br>
+                                        <table style="width: auto; height: auto; border-collapse: collapse;">
                                             <tbody>
                                                 <tr>
-                                                    <td style="font-size: 50px;">
+                                                    <td style="font-size: 65px;">
                                                         {{revendedor.nombre_completo}}
                                                     </td>
                                                     <td>
-                                                        <img style="text-align: right;" src="data:image/png;base64,{{l.qr_code}}" height="160" width="160">
+                                                        <img style="text-align: right;" src="data:image/png;base64,{{l.qr_code}}" height="190" width="190">
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                
+                                                <tr style="padding-top: 20px;">
                                                     <td>
                                                         <table>
                                                             <tr>
-                                                                <td style="font-size: 20px;">
+                                                                <td style="font-size: 28px;">
                                                                     DIRECCIÓN: {{revendedor.direccion}}<br>TELÉFONO:
                                                                     {{revendedor.telefono}} {% if revendedor.celular_empresa %} |
                                                                     {{revendedor.celular_empresa}} {% endif %}
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="font-size:42px;font-weight: bold;text-align:center;color:#ff4444">
+                                                                <td style="font-size:55px;font-weight: bold;text-align:center;color:#ff4444">
                                                                     Guia: {{l.guia_padre}}
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="font-size:20px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                <td style="font-size:24px;font-weight: bold; padding-top:10px; padding-bottom: 1px;">
                                                                     {{l.comentario}}
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <td style="font-size:30px;font-weight: bold;">
+                                                                <td style="font-size:32px;font-weight: bold;">
                                                                     <br>
                                                                     {{forloop.counter}} / {{cantT}}
                                                                 </td>
                                                             </tr>
                                                         </table>
                                                     </td>
-                                                    <td>
+                                                    <td style="padding-top: 20px;">
                                                         <table class="tablas" width="100%" cellspacing="3" cellpadding="3">
                                                             <tbody>
                                                                 <tr>
                                                                     <td
-                                                                        style="font-size:16px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                        style="font-size:20px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
                                                                         DATOS CONSIGNATARIO:</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td
-                                                                        style="font-size:20px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                        style="font-size:30px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
                                                                         {{l.destinatario}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td
-                                                                        style="font-size:22px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                        style="font-size:28px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
                                                                         Producto: {{l.producto}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td
-                                                                        style="font-size:18px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                        style="font-size:26px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
                                                                         {{l.pais}} | {{l.departamento}} | {{l.direccion}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td
-                                                                        style="font-size:20px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
-                                                                        {{l.telefono}}</td>
+                                                                        style="font-size:24px;font-weight: bold; padding-top:3px; padding-bottom: 1px;">
+                                                                        Tel. {{l.telefono}}</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -210,6 +219,7 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                        <div style="page-break-before: always;"></div>
                                 </div>
                                 {% endfor %}
                             {% endif %}
