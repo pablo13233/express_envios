@@ -29,9 +29,9 @@
                                   <th>Datos</th>
                                 </tr>
                               </thead>
-                             
+                            
                               <tbody>
-                                   {% for envio in envios  %}
+                                  {% for envio in envios  %}
                                     <tr>
                                       <td>{{envio.codigo}}</td>
                                       <td>{{envio.quien_envia}}</td>
@@ -40,7 +40,7 @@
                                       <td>{{envio.estado.estado.estado}}</td>
                                       <td><div class="col s12"><a class="btn btn-success" target="blank" href="{% url 'envio_pdf' envio.pk %}">Ver</a></div></td>
                                     </tr>
-                                   {% endfor %}
+                                  {% endfor %}
                               </tbody>
                         </table>
                     </div>

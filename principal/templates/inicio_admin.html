@@ -19,51 +19,52 @@
                                 <div class="col-lg-3 col-6">
                                     <!-- small box -->
                                     {% if d.pk == 1 %}
+                                    
                                     <div class="small-box bg-info">
                                         <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
-                                        <div class="icon"><i class="fas fa-boxes"></i></div>
+                                        <div class="icon" style="color: rgba(0, 0, 0, 0.15); z-index: 0;"><i style="font-size: 90px; position: absolute; right: 15px; top: 15px; transition: all 0.3s linear;" class="fa-solid fa-boxes-stacked"></i></div>
                                         <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
                                     </div>
                                     {% elif d.pk == 2 %}
                                     <div class="small-box bg-success">
                                         <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
-                                        <div class="icon"><i class="fas fa-pallet"></i></div>
+                                        <div class="icon" style="color: rgba(0, 0, 0, 0.15); z-index: 0;"><i style="font-size: 90px; position: absolute; right: 15px; top: 15px; transition: all 0.3s linear;" class="fa-solid fa-pallet"></i></div>
                                         <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
                                     </div>
                                     {% elif d.pk == 3 %}
                                     <div class="small-box bg-warning">
                                         <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
-                                        <div class="icon"><i class="fas fa-ship"></i></div>
+                                        <div class="icon" style="color: rgba(0, 0, 0, 0.15); z-index: 0;"><i style="font-size: 90px; position: absolute; right: 15px; top: 15px; transition: all 0.3s linear;" class="fa-solid fa-ship"></i></div>
                                         <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
                                     </div>
                                     {% elif d.pk == 4 %}
                                     <div class="small-box bg-danger">
                                         <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
-                                        <div class="icon"><i class="fas fa-pallet"></i></div>
+                                        <div class="icon" style="color: rgba(0, 0, 0, 0.15); z-index: 0;"><i style="font-size: 90px; position: absolute; right: 15px; top: 15px; transition: all 0.3s linear;" class="fa-solid fa-pallet"></i></div>
                                         <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
                                     </div>
                                     {% elif d.pk == 5 %}
                                     <div class="small-box bg-info">
                                         <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
-                                        <div class="icon"><i class="fas fa-boxes"></i></div>
+                                        <div class="icon" style="color: rgba(0, 0, 0, 0.15); z-index: 0;"><i style="font-size: 90px; position: absolute; right: 15px; top: 15px; transition: all 0.3s linear;" class="fa-solid fa-boxes-stacked"></i></div>
                                         <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
                                     </div>
                                     {% elif d.pk == 6 %}
                                     <div class="small-box bg-success">
                                         <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
-                                        <div class="icon"><i class="fas fa-shipping-fast"></i></div>
+                                        <div class="icon" style="color: rgba(0, 0, 0, 0.15); z-index: 0;"><i style="font-size: 90px; position: absolute; right: 15px; top: 15px; transition: all 0.3s linear;" class="fa-solid fa-truck-fast"></i></div>
                                         <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
                                     </div>
                                     {% elif d.pk == 7 %}
                                     <div class="small-box bg-warning">
                                         <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
-                                        <div class="icon"><i class="fas fa-user-check"></i></div>
+                                        <div class="icon" style="color: rgba(0, 0, 0, 0.15); z-index: 0;"><i style="font-size: 90px; position: absolute; right: 15px; top: 15px; transition: all 0.3s linear;" class="fa-solid fa-user-check"></i></div>
                                         <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
                                     </div>
                                     {% elif d.pk == 8 %}
                                     <div class="small-box bg-danger">
                                         <div class="inner"><h3>{{d.cantidad}}</h3><p> CAJAS {{d.estado}}</p></div>
-                                        <div class="icon"><i class="fas fa-user-check"></i></div>
+                                        <div class="icon" style="color: rgba(0, 0, 0, 0.15); z-index: 0;"><i style="font-size: 90px; position: absolute; right: 15px; top: 15px; transition: all 0.3s linear;" class="fa-solid fa-user-check"></i></div>
                                         <a href="{% url 'ver_paquetes' d.pk %}" class="small-box-footer">Ver <i class="fas fa-arrow-circle-right"></i></a>
                                     </div>
                                     {% endif %}

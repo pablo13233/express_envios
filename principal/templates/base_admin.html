@@ -498,6 +498,15 @@
                             <span class="badge badge-info right"></span></p>
                         </a>
                         <ul class="nav nav-treeview">
+                            {% if get_empleado.nombres_empleado == 'ESTAFETA_CENTRAL' %}
+                            <div class="dropdown-divider"></div>
+                            <li class="nav-item">
+                                <a href="{% url 'buscar_envio' %}" class="nav-link">
+                                    <i class="fas fa-file-alt nav-icon"></i><p>Buscar Envios</p>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <div class="dropdown-divider"></div>
                             <li class="nav-item">
                                 <a href="{% url 'tickets_envio' %}" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i><p>Imprimir tickets</p>

@@ -22,6 +22,7 @@ import os
 from django.conf import settings
 
 #---------NUEVO-------#
+from django.db.models import Q
 from django.core.files.images import get_image_dimensions
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
@@ -121,7 +122,8 @@ def buscar_envio(request):
 		es_revendedor = False
 		if r.count() >= 1:
 			es_revendedor = True
-			envios = Envio.objects.filter(revendedor=True, usuario_registro=request.user)
+			usuarios_estafeta = User.objects.filter(empleado_usuario__nombres_empleado__in=["ESTAFETA USA", "ESTAFETA","ESTAFETA_CENTRAL"]).values_list("id", flat=True)
+			envios = Envio.objects.filter(revendedor=True, usuario_registro__in=usuarios_estafeta)
 	else:
 		revendedor = ''
 

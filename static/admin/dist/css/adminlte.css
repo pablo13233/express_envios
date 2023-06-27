@@ -18645,7 +18645,7 @@ html.maximized-card {
   transition: all 0.3s linear;
 }
 
-.small-box .icon > i.fa, .small-box .icon > i.fas, .small-box .icon > i.far, .small-box .icon > i.fab, .small-box .icon > i.glyphicon, .small-box .icon > i.ion {
+.small-box .icon > i.fa-solid, .small-box .icon > i.fas, .small-box .icon > i.far, .small-box .icon > i.fab, .small-box .icon > i.glyphicon, .small-box .icon > i.ion {
   font-size: 70px;
   top: 20px;
 }
@@ -18658,7 +18658,7 @@ html.maximized-card {
   font-size: 95px;
 }
 
-.small-box:hover .icon > i.fa, .small-box:hover .icon > i.fas, .small-box:hover .icon > i.far, .small-box:hover .icon > i.fab, .small-box:hover .icon > i.glyphicon, .small-box:hover .icon > i.ion {
+.small-box:hover .icon > i.fa-solid, .small-box:hover .icon > i.fas, .small-box:hover .icon > i.far, .small-box:hover .icon > i.fab, .small-box:hover .icon > i.glyphicon, .small-box:hover .icon > i.ion {
   font-size: 75px;
 }
 
