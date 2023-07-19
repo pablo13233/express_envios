@@ -267,7 +267,7 @@
                                             <tr >
                                                 {% if a.actividad %}<td>Entregar</td>{% else %}<td>Recoger</td>{% endif %}
                                                 <td>{{a.empleado.nombres_empleado}} {{a.empleado.apellidos_empleado}}</td>
-                                                <td>{{a.cliente.nombre_completo}</td>
+                                                <td>{{a.cliente.nombre_completo}}</td>
                                                 <td>{{a.descripcion_pedido}}</td>
                                                 <td>{{a.fecha}} | {{a.hora}}</td>
                                                 <td style="color:white" id="fila_{{a.pk}}"><center><a data-toggle="tooltip" title="Ir" type='button' class="btn button btn-primary " href="http://maps.apple.com/maps?q={{a.cliente.direccion}}" target="_blank">Ir</a></center></td>

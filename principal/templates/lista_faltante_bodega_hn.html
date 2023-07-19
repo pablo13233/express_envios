@@ -1,0 +1,70 @@
+{% extends "base_admin.html" %} {% load humanize %} {% load l10n %} 
+{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %} {% block contenido %}
+
+<section class="content">
+    <div class="container-fluid">
+        <br />
+        <br />
+        <div class="card col-12">
+            <div class="card-header">
+                <div class="row">
+                    <h1>Detalle de cajas faltantes en <span>Bodega Honduras</span></h1>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Guía Padre</th>
+                            <th>Guía Hija</th>
+                            <th>Envía</th>
+                            <th>Recibe</th>
+                            <th>Tamaño</th>
+                            <th>Dirección</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lista in lista_faltante %}
+                        <tr>
+                            <td>{{lista.guia_padre}}</td>
+                            <td>{{lista.guia_hija}}</td>
+                            <td>{{lista.envia}}</td>
+                            <td>{{lista.recibe}}</td>
+                            <td>{{lista.tamano}}</td>
+                            <td>{{lista.direccion}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock contenido %} {% block js %}
+<script type="text/javascript">
+    var table = $("#example1").DataTable({
+        oLanguage: {
+            sProcessing: "Procesando...",
+            sLengthMenu: "Mostrar _MENU_ registros",
+            sZeroRecords: "No se encontraron resultados",
+            sEmptyTable: "Ningún dato disponible en esta tabla",
+            sInfo: "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
+            sInfoEmpty: "Mostrando 0 - 0 de un total de 0 registros",
+            sInfoFiltered: "<br>(filtrado de un total de _MAX_ registros)",
+            sInfoPostFix: "",
+            sSearch: "Buscar:",
+            sUrl: "",
+            sInfoThousands: ",",
+            sLoadingRecords: "Cargando...",
+            oPaginate: {
+                sFirst: "Primero",
+                sLast: "Último",
+                sNext: "Sig.",
+                sPrevious: "Ant.",
+            },
+        },
+        responsive: true,
+    });
+</script>
+{% endblock js %}

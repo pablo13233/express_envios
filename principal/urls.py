@@ -104,6 +104,7 @@ urlpatterns = [
     url(r'^reporte/estado-cajas-contenedor/(?P<id>\d+)/$', estado_cajas_contenedor_pdf, name='estado_cajas_contenedor'),
     url(r'^reporte/reversion-estado-honduras/$', reversion_estado_honduras, name='reversion_estado_honduras'),
     url(r'^reversion/guia-hn/$', trasladar_guia_hn, name='trasladar_guia_hn'),
+    url(r'^faltantes/bodega-hn/$', lista_guias_faltante_bodega_hn, name='lista_faltante_bodega_hn'),
 ]
 # url(r'^$', inicio, name='inicio'),
 # url(r'^servicios/$', servicios, name='servicios'),

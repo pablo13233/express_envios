@@ -4457,3 +4457,30 @@ def trasladar_guia_hn(request):
 		
 	elif request.method == 'GET':
 		return HttpResponseRedirect(reverse('reversion_estado_honduras'))
+	
+@login_required
+def lista_guias_faltante_bodega_hn(request):
+	try:
+		with transaction.atomic():
+			envios = Envio.objects.filter(estado_envio_id = 5)
+
+			lista_faltante = []
+			#por cada envio buscar las cajas
+			for env in envios:
+				faltantes = DetalleEnvio.objects.filter(envio=env,estado_hija_id = 4)
+				for faltante in faltantes:
+					dic={}
+					dic['guia_padre'] = env.codigo
+					dic['guia_hija'] = faltante.codigo
+					dic['envia'] = env.quien_envia.nombre_completo
+					dic['recibe'] = env.quien_recibe.nombre_completo
+					dic['tamano'] = faltante.tipo_caja.tipo_caja.descripcion
+					dic['direccion'] = env.direccion_registrar
+					lista_faltante.append(dic)
+			data = {'lista_faltante':lista_faltante}
+	except Exception as e:
+		print("Error al mostrar faltantes----> ", e)
+		transaction.rollback()
+	else:
+		transaction.commit()
+		return render(request, 'lista_faltante_bodega_hn.html',data)
