@@ -1165,7 +1165,7 @@ def validar_clientes(request):
 def clientes(request):
 	empleado = Empleado.objects.get(usuario=request.user)
 	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
-	clientes = Cliente.objects.filter(empresa=empresa.empresa)
+	clientes = Cliente.objects.filter(empresa=empresa.empresa).order_by('-pk')
 	duplicado = ''
 	if request.method == 'POST':
 		ret_data,errores,query_clientes,recibo,ingreso_correcto = {},{},{},{},{}
@@ -4484,3 +4484,45 @@ def lista_guias_faltante_bodega_hn(request):
 	else:
 		transaction.commit()
 		return render(request, 'lista_faltante_bodega_hn.html',data)
+	
+@login_required
+def editar_dato_cliente(request):
+	if request.method == 'POST':
+		try:
+			with transaction.atomic():
+				if request.POST['id_cliente'] == '':
+					return JsonResponse({'option': 'error','detalle_error':'Recarga la pagina o contacta con alguien de soporte'})
+				else:
+					if request.POST['nombre_cliente'] == '' or request.POST['telefono_cliente'] == '' or request.POST['direcion_cliente'] == '':
+						return JsonResponse({'option': 'error','detalle_error':'Revisa que los datos esten completos'})
+					else:
+						#print request.POST['recibe_pk_modal_Edit'],'recibe_pk_modal_Edit'
+						cliente = Cliente.objects.filter(pk=request.POST['id_cliente']).update(
+																nombre_completo = request.POST['nombre_cliente'],
+																celular = request.POST['telefono_cliente'],
+																direccion=request.POST['direcion_cliente'],
+																usuario_registro=request.user
+																)
+						recibe_ = Cliente.objects.get(pk=request.POST['id_cliente'])
+						option = '''
+							<option value="{}" selected>{}</option>
+						'''.format(recibe_.pk, recibe_.nombre_completo+'|'+recibe_.celular)
+						# return JsonResponse({'option': option})
+		except Exception as e:
+			print('Error al editar cliente ----> ',e)
+			transaction.rollback()
+		else:
+			return JsonResponse({'option': option})
+	else:
+		return render(request, '404.html')
+
+@login_required
+def obtener_clientes_ajax(request):
+	empleado = Empleado.objects.get(usuario=request.user)
+	empresa = EmpresaEmpleado.objects.get(empleado = empleado)
+	clientes = Cliente.objects.filter(empresa=empresa.empresa).order_by('-pk')
+	
+	data = {
+        'clientes': list(clientes.values()),
+    }
+	return JsonResponse(data)

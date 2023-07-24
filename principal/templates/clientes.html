@@ -1,10 +1,10 @@
 {% extends "base_admin.html" %}
 {% load static %} {% load tz %} {% load humanize %} {% load l10n %}
-<!-- Select2 -->
-<link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
-<link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
-<!-- Tempusdominus Bbootstrap 4 -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+<link rel="stylesheet" href="{% static  'admin/datatables/js/fixedColumns.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static  'admin/datatables/js/fixedHeader.bootstrap4.min.css' %}">
+
 {% block contenido %}
 <!-- Main content -->
 <section class="content">
@@ -19,32 +19,42 @@
                 <div class="card-body">
                     <ul class="nav nav-tabs" id="custom-content-below-tab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="custom-content-below-home-tab" data-toggle="pill" href="#custom-content-below-home" role="tab" aria-controls="custom-content-below-home" aria-selected="true"><strong>Ver Ingresados</strong></a>
+                            <a class="nav-link active" id="custom-content-below-home-tab" data-toggle="pill"
+                                href="#custom-content-below-home" role="tab" aria-controls="custom-content-below-home"
+                                aria-selected="true"><strong>Ver Ingresados</strong></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="custom-content-below-profile-tab" data-toggle="pill" href="#custom-content-below-profile" role="tab" aria-controls="custom-content-below-profile" aria-selected="false"><strong>Agregar Nuevo</strong></a>
+                            <a class="nav-link" id="custom-content-below-profile-tab" data-toggle="pill"
+                                href="#custom-content-below-profile" role="tab"
+                                aria-controls="custom-content-below-profile" aria-selected="false"><strong>Agregar
+                                    Nuevo</strong></a>
                         </li>
                     </ul>
                     <div class="tab-content" id="custom-content-below-tabContent">
-                        <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+                        <div class="tab-pane fade show active" id="custom-content-below-home" role="tabpanel"
+                            aria-labelledby="custom-content-below-home-tab">
                             <br>
                             <table id="example1" class="table table-bordered table-striped">
                                 <thead>
-                                    <tr>
+                                    <tr class="text-center">
+                                        <th style="width: 50px">#</th>
                                         <th>Nombre completo</th>
-                                        <th>Telefono</th>
+                                        <th>Teléfono</th>
                                         <th>Correo</th>
                                         <th>Dirección</th>
+                                        <th style="width: 150px">Acción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {% for c in clientes  %}
-                                        <tr >
-                                            <td>{{c.nombre_completo}}</td>
-                                            <td>{{c.celular}}</td>
-                                            <td>{{c.correo}}</td>
-                                            <td><a href="http://maps.apple.com/maps?q={{c.direccion}}" target="_blank">{{c.direccion}}</a></td>
-                                        </tr>
+                                <tbody id="tabla_tbody_clientes">
+                                    {% for c in clientes %}
+                                    <tr>
+                                        <td>{{c.pk}}</td>
+                                        <td>{{c.nombre_completo}}</td>
+                                        <td>{{c.celular}}</td>
+                                        <td>{{c.correo}}</td>
+                                        <td><a href="http://maps.apple.com/maps?q={{c.direccion}}" target="_blank">{{c.direccion}}</a></td>
+                                        <td class="text-wrap text-center"><a class="btn btn-warning h5 m-0 btn-editar" id="btn_edit_recibe" rel="editar"><i class="fa-solid fa-user-pen"></i>Editar</a></td>
+                                    </tr>
                                     {% endfor %}
                                 </tbody>
                                 <tfoot>
@@ -56,18 +66,22 @@
                                     </tr>
                                 </tfoot>
                             </table>
-                            
+
                         </div>
-                        <div class="tab-pane fade" id="custom-content-below-profile" role="tabpanel" aria-labelledby="custom-content-below-profile-tab">
-                            <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="{% url 'clientes' %}">
+                        <div class="tab-pane fade" id="custom-content-below-profile" role="tabpanel"
+                            aria-labelledby="custom-content-below-profile-tab">
+                            <form class="form-horizontal" enctype='multipart/form-data' method="POST"
+                                action="{% url 'clientes' %}">
                                 {% csrf_token %}
                                 <div class="form-group row">
                                     <div class="col-md-3">
                                         <div class="col-md-12">
-                                            <label for="id_nombre_completo" class="col-form-label">Nombre Completo:</label>
+                                            <label for="id_nombre_completo" class="col-form-label">Nombre
+                                                Completo:</label>
                                         </div>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control" name="nombre_completo" id="id_nombre_completo" placeholder="Nombre del empleado">
+                                            <input type="text" class="form-control" name="nombre_completo"
+                                                id="id_nombre_completo" placeholder="Nombre del empleado">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -75,7 +89,8 @@
                                             <label for="id_celular" class="col-form-label">Telefono:</label>
                                         </div>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control" name="celular" id="id_celular" data-inputmask='"mask": "(999) 999-9999"' data-mask>
+                                            <input type="text" class="form-control" name="celular" id="id_celular"
+                                                data-inputmask='"mask": "(999) 999-9999"' data-mask>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -83,7 +98,8 @@
                                             <label for="id_correo" class="col-form-label">Correo:</label>
                                         </div>
                                         <div class="col-sm-12">
-                                            <input type="email" class="form-control" name="correo" id="id_correo" placeholder="Correo">
+                                            <input type="email" class="form-control" name="correo" id="id_correo"
+                                                placeholder="Correo">
                                         </div>
                                     </div>
                                     <div class="col-md-7">
@@ -91,55 +107,87 @@
                                             <label for="id_direccion" class="col-form-label">Direccion:</label>
                                         </div>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control" name="direccion" id="id_direccion" placeholder="Direccion">
+                                            <input type="text" class="form-control" name="direccion" id="id_direccion"
+                                                placeholder="Direccion">
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                                 <button type="submit" class="btn float-right btn-info">Agregar</button>
                             </form>
-                            
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
+    </div>
+    <!-- modal para editar -->
+    <div class="modal fade" id="edit_cliente" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 style="color:#000000" class="modal-title" id="myModalLabel">Editar Cliente</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> <span
+                            class="fas fa-times" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <form action="{% url 'editar_dato_cliente' %}" method="post" id="addFormCliente">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <input type="hidden" id="id_cliente_modal" value="0" name="id_cliente">
+                        <div class="row">
+                            <label>Nombre Completo: <a class="a_obligatorio fas fa-asterisk"
+                                    style="color:red"></a></label>
+                            <input type="text" name="nombre_cliente" id="nombre_cliente_modal" required class="form-control"
+                                maxlength="100" autofocus />
+                        </div>
+
+                        <div class="row">
+                            <label>Telefono: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
+                            <input type="text" name="telefono_cliente" id="telefono_recibe_modal" required
+                                class="form-control" maxlength="100" autofocus />
+                        </div>
+
+                        <div class="row">
+                            <label>Dirección: <a class="a_obligatorio fas fa-asterisk" style="color:red"></a></label>
+                            <input type="text" name="direcion_cliente" id="direcion_cliente_modal" required
+                                class="form-control" maxlength="100" autofocus />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-labeled btn-danger" data-dismiss="modal"><span
+                                class="btn-label"><i class="fas fa-times"></i></span>Cancelar</button>
+                        <button type="submit" class="btn btn-labeled bg-olive"><span class="btn-label"><i
+                                    class="fas fa-check"></i></span>Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock contenido %}
 
 {% block js%}
-<!-- jQuery -->
 <script src="{% static  'admin/plugins/jquery/jquery.min.js' %}"></script>
-<!-- Bootstrap 4 -->
 <script src="{% static  'admin/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<!-- Select2 -->
 <script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
-<!-- AdminLTE App -->
 <script src="{% static  'admin/dist/js/adminlte.min.js' %}"></script>
-<!-- AdminLTE for demo purposes -->
 <script src="{% static  'admin/dist/js/demo.js' %}"></script>
-<!-- Select2 -->
-<script src="{% static  'admin/plugins/select2/js/select2.full.min.js' %}"></script>
-<script>
-    $(function () {
-      //Initialize Select2 Elements
-      $('.select2').select2()
-  
-      //Initialize Select2 Elements
-      $('.select2bs4').select2({
-        theme: 'bootstrap4'
-      })
-  
-    });
-</script>
+<script src="{% static 'admin/js/notify.js' %}"></script>
+<script src="{% static 'admin/js/pnotify.js' %}"></script>
+<script src="{% static 'admin/js/pnotify.buttons.js' %}"></script>
+
 <!-- DATATABLES-->
 <script type="text/javascript" src="{% static 'admin/datatables/js/jquery.dataTables.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.buttons.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.responsive.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.fixedColumns.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/fixedColumns.bootstrap4.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/dataTables.fixedHeader.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/datatables/js/fixedHeader.bootstrap4.min.js' %}"></script>
 <script src="{% static  'admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js' %}"></script>
 <script type="text/javascript">
     $(function () {
@@ -149,22 +197,95 @@
     });
 </script>
 <script>
-  $(function () {
-    $("#example1").DataTable({
+$(function () {
+    
+    $('#example2').DataTable({
+        "paging": true,
+        "lengthChange": false,
+        "searching": false,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
         responsive: true
     });
-    $('#example2').DataTable({
-      "paging": true,
-      "lengthChange": false,
-      "searching": false,
-      "ordering": true,
-      "info": true,
-      "autoWidth": false,
-      responsive: true
+});
+$(document).ready(function () {
+    $("#example1").DataTable({
+        responsive: true,
+        "aLengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+        "iDisplayLength": 10
     });
-  });
+});
+    
+
+    $('#example1 tbody').on('click', 'a[rel="editar"]', function(){
+        const clienteId = $(this).closest('tr').find('td:eq(0)').text().trim();
+        const nombreCliente = $(this).closest('tr').find('td:eq(1)').text().trim();
+        const telefonoCliente = $(this).closest('tr').find('td:eq(2)').text().trim();
+        const direccionCliente = $(this).closest('tr').find('td:eq(4)').text().trim();
+
+        $('#id_cliente_modal').val(clienteId);
+        $('#nombre_cliente_modal').val(nombreCliente);
+        $('#telefono_recibe_modal').val(telefonoCliente);
+        $('#direcion_cliente_modal').val(direccionCliente);
+        
+        $('#edit_cliente').modal('show');
+    });
+
+
+    $('#addFormCliente').on('submit', function (e) {
+        e.preventDefault();
+        var url = $(this).attr('action');
+        $.post(url, $(this).serialize(), function (data) {
+            if (data.option == 'error') {
+                $.notify(data.detalle_error, {
+                    className: 'error',
+                    globalPosition: "right bottom",
+                    clickToHide: true,
+                    autoHide: true,
+                    autoHideDelay: 5000,
+                    arrowShow: true,
+                    arrowSize: 5,
+                    style: 'bootstrap',
+                    showAnimation: 'slideDown',
+                    showDuration: 400,
+                    hideAnimation: 'slideUp',
+                    hideDuration: 200,
+                    gap: 2
+                });
+            } else {
+                $('#id_cliente').append(data.option)
+                $('#edit_cliente').modal('hide');
+                $.notify("Información actualizada correctamente!", {
+                    className: 'success',
+                    globalPosition: "right bottom",
+                    clickToHide: true,
+                    autoHide: true,
+                    autoHideDelay: 5000,
+                    arrowShow: true,
+                    arrowSize: 5,
+                    style: 'bootstrap',
+                    showAnimation: 'slideDown',
+                    showDuration: 400,
+                    hideAnimation: 'slideUp',
+                    hideDuration: 200,
+                    gap: 2
+                });
+                /*$('#id_quien_recibe').trigger('change');*/
+                $("#id_cliente").val("");
+                $("#nombre_cliente").val("");
+                $("#id_telefono_recibe_modal").val("");
+                $("#direcion_cliente").val("");
+                
+                location.reload(true);
+            }
+        }, 'json');
+    });
+
+    
 </script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
 
 {% endblock js %}
