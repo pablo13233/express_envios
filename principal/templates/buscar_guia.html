@@ -1,11 +1,12 @@
 {% extends "base_admin.html" %}
- {% load static %}
+{% load static %}
 {% load l10n %}
 <!-- Select2 -->
 <link rel="stylesheet" href="{% static  'admin/plugins/select2/css/select2.min.css' %}">
 <link rel="stylesheet" href="{% static  'admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}">
 <!-- Tempusdominus Bbootstrap 4 -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />   
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
 {% block contenido %}
 <!-- Main content -->
 <section class="content">
@@ -14,31 +15,33 @@
         <div class="col-md-12">
             <div class="card card-primary card-outline">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-edit"></i>Gestiòn de guías</h3>
+                    <h3 class="card-title"><i class="fas fa-edit"></i> Entregar Cajas</h3>
                 </div>
 
                 <div class="card-body">
-                    <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="" >
-                      {% csrf_token %}
+                    <form class="form-horizontal" enctype='multipart/form-data' method="POST" action="">
+                        {% csrf_token %}
                         <div>
-                          <label for="">GUIA</label>
-                          <input type="text" name="guia" id="id_guia" >
+                            <label for="">Guia Hija</label>
+                            <input type="text" name="guia" id="id_guia">
                         </div>
-                        
+
                         <div class="col-md-12" style="text-align: center; margin-top: 10px">
-                            <button style="margin-left: 5px" type="button" id="id_buscar" class="btn btn-labeled btn-primary"><span class="btn-label"><i class="fas fa-search"></i></span>Buscar</button>
+                            <button style="margin-left: 5px" type="button" id="id_buscar"
+                                class="btn btn-labeled btn-primary"><span class="btn-label"><i
+                                        class="fas fa-search"></i></span> Buscar</button>
                         </div>
                     </form>
                 </div>
                 <div id="id_resultados">
-                    
+
                 </div>
-                 <div id="id_detalle">
-                    
+                <div id="id_detalle">
+
                 </div>
             </div>
         </div>
-        
+
     </div>
 </section>
 {% endblock contenido %}
@@ -46,130 +49,128 @@
 {% block js%}
 
 <script>
-    $('#id_buscar').click( function(e){
+    $('#id_buscar').click(function (e) {
         document.getElementById('id_resultados').style.display = 'none'; //ocultamos div de resultados
         var guia = $('#id_guia').val();
-    
-        if(guia =='' )
-        {
-           $.notify("Error, Utilice un dato para buscar!",{
-                        className: 'error',
-                        globalPosition:"right bottom",
-                        clickToHide: true,
-                        autoHide: true,
-                        autoHideDelay: 5000,
-                        arrowShow: true,
-                        arrowSize: 5,
-                        style: 'bootstrap',
-                        showAnimation: 'slideDown',
-                        showDuration: 400,
-                        hideAnimation: 'slideUp',
-                        hideDuration: 200,
-                        gap: 2
-                    });
+
+        if (guia == '') {
+            $.notify("Error, Utilice un dato para buscar!", {
+                className: 'error',
+                globalPosition: "right bottom",
+                clickToHide: true,
+                autoHide: true,
+                autoHideDelay: 5000,
+                arrowShow: true,
+                arrowSize: 5,
+                style: 'bootstrap',
+                showAnimation: 'slideDown',
+                showDuration: 400,
+                hideAnimation: 'slideUp',
+                hideDuration: 200,
+                gap: 2
+            });
             return;
-        }else{ 
+        } else {
             // realizar ajax 
-              $.ajax({
-                  type: "get",
-                  url: "{% url 'buscar_guia' %}",
-                  data: {
-                     'guia': guia,
-                     'csrfmiddlewaretoken' : $("input[name=csrfmiddlewaretoken]").val(),
-                  },
-                  contentType: "application/json; charset=utf-8",
-                  dataType: "json", 
-                   success: function(data) {
-                       if (data.tiene_datos == 1)
-                       {
-                                
-                            var tabla = "<table id='seguimiento' class='table table-striped table-bordered nowrap' cellspacing='0' width='100%'><thead><tr><th hidden='hidden'>id</th><th>Código</th><th>Envia</th><th>Recibe</th><th>Estado</th><th>Fecha</th><th>Usuario</th><th>Contenedor</th><th>Camión</th></tr></thead><tbody>"
-                                     
-                                       tabla += "<tr>";
-                                       tabla +="<td hidden='hidden'>"+data.pk+"</td>";
-                                       tabla +="<td>"+data.codigo+"</td>";
-                                       tabla +="<td>"+data.envia+"</td>";
-                                       tabla +="<td>"+data.recibe+"</td>";
-                                       tabla +="<td>"+data.estado+"</td>";
-                                       tabla += "<td>"+data.fechahora+"</td>";
-                                       tabla += "<td>"+data.usuario_registro+"</td>";
-                                       tabla += "<td>"+data.contenedor+"</td>";
-                                       tabla += "<td>"+data.camion+"</td>";
-                                        tabla += "</tr>";
-                                   
-                                tabla +="</tbody></table>";
-                                document.getElementById('id_resultados').style.display = 'block'; //mostramos div de resultados
+            $.ajax({
+                type: "get",
+                url: "{% url 'buscar_guia' %}",
+                data: {
+                    'guia': guia,
+                    'csrfmiddlewaretoken': $("input[name=csrfmiddlewaretoken]").val(),
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.tiene_datos == 1) {
+
+                        var tabla = "<table id='seguimiento' class='table table-striped table-bordered nowrap' cellspacing='0' width='100%'><thead><tr><th hidden='hidden'>id</th><th>Código</th><th>Envia</th><th>Recibe</th><th>Estado</th><th>Fecha</th><th>Usuario</th><th>Contenedor</th><th>Camión</th></tr></thead><tbody>"
+
+                        tabla += "<tr>";
+                        tabla += "<td hidden='hidden'>" + data.pk + "</td>";
+                        tabla += "<td>" + data.codigo + "</td>";
+                        tabla += "<td>" + data.envia + "</td>";
+                        tabla += "<td>" + data.recibe + "</td>";
+                        tabla += "<td>" + data.estado + "</td>";
+                        tabla += "<td>" + data.fechahora + "</td>";
+                        tabla += "<td>" + data.usuario_registro + "</td>";
+                        tabla += "<td>" + data.contenedor + "</td>";
+                        tabla += "<td>" + data.camion + "</td>";
+                        tabla += "</tr>";
+
+                        tabla += "</tbody></table>";
+                        document.getElementById('id_resultados').style.display = 'block'; //mostramos div de resultados
 
 
-                                var tabladetalle = "<table id='example' class='table table-striped table-bordered nowrap' cellspacing='0' width='100%'><thead><tr><th>Caja</th><th>Cantidad</th><th>Precio</th><th>Total</th><th>Enviada</th><th>Esta en transito</th></tr></thead><tbody>"
-                                         $.each(data.lista_detalle, function(key, val) {
-                                           tabladetalle += "<tr>";
-                                           tabladetalle += "<td>"+val.caja+"</td>";
-                                           tabladetalle += "<td>"+val.cantidad+"</td>";
-                                           tabladetalle += "<td>"+val.precio+"</td>";
-                                           tabladetalle += "<td>"+val.total+"</td>";
-                                           tabladetalle += "<td>"+val.enviada+"</td>";
-                                           tabladetalle += "<td>"+val.camion+"</td>";
-                                        });
-                                      tabladetalle +="</tbody></table>";
+                        var tabladetalle = "<table id='example' class='table table-striped table-bordered nowrap' cellspacing='0' width='100%'><thead><tr><th>Caja</th><th>Cantidad</th><th>Precio</th><th>Total</th><th>Enviada</th><th>Esta en transito</th></tr></thead><tbody>"
+                        $.each(data.lista_detalle, function (key, val) {
+                            tabladetalle += "<tr>";
+                            tabladetalle += "<td>" + val.caja + "</td>";
+                            tabladetalle += "<td>" + val.cantidad + "</td>";
+                            tabladetalle += "<td>" + val.precio + "</td>";
+                            tabladetalle += "<td>" + val.total + "</td>";
+                            tabladetalle += "<td>" + val.enviada + "</td>";
+                            tabladetalle += "<td>" + val.camion + "</td>";
+                        });
+                        tabladetalle += "</tbody></table>";
 
-                                $('#id_resultados').html(tabla);
-                                $('#id_detalle').html(tabladetalle);
-                        }else{
-                            $.notify("Error, No hay datos que coincidan con esos criterios!",{
-                                        className: 'error',
-                                        globalPosition:"right bottom",
-                                        clickToHide: true,
-                                        autoHide: true,
-                                        autoHideDelay: 5000,
-                                        arrowShow: true,
-                                        arrowSize: 5,
-                                        style: 'bootstrap',
-                                        showAnimation: 'slideDown',
-                                        showDuration: 400,
-                                        hideAnimation: 'slideUp',
-                                        hideDuration: 200,
-                                        gap: 2
-                                    });
-                            return;
-                        }
-                        
-                    },
-                    error: function(ts) {
-                        alert(ts);
-                        } 
-              });
-                    
+                        $('#id_resultados').html(tabla);
+                        $('#id_detalle').html(tabladetalle);
+                    } else {
+                        $.notify("Error, No hay datos que coincidan con esos criterios!", {
+                            className: 'error',
+                            globalPosition: "right bottom",
+                            clickToHide: true,
+                            autoHide: true,
+                            autoHideDelay: 5000,
+                            arrowShow: true,
+                            arrowSize: 5,
+                            style: 'bootstrap',
+                            showAnimation: 'slideDown',
+                            showDuration: 400,
+                            hideAnimation: 'slideUp',
+                            hideDuration: 200,
+                            gap: 2
+                        });
+                        return;
+                    }
+
+                },
+                error: function (ts) {
+                    alert(ts);
+                }
+            });
+
             return false; //este return es para evitar refrescar la pagina
 
-         }
+        }
     });
 
-     $(document).ready(function () {
-    var table = $('#seguimiento').DataTable({
-        "oLanguage": {
-                                "sProcessing":     "Procesando...",
-                                "sLengthMenu":     "Mostrando _MENU_ registros",
-                                "sZeroRecords":    "No se encontraron resultados",
-                                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                                "sInfo":           "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
-                                "sInfoEmpty":      "Mostrando 0 - 0 de un total de 0 registros",
-                                "sInfoFiltered":   "<br>(filtrado de un total de _MAX_ registros)",
-                                "sInfoPostFix":    "",
-                                "sSearch":         "Buscar:",
-                                "sUrl":            "",
-                                "sInfoThousands":  ",",
-                                "sLoadingRecords": "Cargando...",
-                                "oPaginate": {
-                                    "sFirst":    "Primero",
-                                    "sLast":     "Último",
-                                    "sNext":     "Sig.",
-                                    "sPrevious": "Ant."
-                                },
-                        },
-                    responsive: true
-    });
-    $('.dataTables_length').addClass('bs-select');
+    $(document).ready(function () {
+        var table = $('#seguimiento').DataTable({
+            "oLanguage": {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrando _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando 0 - 0 de un total de 0 registros",
+                "sInfoFiltered": "<br>(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Sig.",
+                    "sPrevious": "Ant."
+                },
+            },
+            responsive: true
+        });
+        $('.dataTables_length').addClass('bs-select');
     });
 
 </script>

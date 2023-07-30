@@ -3828,7 +3828,7 @@ def entregar_caja(request,envio):
 			# Actualiza el seguimiento
 			SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e.pk)).update(estado=estado)
 			#crea el historico
-			HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e.pk),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
+			HistorialEnvio.objects.get_or_create(codigo_envio=Envio.objects.get(pk=e.pk),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
 			envio_cliente.estado_envio = estado_final
 
 			envio_cliente.save()
@@ -3849,6 +3849,7 @@ def buscar_caja_transito(request):
 			with transaction.atomic():
 				#seguimiento = SeguimientoEnvio.objects.get(codigo_envio__codigo= request.GET.get('guia'),estado=6)
 				guia = request.GET.get('guia')
+				
 				guia_envio=''
 				try:
 					if Envio.objects.get(codigo=guia):
@@ -3877,10 +3878,6 @@ def buscar_caja_transito(request):
 						else:
 							dic['enviada'] = 'NO'
 						lista_detalle.append(dic)
-				if seguimiento.codigo_envio.contenedor:
-					contendor = str(seguimiento.codigo_envio.contenedor.codigo_original)+'|'+str(seguimiento.codigo_envio.contenedor.codigo_express)
-				else:
-					contendor ='NO ESTA ASIGNADA A CONTENEDOR'
 				data = {'pk':seguimiento.pk,
 						'codigo':seguimiento.codigo_envio.codigo,
 						'envia':seguimiento.codigo_envio.quien_envia.nombre_completo,
@@ -3888,7 +3885,6 @@ def buscar_caja_transito(request):
 						'estado':seguimiento.estado.estado,
 						'fechahora':str(seguimiento.fechahora),
 						'usuario_registro':seguimiento.usuario_registro.username,
-						'contenedor':contendor,
 						'tiene_datos':tiene_datos,
 						'lista_detalle':lista_detalle,
 						'url' : reverse('entregar_caja', kwargs={'envio':guia_envio})}
@@ -4462,20 +4458,26 @@ def trasladar_guia_hn(request):
 def lista_guias_faltante_bodega_hn(request):
 	try:
 		with transaction.atomic():
-			envios = Envio.objects.filter(estado_envio_id = 5)
-
+			# envios = Envio.objects.filter(estado_envio_id__gte=5, estado_envio_id__lte=6)
+			hijas = DetalleEnvio.objects.filter(estado_hija_id__gte=4, estado_hija_id__lte=6)
 			lista_faltante = []
 			#por cada envio buscar las cajas
-			for env in envios:
-				faltantes = DetalleEnvio.objects.filter(envio=env,estado_hija_id = 4)
-				for faltante in faltantes:
+			# for env in envios:
+			for det in hijas:
+				# faltantes = DetalleEnvio.objects.filter(envio=env,estado_hija_id__lt=env.estado_envio_id)
+				envio_faltante = Envio.objects.filter(pk=det.envio_id, estado_envio_id__gt=det.estado_hija_id)
+				
+				# for faltante in faltantes:
+				for faltante in envio_faltante:
 					dic={}
-					dic['guia_padre'] = env.codigo
-					dic['guia_hija'] = faltante.codigo
-					dic['envia'] = env.quien_envia.nombre_completo
-					dic['recibe'] = env.quien_recibe.nombre_completo
-					dic['tamano'] = faltante.tipo_caja.tipo_caja.descripcion
-					dic['direccion'] = env.direccion_registrar
+					dic['guia_padre'] = faltante.codigo
+					dic['guia_hija'] = det.codigo
+					dic['envia'] = faltante.quien_envia.nombre_completo
+					dic['recibe'] = faltante.quien_recibe.nombre_completo
+					dic['tamano'] = det.tipo_caja.tipo_caja.descripcion
+					dic['direccion'] = faltante.direccion_registrar
+					dic['estado_hija'] = det.estado_hija.estado
+					dic['estado_padre'] = faltante.estado_envio.estado
 					lista_faltante.append(dic)
 			data = {'lista_faltante':lista_faltante}
 	except Exception as e:
