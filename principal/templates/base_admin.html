@@ -590,12 +590,6 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{% url 'inicio_admin' %}" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i><p>Inicio</p>
-                                </a>
-                            </li>
-                            <div class="dropdown-divider"></div>
-                            <li class="nav-item">
                                 <a href="{% url 'clientes' %}" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i><p>Registrar Cliente</p>
                                 </a>
@@ -627,51 +621,6 @@
                                 </a>
                             </li>
                             <div class="dropdown-divider"></div>
-                            <li class="nav-item">
-                                <a href="{% url 'recibo_vehiculo' %}" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Vehiculo</p>
-                                </a>
-                            </li>
-                            <div class="dropdown-divider"></div>
-                            <li class="nav-item">
-                                <a href="{% url 'recibo_contenedor' %}" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i><p>Registrar Contenedor</p>
-                                </a>
-                            </li>
-                            <div class="dropdown-divider"></div>
-                        </ul>
-                    </li>
-                    <li class="nav-item has-treeview">
-                        <a href="#" class="nav-link">
-                            <i class="fa-solid fa-file-chart-column" style="font-size: 22px;"></i>
-                            <p class="ml-3" style="font-size: 16px;">Reportes<i class="fas fa-angle-left right"></i>
-                            <span class="badge badge-info right"></span></p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{% url 'cierre' %}" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre diario</p>
-                                </a>
-                            </li>
-                            <div class="dropdown-divider"></div>
-                            <li class="nav-item">
-                                <a href="{% url 'cierre_mensual' %}" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre mensual</p>
-                                </a>
-                            </li>
-                            <div class="dropdown-divider"></div>
-                            <!--
-                            <li class="nav-item">
-                                <a href="pages/layout/fixed-sidebar.html" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
-                                </a>
-                            </li>
-                            -->
-                             <li class="nav-item">
-                                <a href="" class="nav-link">
-                                    <i class="fas fa-file-alt nav-icon"></i><p>Cierre anual</p>
-                                </a>
-                            </li>
                         </ul>
                     </li>
                 {% endif %}
