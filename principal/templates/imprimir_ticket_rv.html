@@ -148,14 +148,22 @@
                                         <br>
                                         <table style="width: auto; height: auto; border-collapse: collapse;">
                                             <tbody>
-                                                <tr>
-                                                    <td style="font-size: 58px;">
-                                                        {{revendedor.nombre_completo}}
-                                                    </td>
-                                                    <td>
-                                                        <img style="text-align: right;" src="data:image/png;base64,{{l.qr_code}}" height="190" width="190">
-                                                    </td>
-                                                </tr>
+                                                {% if revendedor.logo %}
+                                                    <tr>
+                                                        <td><img width="481px" height="87px"src="{{revendedor.logo.path}}" style="margin-top:10px;"></td>
+                                                        <td ><img src="data:image/png;base64,{{l.qr_code}}" height="150" width="150"></td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        
+                                                        <td style="font-size: 58px;">
+                                                            {{revendedor.nombre_completo}}
+                                                        </td>
+                                                        <td>
+                                                            <img style="text-align: right;" src="data:image/png;base64,{{l.qr_code}}" height="190" width="190">
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
                                                 
                                                 <tr style="padding-top: 20px;">
                                                     <td>
