@@ -2052,8 +2052,8 @@ def cierre(request):
 		datos['cliente'] = i.cliente
 		datos['vehiculo'] = i.marca_vehiculo
 		datos['modelo_vehiculo'] = i.modelo_vehiculo
-		datos['valor_vehiculo'] = i.valor_vehiculo
-		saldo_vehiculos += i.valor_vehiculo
+		datos['valor_vehiculo'] = i.valor_envio_vehiculo
+		saldo_vehiculos += i.valor_envio_vehiculo
 		dic_vehiculos.append(datos)
 	
 	for i in contenedores:
@@ -2154,7 +2154,7 @@ def cierre_mensual_print(request):
 			for c in cajas:
 				total_cajas += c.valor_caja
 			for v in vehiculos:
-				total_vehiculos += v.valor_vehiculo
+				total_vehiculos += v.valor_envio_vehiculo
 			for co in contenedores:
 				total_contenedores += co.valor_contenedor
 			# print('envios-->',total_envios)
@@ -2228,8 +2228,8 @@ def cierre_diario_print(request):
 		datos['cliente'] = i.cliente
 		datos['marca_vehiculo'] = i.marca_vehiculo
 		datos['modelo_vehiculo'] = i.modelo_vehiculo
-		datos['valor_vehiculo'] = i.valor_vehiculo
-		saldo_vehiculos += i.valor_vehiculo
+		datos['valor_vehiculo'] = i.valor_envio_vehiculo
+		saldo_vehiculos += i.valor_envio_vehiculo
 		dic_vehiculos.append(datos)
 	
 	for i in contenedores:
@@ -2468,27 +2468,6 @@ def validar_vehiculo(request,quien_envia):
 		ret_data['id_quien_envia'] = int(request.POST.get('quien_envia',''))
 		quien_envia_query = quien_envia.get(pk=request.POST.get('quien_envia',''))
 		query_contenedor['quien_envia'] = quien_envia_query
-	else:
-		if request.POST.get('nuevo_cliente') != '':
-			ret_data.update({'nuevo_cliente':request.POST.get('nuevo_cliente')})
-			query_contenedor.update({'nuevo_cliente':request.POST.get('nuevo_cliente')})
-		else:
-			errores['nuevo_cliente'] = u'Falta selecionar o ingresar los datos del cliente'
-		
-		if request.POST.get('telefono1') != '':
-			ret_data.update({'telefono1':request.POST.get('telefono1')})
-			query_contenedor.update({'telefono1':request.POST.get('telefono1')})
-		else:
-			errores['telefono1'] = u'Falta ingresar el telefono del cliente'
-				
-		if request.POST.get('cliente_direccion') != '':
-			ret_data.update({'cliente_direccion':request.POST.get('cliente_direccion')})
-			query_contenedor.update({'cliente_direccion':request.POST.get('cliente_direccion')})
-		else:
-			errores['cliente_direccion'] = u'Falta ingresar la direccion del cliente'
-
-		if request.POST.get('nuevo_cliente') == '' and request.POST.get('telefono1') == '' and request.POST.get('cliente_direccion') == '':
-			errores['quien_envia'] = u'Falta selecionar o ingresar los datos del cliente'
 
 	if request.POST.get('telefono2') != '':
 		ret_data.update({'telefono2':request.POST.get('telefono2')})
@@ -2513,6 +2492,12 @@ def validar_vehiculo(request,quien_envia):
 		query_contenedor.update({'quien_recibe':request.POST.get('quien_recibe')})
 	else:
 		errores['quien_recibe'] = u'Falta ingresar la persona que realiza el envío'
+
+	if request.POST.get('direccion_recibe') != '':
+		ret_data.update({'direccion_recibe':request.POST.get('direccion_recibe')})
+		query_contenedor.update({'direccion_recibe':request.POST.get('direccion_recibe')})
+	else:
+		errores['direccion_recibe'] = u'Falta ingresar la la direcion de quien recibe'
 
 	if request.POST.get('rnt') != '':
 		ret_data.update({'rnt':request.POST.get('rnt')})
@@ -2562,6 +2547,30 @@ def validar_vehiculo(request,quien_envia):
 	else:
 		errores['puerto_destino'] = u'Falta ingresar el pais de destino'
 
+	if request.POST.get('color_vehiculo') != '':
+		ret_data.update({'color_vehiculo':request.POST.get('color_vehiculo')})
+		query_contenedor.update({'color_vehiculo':request.POST.get('color_vehiculo')})
+	else:
+		errores['color_vehiculo'] = u'Falta ingresar el color del vehiculo'
+
+	if request.POST.get('seguro_vehiculo') != '':
+		ret_data.update({'seguro_vehiculo':request.POST.get('seguro_vehiculo')})
+		query_contenedor.update({'seguro_vehiculo':request.POST.get('seguro_vehiculo')})
+	else:
+		errores['seguro_vehiculo'] = u'Falta ingresar el valor de seguro del vehiculo'
+	
+	if request.POST.get('valor_asegurado_vehiculo') != '':
+		ret_data.update({'valor_asegurado_vehiculo':request.POST.get('valor_asegurado_vehiculo')})
+		query_contenedor.update({'valor_asegurado_vehiculo':request.POST.get('valor_asegurado_vehiculo')})
+	else:
+		errores['valor_asegurado_vehiculo'] = u'Falta ingresar el valor asegurado seguro del vehiculo'
+	
+	if request.POST.get('valor_documentacion') != '':
+		ret_data.update({'valor_documentacion':request.POST.get('valor_documentacion')})
+		query_contenedor.update({'valor_documentacion':request.POST.get('valor_documentacion')})
+	else:
+		errores['valor_documentacion'] = u'Falta ingresar el valor de la documentacion'
+
 	retorno['query_contenedor'] = query_contenedor
 	retorno['errores'] = errores
 	retorno['ret_data'] = ret_data
@@ -2569,6 +2578,9 @@ def validar_vehiculo(request,quien_envia):
 
 @login_required
 def recibo_vehiculo(request):
+	empleado = Empleado.objects.get(usuario=request.user)
+	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
+	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
 	quien_envia = Cliente.objects.all()
 	vehiculos = ReciboVehiculos.objects.all()
 	if request.method == 'POST':
@@ -2590,36 +2602,25 @@ def recibo_vehiculo(request):
 			marca_vehiculo = request.POST.get('marca_vehiculo').upper()
 			modelo_vehiculo = request.POST.get('modelo_vehiculo').upper()
 			vin_vehiculo = request.POST.get('vin_vehiculo').upper()
+			color_vehiculo = request.POST.get('color_vehiculo').upper()
+			seguro_vehiculo = request.POST.get('seguro_vehiculo').upper()
+			valor_asegurado = request.POST.get('valor_asegurado_vehiculo').upper()
 			valor_vehiculo = request.POST.get('valor_vehiculo')
 			pais_destino = request.POST.get('pais_destino').upper()
 			puerto_destino = request.POST.get('puerto_destino').upper()
-			pdf = request.FILES.get('pdf')
-			#print(pdf, 'pdf')
+			valor_documentacion = request.POST.get('valor_documentacion')
 			telefono2 = request.POST.get('telefono2')
-			####NUEVO CLIENTE
-			nuevo_cliente = request.POST.get('nuevo_cliente')
-			if nuevo_cliente == '':
-				cliente = Cliente.objects.get(pk=request.POST.get('quien_envia'))
-			else:
-				cliente = ''
-			telefono1 = request.POST.get('telefono1')
-			cliente_direccion = request.POST.get('cliente_direccion').upper()
+			cliente = Cliente.objects.get(pk=request.POST.get('quien_envia'))
+			cliente_direccion = request.POST.get('direccion_recibe').upper()
 			recibo_no = ReciboVehiculos.objects.count() 
 			recibo_no += 1
 			codigo_final = 'EECR0' + str(recibo_no)
+			valor_envio = float(seguro_vehiculo) + float(valor_vehiculo) + float(valor_documentacion)
 			try:
-				#print('entro try')
-				if cliente != '':
-					#print('if try')
-					new_recibo_vehiculo = ReciboVehiculos.objects.create(recibo_no=codigo_final,cliente=cliente,num_pasaporte=pasaporte,correo=correo,telefono_adicional=telefono2,pais_destino=pais_destino,puerto_destino=puerto_destino,nombre_recibe=quien_recibe,telefono_recibe=telefono_recibe,nip_rtn=rtn,marca_vehiculo=marca_vehiculo,modelo_vehiculo=modelo_vehiculo,vin_vehiculo=vin_vehiculo,valor_vehiculo=valor_vehiculo,pdf=pdf,usuario_registro=request.user )
-				else:
-					#print('else try')
-					nuevo_cliente = Cliente.objects.create(nombre_completo=nuevo_cliente,celular=telefono1,direccion=cliente_direccion,usuario_registro=request.user)
-					#print('paso nuevo cliente')
-					ultimo_cliente = Cliente.objects.last()
-					#print('paso ultimo cliente')
-					new_recibo_vehiculo = ReciboVehiculos.objects.create(recibo_no=codigo_final,cliente=Cliente.objects.get(pk=ultimo_cliente.pk),num_pasaporte=pasaporte,correo=correo,telefono_adicional=telefono2,pais_destino=pais_destino,puerto_destino=puerto_destino,nombre_recibe=quien_recibe,telefono_recibe=telefono_recibe,nip_rtn=rtn,marca_vehiculo=marca_vehiculo,modelo_vehiculo=modelo_vehiculo,vin_vehiculo=vin_vehiculo,valor_vehiculo=valor_vehiculo,pdf=pdf,usuario_registro=request.user )
-					#print('paso recibo')
+				with transaction.atomic():
+					if cliente != '':
+						#print('if try')
+						new_recibo_vehiculo = ReciboVehiculos.objects.create(recibo_no=codigo_final,cliente=cliente,num_pasaporte=pasaporte,correo=correo,telefono_adicional=telefono2,pais_destino=pais_destino,puerto_destino=puerto_destino,nombre_recibe=quien_recibe,telefono_recibe=telefono_recibe,nip_rtn=rtn,marca_vehiculo=marca_vehiculo,modelo_vehiculo=modelo_vehiculo,vin_vehiculo=vin_vehiculo,valor_vehiculo=valor_vehiculo,valor_documentacion=valor_documentacion,usuario_registro=request.user, color_vehiculo=color_vehiculo, valor_asegurado=valor_asegurado, seguro=seguro_vehiculo, direccion_recibe=cliente_direccion, valor_envio_vehiculo=valor_envio)
 			except Exception as e:
 				errores['extra'] = e
 				transaction.rollback()
@@ -2639,11 +2640,13 @@ def recibo_vehiculo(request):
 		return render(request,'recibo_vehiculo.html',ctx)
 
 def recibo_vehiculo_pdf(request, id):
+	empleado = Empleado.objects.get(usuario=request.user)
+	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
+	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
 	envio = ReciboVehiculos.objects.get(pk = id)
-	hoy = datetime.now().date()
 	barcode = get_barcode(value = id, width = 600)
 	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))
-	return generar_pdf('recibo_vehiculo_pdf.html',{'pagesize':'A4','orientation':'landscape','envio':envio,'codigo':codigo,'fecha':hoy})
+	return generar_pdf('recibo_vehiculo_pdf.html',{'pagesize':'A4','orientation':'landscape','envio':envio,'codigo':codigo, 'empresa':empresa})
 
 def ver_pdf_vehiculo_pdf(request, id):
 	envio = ReciboVehiculos.objects.get(pk = id)
@@ -4036,7 +4039,7 @@ def cierre_anual_print(request):
 				total_anual_cajas += total_mes_cajas
 
 				vehiculos_mes = vehiculos.filter(fecha_cierre__month = month)
-				total_mes_vehiculos = vehiculos_mes.aggregate(Sum('valor_vehiculo'))['valor_vehiculo__sum'] or 0
+				total_mes_vehiculos = vehiculos_mes.aggregate(Sum('valor_envio_vehiculo'))['valor_envio_vehiculo__sum'] or 0
 				resultados_vehiculos[month] = total_mes_vehiculos
 				total_anual_vehiculos += total_mes_vehiculos
 

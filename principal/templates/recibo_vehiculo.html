@@ -1,301 +1,255 @@
 {% extends "base_admin.html" %}
 {% load humanize %}
 {% load l10n %}
-{% block titulo %}EXPRESS ENVIOS HN{% endblock titulo %}
+{% block titulo %}EXPRESS ENVÍOS HN | Recibo Vehículo{% endblock titulo %}
 {% block contenido %}
-<div class="row">
-    <div class="col s12 m12 l12">
-        <div class="card-panel">
-            <h4 class="header2">Registrar Envío Vehiculo</h4>
-            <div class="row">
-                {% if errores.extra %}
-                    <div id="card-alert" class="card red">
-                        <div class="card-content white-text">
-                            <p>{{errores.extra}}}</p>
+<section class="content">
+    <div class="container-fluid ">
+        <br>
+        <div class="container col-12">
+            <div class="card col-12 ">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fa-solid fa-car"></i> Registrar Envío Vehículo</h3>
+                </div>
+                <div class="card-body">
+                    {% if 'ok' in request.GET %}
+                        <div class="alert alert-primary">
+                            <h5><i class="fa-regular fa-circle-check"></i> Envio Registrado!</h5>
                         </div>
-                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                {% endif %}
-                <form class="col s12"  enctype='multipart/form-data' method="POST" action="{% url 'recibo_vehiculo' %}" >
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col m6 s12">
-                            <div class="col m12 s12">
-                                <label class="bmd-label-floating has-primary"> Envia</label>
-                                <select style="text-transform:uppercase;width: 100%;" id="id_quien_envia" name="quien_envia" class="">
-                                    <option value="0" >SELECCIONE</option>
-                                    {% for cliente in quien_envia %}
-                                        {% ifequal cliente.pk ret_data.quien_envia  %}
-                                            <option value="{{cliente.pk}}" >{{cliente.celular}} | {{cliente.nombre_completo}} </option>
-                                        {% else %}
-                                            <option value="{{cliente.pk}}">{{cliente.celular}} | {{cliente.nombre_completo}}</option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                                    {% if errores.quien_envia %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.quien_envia}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        
-                            <div class="input-field col m5 s12">
-                                <input id="id_correo" type="email" name="correo" value="{{ret_data.correo}}" required>
-                                <label for="correo">Correo</label>
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_pasaporte" type="text" value="{% if ret_data.pasaporte != None %}{{ret_data.pasaporte}}{% endif %}" name="pasaporte" required="">
-                                <label for="pasaporte">Pasaporte Nº</label>
-                                {% if errores.pasaporte %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.pasaporte}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="id_telefono2" type="text" value="{% if ret_data.telefono2 != None %}{{ret_data.telefono2}}{% endif %}" name="telefono2" required="">
-                                <label for="telefono2">Telefono #2</label>
-                                {% if errores.telefono2 %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.telefono2}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="input-field col m8 s12">
-                                <input id="id_quien_recibe" type="text" value="{% if ret_data.quien_recibe != None %}{{ret_data.quien_recibe}}{% endif %}" name="quien_recibe" required="">
-                                <label for="quien_recibe">Recibe</label>
-                                {% if errores.quien_recibe %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.quien_recibe}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_rtn" type="text" value="{% if ret_data.rtn != None %}{{ret_data.rtn}}{% endif %}" name="rtn" required="">
-                                <label for="rtn">RTN/NIP</label>
-                                {% if errores.rtn %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.rtn}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_telefono_recibe" type="text" value="{% if ret_data.telefono_recibe != None %}{{ret_data.telefono_recibe}}{% endif %}" name="telefono_recibe" required="">
-                                <label for="telefono_recibe">Telefono</label>
-                                {% if errores.telefono_recibe %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.telefono_recibe}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_marca_vehiculo" type="text" value="{% if ret_data.marca_vehiculo != None %}{{ret_data.marca_vehiculo}}{% endif %}" name="marca_vehiculo" required="">
-                                <label for="marca_vehiculo">Marca del vehiculo</label>
-                                {% if errores.marca_vehiculo %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.marca_vehiculo}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_modelo_vehiculo" type="text" value="{% if ret_data.modelo_vehiculo != None %}{{ret_data.modelo_vehiculo}}{% endif %}" name="modelo_vehiculo" required="">
-                                <label for="modelo_vehiculo">Modelo del vehiculo</label>
-                                {% if errores.modelo_vehiculo %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.modelo_vehiculo}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_vin_vehiculo" type="text" value="{% if ret_data.vin_vehiculo != None %}{{ret_data.vin_vehiculo}}{% endif %}" name="vin_vehiculo" required="">
-                                <label for="vin_vehiculo">Vin del vehiculo</label>
-                                {% if errores.vin_vehiculo %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.vin_vehiculo}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_valor_vehiculo" type="text" value="{% if ret_data.valor_vehiculo != None %}{{ret_data.valor_vehiculo}}{% endif %}" name="valor_vehiculo" required="">
-                                <label for="valor_vehiculo">Valor del vehiculo</label>
-                                {% if errores.valor_vehiculo %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.valor_vehiculo}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_pais_destino" type="text" value="{% if ret_data.pais_destino != None %}{{ret_data.pais_destino}}{% endif %}" name="pais_destino" required="">
-                                <label for="pais_destino">Pais destino</label>
-                                {% if errores.pais_destino %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.pais_destino}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_puerto_destino" type="text" value="{% if ret_data.puerto_destino != None %}{{ret_data.puerto_destino}}{% endif %}" name="puerto_destino" required="">
-                                <label for="puerto_destino">Puerto destino</label>
-                                {% if errores.puerto_destino %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.puerto_destino}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
+                    {% endif %}
+                    {% if errores %}
+                        <div class="alert alert-danger">
+                            <h5><i class="fa-solid fa-triangle-exclamation"></i> Alerta revisar!</h5>
+                            <div class="row">
+                                <div class="col-md-12">{% if errores.extra %}- {{errores.extra}} {% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.quien_envia %}-{{errores.quien_envia}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.telefono2 %}-{{errores.telefono2}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.rtn %}- {{errores.rtn}}{% endif %} <br></div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.pasaporte %}-{{errores.pasaporte}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.quien_recibe %}-{{errores.quien_recibe}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.telefono_recibe %}-{{errores.telefono_recibe}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.marca_vehiculo %}-{{errores.marca_vehiculo}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.modelo_vehiculo %}-{{errores.modelo_vehiculo}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.vin_vehiculo %}-{{errores.vin_vehiculo}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.valor_vehiculo %}-{{errores.valor_vehiculo}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.pais_destino %}-{{errores.pais_destino}}{% endif %}</div>
+                                <div class="col-md-6" style="float:inline-start">{% if errores.puerto_destino %}-{{errores.puerto_destino}}{% endif %}</div>
                             </div>
                         </div>
-                        <div class="col m6 s12">
-                            <h5>Nuevo Cliente</h5><hr>
-                            <div class="input-field col m8 s12">
-                                <input id="id_nuevo_cliente" type="text" value="{% if ret_data.nuevo_cliente != None %}{{ret_data.nuevo_cliente}}{% endif %}" name="nuevo_cliente" >
-                                <label for="nuevo_cliente">Nuevo cliente nombre completo</label>
-                                {% if errores.nuevo_cliente %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.nuevo_cliente}}</p>
-                                        </div>
+                    {% endif %}
+                    <form enctype='multipart/form-data' method="POST" action="{% url 'recibo_vehiculo' %}">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <!-- Quien envia -->
+                                <div class="row">
+                                    <div class="col-5">
+                                        <label>Quien Envia:</label>
+                                        <select class="form-control select2" style="width: 100%;" id="id_quien_envia" name="quien_envia">
+                                            <option value="0">SELECCIONE</option>
+                                            {% for cliente in quien_envia %}
+                                                {% ifequal cliente.pk ret_data.quien_envia %}
+                                                    <option value="{{cliente.pk}}">{{cliente.celular}} | {{cliente.nombre_completo}}
+                                                    </option>
+                                                {% else %}
+                                                    <option value="{{cliente.pk}}">{{cliente.celular}} | {{cliente.nombre_completo}}
+                                                    </option>
+                                                {% endifequal %}
+                                            {% endfor %}
+                                        </select>
                                     </div>
-                                {% endif %}
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <input id="id_telefono1" type="text" value="{% if ret_data.telefono1 != None %}{{ret_data.telefono1}}{% endif %}" name="telefono1" >
-                                <label for="telefono1">Nuevo cliente telefono</label>
-                                {% if errores.telefono1 %}
-                                    <div id="card-alert" class="card red">
-                                        <div class="card-content white-text">
-                                        <p>{{errores.telefono1}}</p>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="input-field col m12 s12">
-                                <div class="form-group">
-                                    <div class="form-group">
-                                    <label class="bmd-label-floating"> Nuevo cliente direccion</label>
-                                    <textarea id="id_cliente_direccion" style="text-transform: uppercase;" name="cliente_direccion" class="materialize-textarea"  maxlength="300">{{ret_data.cliente_direccion}}</textarea>
+                                    <div class="col-1"></div>
+                                    <div class="col-5">
+                                        <label for="correo">Correo: </label>
+                                        <input id="id_correo" class="form-control" type="email" name="correo" value="{{ret_data.correo}}" placeholder="ejemplo@gmail.com" required>
                                     </div>
                                 </div>
+                                <div class="row pt-2">
+                                    <div class="col-5">
+                                        <label for="pasaporte">Pasaporte Nº:</label>
+                                        <input id="id_pasaporte" class="form-control" type="text" value="{% if ret_data.pasaporte != None %}{{ret_data.pasaporte}}{% endif %}" name="pasaporte" required placeholder="EE1234567">
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-5">
+                                        <label for="telefono2">Telefono #2:</label>
+                                        <input id="id_telefono2" type="text" class="form-control" value="{% if ret_data.telefono2 != None %}{{ret_data.telefono2}}{% endif %}" name="telefono2">
+                                        
+                                    </div>
+                                </div>
+                                <!-- Quien Recibe -->
+                                <div class="row pt-2">
+                                    <div class="col-3">
+                                        <label for="quien_recibe">Quien Recibe:</label>
+                                        <input id="id_quien_recibe" type="text" class="form-control" value="{% if ret_data.quien_recibe != None %}{{ret_data.quien_recibe}}{% endif %}" name="quien_recibe" required>
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-3">
+                                        <label for="rtn">RTN/NIP:</label>
+                                        <input id="id_rtn" type="text" class="form-control" value="{% if ret_data.rtn != None %}{{ret_data.rtn}}{% endif %}" name="rtn" required>
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-3">
+                                        <label for="telefono_recibe">Telefono:</label>
+                                        <input id="id_telefono_recibe" type="text" class="form-control" value="{% if ret_data.telefono_recibe != None %}{{ret_data.telefono_recibe}}{% endif %}" name="telefono_recibe" required>
+                                    </div>
+                                </div>
+                                <div class="row pt-2">
+                                    <div class="col-9">
+                                        <label for="exampleFormControlTextarea1">Dirección: </label>
+                                        <textarea class="form-control" id="id_comentario" style="text-transform: uppercase;" name="direccion_recibe" rows="1" maxlength="150" required></textarea>
+                                    </div>
+                                </div>
+                                <!-- Vehiculo -->
+                                <div class="row pt-2">
+                                    <div class="col-3">
+                                        <label for="marca_vehiculo">Marca del vehiculo:</label>
+                                        <input id="id_marca_vehiculo" type="text" class="form-control" value="{% if ret_data.marca_vehiculo != None %}{{ret_data.marca_vehiculo}}{% endif %}" name="marca_vehiculo" required>
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-3">
+                                        <label for="modelo_vehiculo">Modelo del vehiculo:</label>
+                                        <input id="id_modelo_vehiculo" type="text" class="form-control" value="{% if ret_data.modelo_vehiculo != None %}{{ret_data.modelo_vehiculo}}{% endif %}" name="modelo_vehiculo" required>
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-3">
+                                        <label for="vin_vehiculo">Vin del vehiculo:</label>
+                                        <input id="id_vin_vehiculo" type="text" class="form-control" value="{% if ret_data.vin_vehiculo != None %}{{ret_data.vin_vehiculo}}{% endif %}" name="vin_vehiculo" required>
+                                    </div>
+                                </div>
+                                <!-- vehiculo ln2 -->
+                                <div class="row pt-2">
+                                    <div class="col-3 pr-5">
+                                        <label for="color_vehiculo">Color del vehiculo:</label>
+                                        <input id="id_color_vehiculo" type="text" class="form-control" value="{% if ret_data.color_vehiculo != None %}{{ret_data.color_vehiculo}}{% endif %}" name="color_vehiculo" required>
+                                    </div>
+                                    <div class="col-3 pr-5">
+                                        <label for="valor_documentacion">Valor de documentación:</label>
+                                        <input id="id_valor_documentacion" type="text" class="form-control" value="{% if ret_data.valor_documentacion != None %}{{ret_data.valor_documentacion}}{% endif %}" name="valor_documentacion" placeholder="0.00" required>
+                                    </div>
+                                    <div class="col-3 pr-5">
+                                        <label for="seguro_vehiculo">Seguro: </label>
+                                        <input id="id_seguro_vehiculo" type="text" class="form-control" value="{% if ret_data.seguro_vehiculo != None %}{{ret_data.seguro_vehiculo}}{% endif %}" name="seguro_vehiculo" placeholder="0.00" required>
+                                    </div>
+                                    <div class="col-3 pr-5">
+                                        <label for="valor_asegurado_vehiculo">Valor Asegurado del vehiculo: </label>
+                                        <input id="id_valor_asegurado_vehiculo" type="text" class="form-control" value="{% if ret_data.valor_asegurado_vehiculo != None %}{{ret_data.valor_asegurado_vehiculo}}{% endif %}" name="valor_asegurado_vehiculo" placeholder="0.00" required>
+                                    </div>
+                                </div>
+                                <!-- Vehiculo ln3 -->
+                                <div class="row pt-2">
+                                    <div class="col-3">
+                                        <label for="valor_vehiculo">Valor del vehiculo: </label>
+                                        <input id="id_valor_vehiculo" type="text" class="form-control" value="{% if ret_data.valor_vehiculo != None %}{{ret_data.valor_vehiculo}}{% endif %}" name="valor_vehiculo" placeholder="0.00" required>
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-3">
+                                        <label for="pais_destino">Pais destino: </label>
+                                        <input id="id_pais_destino" type="text" class="form-control" value="{% if ret_data.pais_destino != None %}{{ret_data.pais_destino}}{% endif %}" name="pais_destino" required>
+                                    </div>
+                                    <div class="col-1"></div>
+                                    <div class="col-3">
+                                        <label for="puerto_destino">Puerto destino: </label>
+                                        <input id="id_puerto_destino" type="text" class="form-control" value="{% if ret_data.puerto_destino != None %}{{ret_data.puerto_destino}}{% endif %}" name="puerto_destino" required>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="row pt-3">
+                            <button type="submit" class="btn float-right btn-info" name="action" formtarget="_blank">Guardar
+                                <i class="fa-solid fa-floppy-disk"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+        <br>
+        <div class="row">
+            <div class="container col-12">
+                <div class="card col-12">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fa-solid fa-ferry"></i> Vehículos enviados</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="content">
+                            <br>
+                            <div class="col-12">
+                                <table id="dtBasicExample" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                                    <thead>
+                                        <tr class="text-center">
+                                            <th>Nombre Completo</th>
+                                            <th>Celular</th>
+                                            <th>Recibe</th>
+                                            <th>Celular</th>
+                                            <th>Lugar Destino</th>
+                                            <th>Recibo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for a in vehiculos %}
+                                        <tr>
+                                            <td>{{a.cliente.nombre_completo}} | {{a.num_pasaporte}}</td>
+                                            <td>{{a.cliente.celular}} | {{a.telefono_adicional}}</td>
+                                            <td>{{a.nombre_recibe}} | {{a.nip_rtn}}</td>
+                                            <td>{{a.telefono_recibe}}</td>
+                                            <td>
+                                                <address class="fila_{{a.pk}}">{{a.pais_destino}}, {{a.puerto_destino}}</address>
+                                            </td>
+                                            <td><a type='button' class="btn button btn-primary "
+                                                    href=" {% url 'recibo_vehiculo_pdf' a.pk %}" target="_blank"> Ver</a></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
-
-                    <div class="row"> <br>
-                        <div class="file-field input-field col m6 s12">
-                            <div class="btn">
-                                <span>Seleccione pdf</span>
-                                <input type="file" type="text" name="pdf">
-                            </div>
-                            <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text" name="pdf" placeholder="Seleccione">
-                            </div>
-                        </div>
-                        <div class="input-field col  m4 s12">
-                        <button class="btn cyan waves-effect waves-light right" type="submit" name="action">Guardar
-                            <i class="material-icons right">send</i>
-                        </button>
-                        </div>
-                    </div>
-                </form>
-                <div class="row">
-                    <br><br>
-                    <div class="col m12 s12">
-                        <table id="dtBasicExample" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
-                          <thead>
-                            <tr>
-                              <th>Nombre Completo</th>
-                              <th>Celular</th>
-                              <th>Recibe</th>
-                              <th>Celular</th>
-                              <th>Lugar Destino</th>
-                              <th>Recibo</th>
-                              <th>Art. PDF</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {% for a in vehiculos  %}
-                              <tr >
-                                <td>{{a.cliente.nombre_completo}} | {{a.num_pasaporte}}</td>
-                                <td>{{a.cliente.celular}} | {{a.telefono_adicional}}</td>
-                                <td>{{a.nombre_recibe}} | {{a.nip_rtn}}</td>
-                                <td>{{a.telefono_recibe}}</td>
-                                <td ><address class="fila_{{a.pk}}">{{a.pais_destino}}, {{a.puerto_destino}}</address></td>
-                                <td><a type='button' class="btn button btn-primary " href=" {% url 'recibo_vehiculo_pdf' a.pk %}" target="_blank"> Ver</a></td>
-                                <td><a type='button' class="btn button btn-primary " href="{% url 'ver_pdf_vehiculo_pdf' a.pk %}" target="_blank"> Ver</a></td>
-                              </tr>
-                            {% endfor %}
-                          </tbody>
-                        </table>
-                      </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
 {% endblock contenido %}
 {% block js %}
 <script>
     $(document).ready(function () {
-    var table = $('#dtBasicExample').DataTable({
-        "oLanguage": {
-                                "sProcessing":     "Procesando...",
-                                "sLengthMenu":     "Mostrando _MENU_ registros",
-                                "sZeroRecords":    "No se encontraron resultados",
-                                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                                "sInfo":           "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
-                                "sInfoEmpty":      "Mostrando 0 - 0 de un total de 0 registros",
-                                "sInfoFiltered":   "<br>(filtrado de un total de _MAX_ registros)",
-                                "sInfoPostFix":    "",
-                                "sSearch":         "Buscar:",
-                                "sUrl":            "",
-                                "sInfoThousands":  ",",
-                                "sLoadingRecords": "Cargando...",
-                                "oPaginate": {
-                                    "sFirst":    "Primero",
-                                    "sLast":     "Último",
-                                    "sNext":     "Sig.",
-                                    "sPrevious": "Ant."
-                                },
-                        },
-                    responsive: true
-    });
-    $('.dataTables_length').addClass('bs-select');
+        var table = $('#dtBasicExample').DataTable({
+            "oLanguage": {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrando _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando _START_ - _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando 0 - 0 de un total de 0 registros",
+                "sInfoFiltered": "<br>(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Sig.",
+                    "sPrevious": "Ant."
+                },
+            },
+            responsive: true
+        });
+        $('.dataTables_length').addClass('bs-select');
     });
 </script>
 <script>
-    $(document).ready(function (){
+    $(document).ready(function () {
         $('#dtBasicExample_length').remove();
         $('select').material_select('destroy');
         $("select").select2({
-            allowClear:true,
+            allowClear: true,
             placeholder: 'Seleccione una opción'
         });
     });
-  </script>
+</script>
 {% endblock js %}
