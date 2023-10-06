@@ -4210,12 +4210,12 @@ def registrar_envio_rv(request):
 				transaction.commit()
 				
 				ingreso_correcto['mensaje'] = u"Datos guardados correctamente."
-				ctx = {'es_revendedor':es_revendedor,'ingreso_correcto':ingreso_correcto, 'envio':envio,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio}
+				ctx = {'es_revendedor':es_revendedor,'ingreso_correcto':ingreso_correcto, 'envio':envio,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio,'empleado':empleado}
 				#return HttpResponseRedirect(reverse('registrar_envio')+"?ok" +"&envio="+ str(envio.pk))
 				return render(request,'registrar_envio_rv.html',ctx)
 		else:
 			#print errores,'erroresdentro de errores'
-			ctx = {'es_revendedor':es_revendedor,'pais':pais,'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio}
+			ctx = {'es_revendedor':es_revendedor,'pais':pais,'ret_data':ret_data,'errores':errores,'quien_envia':quien_envia,'tipo_contenido':tipo_contenido,'tipo_envio':tipo_envio,'empleado':empleado}
 			return render(request,'registrar_envio_rv.html',ctx)
 	elif request.method == 'GET':
 		ctx = {'es_revendedor':es_revendedor,

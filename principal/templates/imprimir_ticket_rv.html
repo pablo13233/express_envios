@@ -32,7 +32,7 @@
             border: 3px solid black;
         }
     </style>
-    {% if empleado.nombres_empleado == 'ESTAFETA USA' or  empleado.nombres_empleado == 'ESTAFETA' %}
+    {% if empleado.nombres_empleado == 'ESTAFETA USA' or  empleado.nombres_empleado == 'ESTAFETA' or empleado.nombres_empleado == 'DATT EXPRESS' or empleado.nombres_empleado == 'DATT' %}
         <style type="text/css">
             @page {
                 size: 220mm 140mm; /* ancho de media página A4, altura de página completa A4 */
@@ -60,7 +60,7 @@
             <div class="col-10">
                 <div class="ticket">
                     
-                    {% if empleado.nombres_empleado == 'ESTAFETA USA' or  empleado.nombres_empleado == 'ESTAFETA' %}
+                    {% if empleado.nombres_empleado == 'ESTAFETA USA' or  empleado.nombres_empleado == 'ESTAFETA' or empleado.nombres_empleado == 'DATT EXPRESS' or empleado.nombres_empleado == 'DATT' %}
                         <!-- Estafeta -->
                         {% if envio.revendedor %}
                             {% if lista %}

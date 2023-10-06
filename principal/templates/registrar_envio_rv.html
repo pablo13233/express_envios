@@ -19,6 +19,13 @@
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-edit"></i>Registro de Envios rv</h3>
                 </div>
+                
+                {% if empleado.nombres_empleado == 'ESTAFETA USA' or  empleado.nombres_empleado == 'ESTAFETA'%}
+                    <input type="text" class="d-none" id="num_empresa" value="2" />
+                {% elif empleado.nombres_empleado == 'DATT EXPRESS' or empleado.nombres_empleado == 'DATT' %}
+                    <input type="text" class="d-none" id="num_empresa" value="3" />
+                {% endif %}
+                    
                 <div class="card-body">
                     <div class="tab-content" id="custom-content-below-tabContent">  
                         {% if 'ok' in request.GET %}
@@ -710,6 +717,7 @@ $('#id_pais').on('change',cajas);
 function cajas() {
     $('#id_tipo_caja').find('option').remove();
     $('#id_tipo_caja').append("<option value='0'selected>Seleccion una opción</option>");
+    var num_empresa = $('#num_empresa').val();
     $.ajax({
         url: "{% url 'cajas_tipo' %}",
         type: "get",
@@ -720,7 +728,7 @@ function cajas() {
         dataType: "json",
         success: function(data) {
             $.each(data, function(key, val) {
-                if(val.empresa === 2)
+                if(val.empresa === parseInt(num_empresa))
                 {
                     $("#id_tipo_caja").append("<option value='"+val.tipo_caja__pk+"|"+val.tipo_caja__descripcion+"|"+val.precio+"|"+val.pk+"'>"+val.tipo_caja__descripcion+"</option>");
                 }
