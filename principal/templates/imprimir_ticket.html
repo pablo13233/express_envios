@@ -32,7 +32,7 @@
         size: A4;
         margin: 5mm;  /* afecta el margen en la configuración de impresión */
         {% if envio.valor_emplasticado > 0 %}
-        background-image: url("../static/cliente/img/star.png");
+        background-image: url("{% static 'cliente/img/star.png' %}");
         background-object-position: 50px 600px;
         background-height: 100px;
         background-width: 100px;
