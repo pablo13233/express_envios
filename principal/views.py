@@ -4246,6 +4246,10 @@ def cajas_contenedor_pdf(request,id):
 		detalle['persona_envia_telefono'] = e.quien_envia.celular
 		detalle['persona_recibe_telefono'] = e.quien_recibe.celular
 		detalle['pais_destino'] = e.pais_destino.nombre
+		if e.valor_emplasticado > 0:
+			detalle['emplasticado'] = 'si'
+		else:
+			detalle['emplasticado'] = 'no'
 
 		cajas = DetalleEnvio.objects.filter(envio_id=e.pk)
 		cajas_agrupadas = {}  # diccionario para almacenar el resultado
@@ -4282,21 +4286,27 @@ def cajas_contenedor_xls(request,id):
 	sheet = workbook.active
 	#cabeceras
 	sheet['A1'] = 'Guia'
-	sheet['B1'] = 'Envia'
-	sheet['C1'] = 'Recibe'
-	sheet['D1'] = 'Pais Destino'
-	sheet['E1'] = 'Departamento'
-	sheet['F1'] = 'Direccion'
-	sheet['G1'] = 'Cajas'
+	sheet['B1'] = 'Emplasticado'
+	sheet['C1'] = 'Envia'
+	sheet['D1'] = 'Recibe'
+	sheet['E1'] = 'Pais Destino'
+	sheet['F1'] = 'Departamento'
+	sheet['G1'] = 'Direccion'
+	sheet['H1'] = 'Cajas'
 
 	for index,e in enumerate(envios):
+		if e.valor_emplasticado > 0:
+			emplasticado = 'SI'
+		else:
+			emplasticado = ''
 		row = index + 2 #para empezar a escribir en la segunda fila
 		sheet[f'A{row}'] = e.codigo
-		sheet[f'B{row}'] = e.quien_envia.nombre_completo + "|" + e.quien_envia.celular
-		sheet[f'C{row}'] = e.quien_recibe.nombre_completo + "|" + e.quien_recibe.celular
-		sheet[f'D{row}'] = e.pais_destino.nombre
-		sheet[f'E{row}'] = e.departamento_destino.nombre
-		sheet[f'F{row}'] = e.quien_recibe.direccion
+		sheet[f'B{row}'] = emplasticado
+		sheet[f'C{row}'] = e.quien_envia.nombre_completo + "|" + e.quien_envia.celular
+		sheet[f'D{row}'] = e.quien_recibe.nombre_completo + "|" + e.quien_recibe.celular
+		sheet[f'E{row}'] = e.pais_destino.nombre
+		sheet[f'F{row}'] = e.departamento_destino.nombre
+		sheet[f'G{row}'] = e.quien_recibe.direccion
 
 		cajas = DetalleEnvio.objects.filter(envio_id=e.pk)
 		cajas_agrupadas = {}  # diccionario para almacenar el resultado

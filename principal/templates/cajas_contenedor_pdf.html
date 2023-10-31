@@ -126,7 +126,8 @@
     <table class="container">
         <thead>
             <tr>
-                <th>Guía</th>
+                <th style="width: 100px">Guía</th>
+                <th style="width: 50px">EP</th>
                 <th>Envia</th>
                 <th>Recibe</th>
                 <th>Cajas</th>
@@ -137,6 +138,11 @@
             {% for en in envios %}
             <tr>
                 <td>{{en.guia}}</td>
+                <td>
+                {% if en.emplasticado == 'si' %}
+                    <div style="width: 10px; height: 10px; background-color: green; text-align: center;">SI</div>
+                {% endif %}
+                    </td>
                 <td>{{en.persona_envia}} | {{en.persona_envia_telefono}}</td>
                 <td>{{en.persona_recibe}} | {{en.persona_recibe_telefono}}</td>
                 <td>{{en.cajas}}</td>
