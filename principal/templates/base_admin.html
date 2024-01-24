@@ -201,7 +201,7 @@
                                 </a>
                             </li>
                             <div class="dropdown-divider"></div>
-                            <li class="nav-item">
+                            <li class="nav-item" hidden>
                                 <a href="{% url 'registrar_envio' %}" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
                                 </a>
@@ -396,7 +396,7 @@
                                 </a>
                             </li>
                             <div class="dropdown-divider"></div>
-                            <li class="nav-item">
+                            <li class="nav-item" hidden>
                                 <a href="{% url 'registrar_envio' %}" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
                                 </a>
@@ -528,7 +528,7 @@
                         </a>
                         
                         {% if get_empleado.nombres_empleado == 'ESTAFETA USA' or  get_empleado.nombres_empleado == 'ESTAFETA' or  get_empleado.nombres_empleado == 'DATT EXPRESS' or  get_empleado.nombres_empleado == 'DATT' %}
-                            <ul class="nav nav-treeview">
+                            <ul class="nav nav-treeview" hidden>
                                 <li class="nav-item">
                                     <a href="{% url 'registrar_envio_rv' %}" class="nav-link">
                                         <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
@@ -537,7 +537,7 @@
                                 <div class="dropdown-divider"></div>
                             </ul>
                         {% else %}
-                            <ul class="nav nav-treeview">
+                            <ul class="nav nav-treeview" hidden>
                                 <li class="nav-item">
                                     <a href="{% url 'registrar_envio' %}" class="nav-link">
                                         <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>
@@ -614,7 +614,7 @@
                             <p class="ml-1" style="font-size: 16px;">Envios/Entregas<i class="fas fa-angle-left right"></i>
                             <span class="badge badge-info right"></span></p>
                         </a>
-                        <ul class="nav nav-treeview">
+                        <ul class="nav nav-treeview" hidden>
                             <li class="nav-item">
                                 <a href="{% url 'registrar_envio' %}" class="nav-link">
                                     <i class="fas fa-file-alt nav-icon"></i><p>Registrar Envio Caja</p>

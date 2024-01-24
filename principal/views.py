@@ -2178,7 +2178,6 @@ def cierre_diario_print(request):
 	empleado = Empleado.objects.get(usuario=user)
 	empresa_e = EmpresaEmpleado.objects.get(empleado = empleado)
 	empresa = Empresa.objects.get(id=empresa_e.empresa_id)
-	print(empresa)
 	envios = Envio.objects.filter(cierre= False, aprobado = True)
 	cajas = ReciboCaja.objects.filter(cierre = False)
 	vehiculos = ReciboVehiculos.objects.filter(cierre = False)
