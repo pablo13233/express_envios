@@ -49,7 +49,9 @@ admin.site.register(TipoContenido)
 admin.site.register(TipoEnvio)
 
 admin.site.register(TipoCaja)
-admin.site.register(CajaPais)
+class CajaPaisAdmin(admin.ModelAdmin):
+    search_fields = ['tipo_caja']
+admin.site.register(CajaPais,CajaPaisAdmin)
 admin.site.register(DetalleEnvio)
 admin.site.register(Contenedor)
 admin.site.register(UbicacionEmpleado)
