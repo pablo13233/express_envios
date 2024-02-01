@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+{% load static %} {% load tz %} {% load humanize %} {% load l10n %}
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>Envíos</title>
+    <link rel="icon" href="{% static  'plantilla/images/favicon/favicon-32x32.png' %}" sizes="32x32">
+    <!-- Favicons-->
+    <link rel="apple-touch-icon-precomposed"
+        href="{% static  'plantilla/images/favicon/apple-touch-icon-152x152.png' %}">
+    <!-- For iPhone -->
+    <meta name="msapplication-TileColor" content="#00bcd4">
+    <meta name="msapplication-TileImage" content="{% static  'plantilla/images/favicon/mstile-144x144.png' %}">
+    <style>
+        * {
+            font-size: 14px;
+            font-family: 'Times New Roman';
+            font-weight: bold;
+        }
+        .striped-table tr.even {
+            background-color: #B3B3B3;
+        }
+
+        .striped-table tr.odd {
+            background-color: #FFFFFF; /* O el color que quieras para las filas impares */
+        }
+
+        @page {
+            size: A4;
+            margin: 5mm;
+            /* afecta el margen en la configuración de impresión */
+        }
+    </style>
+    <script>
+        function imprimir() {
+            window.print();
+        }
+    </script>
+</head>
+
+<body onload="imprimir()">
+    <div class="ticket">
+        <table>
+            <tbody>
+                <tr>
+                    
+                    <td>
+                        <center>
+                            <p style="font-size: 30px;">ENVÍOS DE OCTUBRE 1 2023 - ENERO 24 2024</p>
+                        </center>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </h2>
+        <table class="striped-table" width="100%" border="1" cellspacing="3" cellpadding="3">
+            <thead>
+                <tr>
+                    <th>Fact N°</th>
+                    <!--<th>Encomiendas</th>-->
+                    <th>Cliente</th>
+                    <th>Dirección</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for envio in envios %}
+                <tr class="{% cycle 'odd' 'even' %}">
+                    <td width="20%">{{ envio.codigo }}</td>
+                    <td width="30%">{{ envio.quien_envia.nombre_completo }} {{ envio.quien_envia.apellidos }}</td>
+                    <td width="50%">{{ envio.direccion_registrar }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table><br>
+    </div>
+</body>
+
+</html>

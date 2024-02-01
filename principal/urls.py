@@ -107,6 +107,8 @@ urlpatterns = [
     url(r'^faltantes/bodega-hn/$', lista_guias_faltante_bodega_hn, name='lista_faltante_bodega_hn'),
     url(r'^modal/editar/cliente/$', editar_dato_cliente, name='editar_dato_cliente'),
     url(r'^ajax/cliente/$', obtener_clientes_ajax, name='obtener_clientes_ajax'),
+    url(r'^reportes/envios_rango_fecha_print/$', envios_rango_fecha_print, name='envios_rango_fecha_print'),
+    url(r'^reporte/recibos-envios-contenedor/(?P<id>\d+)/$', generar_recibos_por_contenedor, name='recibos_por_contenedor'),
     
     
 ]

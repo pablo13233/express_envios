@@ -86,11 +86,15 @@
                 </div>
                 <div class="col-3 text-center">
                   <h4><a class="text-success" href="{% url 'cajas_contenedor_xls' contenedor.pk %}" target="_blank"><i class="far fa-file-spreadsheet"></i> Descargar XLS</a></h4>
+                  
                 </div>
-                <div class="col-3 text-center">
+                <div class="col-2 text-center">
+                  <h4><a class="text-secondary" href="{% url 'recibos_por_contenedor' contenedor.pk %}" target="_blank"><i class="far fa-file-pdf fs-2"></i> Lista Envíos</a></h4>
+                </div>
+                <div class="col-2 text-center">
                   <h4><a class="text-warning" href="{% url 'estado_cajas_contenedor' contenedor.pk %}" target="_blank"><i class="fa-regular fa-file-pdf"></i> Estado Cajas</a></h4>
                 </div>
-                <div class="col-3 text-center">
+                <div class="col-2 text-center">
                   <h4><a class="text-primary" href="{% url 'lista_guias_faltante' contenedor.pk %}" target="_blank"><i class="fa-regular fa-boxes"></i> Cajas faltantes</a></h4>
                 </div>
               </div>

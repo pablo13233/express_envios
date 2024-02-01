@@ -3436,105 +3436,6 @@ def trasladar_a_transito(request,envio):
 	return HttpResponseRedirect(reverse('enviar_transito'))
 
 
-# @login_required
-# def buscar_caja_transito(request):
-# 	tiene_datos = 0
-# 	resultado = {}
-# 	data = []
-# 	if request.is_ajax():
-# 		try:
-# 			#seguimiento = SeguimientoEnvio.objects.get(codigo_envio__codigo= request.GET.get('guia'),estado=6)
-# 			seguimiento = SeguimientoEnvio.objects.filter(codigo_envio__codigo= request.GET.get('guia'),estado=6).order_by('-id')[0]
-# 			detalle = DetalleEnvio.objects.filter(envio__codigo=seguimiento.codigo_envio.codigo)
-# 			lista_detalle = []
-# 			if detalle:
-# 				tiene_datos = 1
-# 				for d in detalle:
-# 					dic = {}
-# 					dic['cantidad'] = d.cantidad
-# 					dic['caja'] = d.tipo_caja.tipo_caja.descripcion 
-# 					dic['precio'] = d.precio
-# 					dic['total'] = d.total
-# 					if d.fue_enviada:
-# 						dic['enviada'] = 'SI'
-# 					else:
-# 						dic['enviada'] = 'NO'
-# 					lista_detalle.append(dic) 
-# 			if seguimiento.codigo_envio.contenedor:
-# 				contendor = str(seguimiento.codigo_envio.contenedor.codigo_original)+'|'+str(seguimiento.codigo_envio.contenedor.codigo_express)
-# 			else:
-# 				contendor ='NO ESTA ASIGNADA A CONTENEDOR'
-# 			data = {'pk':seguimiento.pk,
-# 					'codigo':seguimiento.codigo_envio.codigo,
-# 					'envia':seguimiento.codigo_envio.quien_envia.nombre_completo,
-# 					'recibe':seguimiento.codigo_envio.quien_recibe.nombre_completo,
-# 					'estado':seguimiento.estado.estado,
-# 					'fechahora':str(seguimiento.fechahora),
-# 					'usuario_registro':seguimiento.usuario_registro.username,
-# 					'contenedor':contendor,
-# 					'tiene_datos':tiene_datos,
-# 					'lista_detalle':lista_detalle,
-# 					'url' : reverse('entregar_caja', kwargs={'envio':request.GET.get('guia')})}
-# 		except Exception as e:
-# 			data = {'tiene_datos':0}
-# 			#print 'errores', e
-		
-# 		return HttpResponse(simplejson.dumps(data), content_type='application/javascript')
-# 	return render(request, 'buscar_caja_transito.html')
-
-# @login_required
-# def entregar_caja(request,envio):
-# 	e = Envio.objects.get(codigo=envio)
-# 	estado = 7
-# 	envio_cliente = Envio.objects.get(pk=e.pk)
-# 	empresa = Envio.objects.get(pk=e.pk)
-# 	estado_final = EstadoEnvio.objects.filter(empresa=empresa.empresa).last()
-	
-
-# 	###UPDATE EEHN
-# 	envio = SeguimientoEnvio.objects.filter(codigo_envio=Envio.objects.get(pk=e.pk)).update(estado=estado)
-# 	historial = HistorialEnvio.objects.create(codigo_envio=Envio.objects.get(pk=e.pk),estado=EstadoEnvio.objects.get(pk=estado),usuario_registro=request.user)
-# 	envio_cliente.estado_envio = estado_final
-# 	envio_cliente.save()
-# 	###UPDATE KRAKEN
-# 	#OBTENER ENVIO EN kraken_cargo
-# 	es_kraken = False
-# 	kraken_envio = SistemaEmpresaenvio.objects.using('kraken_cargo').filter(codigo = envio_cliente.guia_revendedor)
-# 	if kraken_envio.count() >= 1:
-# 		es_kraken = True
-	
-# 	if es_kraken:
-# 		estado_kraken = ''
-# 		pk = 0
-# 		if estado_final.pk == 1:
-# 			estado_kraken = 'BODEGA EEUU'
-# 			pk = 8
-# 		elif estado_final.pk == 2:
-# 			estado_kraken = 'PUERTO EEUU'
-# 			pk = 9
-# 		elif estado_final.pk == 3:
-# 			estado_kraken = 'TRANSITO MARITIMO'
-# 			pk = 10
-# 		elif estado_final.pk == 4:
-# 			estado_kraken = 'PUERTO HONDURAS'
-# 			pk = 11
-# 		elif estado_final.pk == 5:
-# 			estado_kraken = 'BODEGA HONDURAS'
-# 			pk = 12
-# 		elif estado_final.pk == 6:
-# 			estado_kraken = 'EN TRANSITO PARA ENTREGA'
-# 			pk = 13
-# 		elif estado_final.pk == 7:
-# 			estado_kraken = 'ENTREGADO'
-# 			pk = 14
-# 		estadokraken = SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk)
-# 		seguimiento_kraken_cargo = SistemaSeguimientoenvio.objects.db_manager('kraken_cargo').filter(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)).update(estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk))
-# 		historial_kraken_cargo = SistemaHistorialenvio.objects.db_manager('kraken_cargo').create(codigo_envio=SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor),estado=SistemaEmpresaestadoenvio.objects.using('kraken_cargo').get(pk=pk),usuario_registro=AuthUser.objects.using('kraken_cargo').get(pk=14),fechahora = timezone.now())
-# 		envio_kraken = SistemaEmpresaenvio.objects.using('kraken_cargo').get(codigo =  envio_cliente.guia_revendedor)
-# 		hoy = timezone.now()
-# 	return HttpResponseRedirect(reverse('enviar_transito'))
-
-
 @login_required
 def reporte_ventas(request):
 	empleados = Empleado.objects.all()
@@ -4322,7 +4223,7 @@ def cajas_contenedor_xls(request,id):
 			cajas_string += f'{descripcion}:({cantidad}), '
 		cajas_string = cajas_string[:-2]  # eliminamos la última coma y espacio
 
-		sheet[f'G{row}'] = cajas_string
+		sheet[f'H{row}'] = cajas_string
 
 	for column_cells in sheet.columns:
 		length = max(len(str(cell.value)) for cell in column_cells)
@@ -4540,3 +4441,78 @@ def obtener_clientes_ajax(request):
         'clientes': list(clientes.values()),
     }
 	return JsonResponse(data)
+
+
+
+@login_required
+def envios_rango_fecha_print(request):
+	hoy = timezone.now()
+	fecha_inicio = datetime(2023, 10, 1, tzinfo=hoy.tzinfo)  # Establece la fecha de inicio como 1 de octubre de 2023
+
+	if request.method == 'GET':
+		try:
+			# Filtramos los envíos y luego los ordenamos para prepararlos para distinct()
+			# Subconsulta para aplicar primero DISTINCT ON y luego ordenar por id
+			subconsulta = Envio.objects.filter(
+				fecha_envio__gte=fecha_inicio, 
+				fecha_envio__lte=hoy, 
+				cierre=True, 
+				aprobado=True
+			).order_by('quien_envia', 'quien_recibe', 'direccion_registrar', '-fecha_envio').distinct('quien_envia', 'quien_recibe', 'direccion_registrar')
+
+			# Consulta principal para ordenar los resultados de la subconsulta por id
+			envios = Envio.objects.filter(id__in=subconsulta).order_by('id')
+
+		except Exception as e:
+			print("Error es-->", str(e))
+		else:
+			return generar_pdf('envios_rango_fechas_pdf.html',
+								{'pagesize': 'A4',
+								'orientation': 'landscape',
+								'envios': envios,
+								}
+							)
+@login_required
+def generar_recibos_por_contenedor(request, id):
+    envios = Envio.objects.filter(contenedor_id=id)
+    envios_detalle = []
+    
+    for envio in envios:
+        detalle = DetalleEnvio.objects.filter(envio=envio).order_by('pk')
+        abonos = PagosCredito.objects.filter(envio=envio).aggregate(abonos_envios=Sum('pago'))
+        abonos_totales = 0 if abonos['abonos_envios'] is None else float(abonos['abonos_envios'])
+        saldo = round(envio.total, 2) - (float(envio.pago_recibido) + abonos_totales)
+        
+        detalle_guia = []
+        for d in detalle:
+            lista = {
+                'descripcion': d.tipo_caja.tipo_caja.descripcion,
+                'cantidad': d.cantidad,
+                'codigo': d.codigo_orden,
+            }
+            detalle_guia.append(lista)
+        
+        # Procesamiento del logo de la empresa, asumiendo que es el mismo para todos los envíos
+        if 'width' not in locals() or 'height' not in locals():
+            filename = envio.empresa.logo_empresa.name.split('/')[-1]
+            separar = filename.split('.')
+            if separar[1].lower() in ['jpg', 'jpeg', 'png']:
+                width, height = get_image_dimensions(envio.empresa.logo_empresa)
+        
+        envios_detalle.append({
+            'envio': envio,
+            'detalle_guia': detalle_guia,
+            'abonos': abonos_totales,
+            'saldo': saldo,
+            'codigo': b64encode(renderPM.drawToString(get_barcode(value=envio.codigo, width=600), fmt='PNG'))
+        })
+
+    
+    # Se pasa la lista de envíos al PDF
+    return generar_pdf('recibos_contenedor_pdf.html', {
+        'pagesize': 'A4',
+        'orientation': 'landscape',
+        'envios_detalle': envios_detalle,
+        'anchura': width if 'width' in locals() else None, 
+        'altura': height if 'height' in locals() else None,
+    })
