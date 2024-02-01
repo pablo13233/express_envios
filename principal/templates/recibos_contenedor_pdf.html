@@ -61,7 +61,7 @@
       <table width="100%">
         <tbody>
           <tr>
-            <td width="63%" style="font-size:20px;font-weight: bold;">Fecha: {{envio_detalle.fecha_recoleccion}}</td>
+            <td width="63%" style="font-size:20px;font-weight: bold;">Fecha: {{envio_detalle.envio.fecha_recoleccion}}</td>
             <td width="15%" style="font-size:30px;font-weight: bold;text-align:right;color:#ff4444">Guia:</td>
             <td width="10%" style="font-size:30px;font-weight: bold;color:#ff4444">{{envio_detalle.envio.codigo}}</td>
           </tr>
@@ -177,13 +177,13 @@
           <tr>
             <td width="50%" style="font-size:16px;font-weight: bold;text-align:left" align="center"></td>
             <td width="30%" style="font-size:15px;font-weight: bold;text-align:right">ABONOS:</td>
-            <td width="10%" style="font-size:15px;font-weight: bold;text-align:right">${{abonos|unlocalize|intcomma}}</td>
+            <td width="10%" style="font-size:15px;font-weight: bold;text-align:right">${{envios_detalle.abonos|unlocalize|intcomma}}</td>
           </tr>
           <tr>
             <td width="50%" style="font-size:20px;font-weight: bold;" align="center"></td>
             <td width="30%" style="font-size:15px;font-weight: bold;text-align:right">SALDO:</td>
             <td width="10%" style="font-size:15px;font-weight: bold;text-align:right;border-bottom: 3px solid black;">
-              ${{saldo|unlocalize|intcomma}}</td>
+              ${{envios_detalle.saldo|unlocalize|intcomma}}</td>
           </tr>
         </tbody>
       </table>

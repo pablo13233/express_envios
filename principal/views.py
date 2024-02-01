@@ -4480,9 +4480,10 @@ def generar_recibos_por_contenedor(request, id):
     for envio in envios:
         detalle = DetalleEnvio.objects.filter(envio=envio).order_by('pk')
         abonos = PagosCredito.objects.filter(envio=envio).aggregate(abonos_envios=Sum('pago'))
+
         abonos_totales = 0 if abonos['abonos_envios'] is None else float(abonos['abonos_envios'])
         saldo = round(envio.total, 2) - (float(envio.pago_recibido) + abonos_totales)
-        
+        print(abonos)
         detalle_guia = []
         for d in detalle:
             lista = {
@@ -4516,3 +4517,43 @@ def generar_recibos_por_contenedor(request, id):
         'anchura': width if 'width' in locals() else None, 
         'altura': height if 'height' in locals() else None,
     })
+
+def envio_pdf(request, id):
+	envio = Envio.objects.get(pk = id)
+	detalle = DetalleEnvio.objects.filter(envio=envio).order_by('pk')
+	abonos = PagosCredito.objects.filter(envio=envio).aggregate(abonos_envios=Sum('pago'))
+	abonos_totales = 0
+	if abonos['abonos_envios'] == None:
+		abonos_totales = 0
+	else:
+		abonos_totales = float(abonos['abonos_envios'])
+	saldo = round(envio.total,2) - (float(envio.pago_recibido)+float(abonos_totales))
+	detalle_guia = []
+	for d in detalle:
+		lista = {}
+		lista['descripcion'] = d.tipo_caja.tipo_caja.descripcion
+		lista['cantidad'] = d.cantidad
+		barcode = get_barcode(value = d.codigo, width = 600)
+		codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
+		lista['codigo'] = codigo
+		detalle_guia.append(lista)
+	filename = envio.empresa.logo_empresa.name.split('/')[-1]
+	separar = filename.split('.')
+	if separar[1] == 'pdf':
+		nada = ''
+	elif separar[1].lower() == 'jpg' or separar[1].lower() == 'jpeg' or separar[1].lower() == 'png':
+		width, height = get_image_dimensions(envio.empresa.logo_empresa)
+	#print width, height
+	barcode = get_barcode(value = envio.codigo, width = 600)
+	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
+	return generar_pdf('envio_pdf.html',
+						{'pagesize':'A4',
+						'orientation':'landscape',
+						'envio':envio,
+						'codigo':codigo,
+						'anchura': width, 
+						'altura': height,
+						'detalle':detalle,
+						'detalle_guia':detalle_guia,
+						'abonos':abonos_totales,
+						'saldo':saldo}) 
