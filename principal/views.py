@@ -4174,74 +4174,7 @@ def cajas_contenedor_pdf(request,id):
 	
 	return render(request, 'cajas_contenedor_pdf.html',{'envios':envios_detalle_ordenado,'empresa':empresa, 'contenedor':contenedor})
 
-@login_required
-def cajas_contenedor_xls(request,id):
-	# Crear un nuevo archivo de Excel
-	workbook = Workbook()
-	
-	envios = Envio.objects.filter(contenedor_id = id).order_by('codigo')
-	
-	contenedor = Contenedor.objects.get(pk = id)
-	# Seleccionar la hoja activa
-	sheet = workbook.active
-	#cabeceras
-	sheet['A1'] = 'Guia'
-	sheet['B1'] = 'Emplasticado'
-	sheet['C1'] = 'Envia'
-	sheet['D1'] = 'Recibe'
-	sheet['E1'] = 'Pais Destino'
-	sheet['F1'] = 'Departamento'
-	sheet['G1'] = 'Direccion'
-	sheet['H1'] = 'Cajas'
 
-	for index,e in enumerate(envios):
-		if e.valor_emplasticado > 0:
-			emplasticado = 'SI'
-		else:
-			emplasticado = ''
-		row = index + 2 #para empezar a escribir en la segunda fila
-		sheet[f'A{row}'] = e.codigo
-		sheet[f'B{row}'] = emplasticado
-		sheet[f'C{row}'] = e.quien_envia.nombre_completo + "|" + e.quien_envia.celular
-		sheet[f'D{row}'] = e.quien_recibe.nombre_completo + "|" + e.quien_recibe.celular
-		sheet[f'E{row}'] = e.pais_destino.nombre
-		sheet[f'F{row}'] = e.departamento_destino.nombre
-		sheet[f'G{row}'] = e.quien_recibe.direccion
-
-		cajas = DetalleEnvio.objects.filter(envio_id=e.pk)
-		cajas_agrupadas = {}  # diccionario para almacenar el resultado
-		for caja in cajas:
-			descripcion = caja.tipo_caja.tipo_caja.descripcion
-			if descripcion not in cajas_agrupadas:
-				cajas_agrupadas[descripcion] = 1
-			else:
-				cajas_agrupadas[descripcion] += 1
-
-		# construimos el string resultante a partir del diccionario
-		cajas_string = ''
-		for descripcion, cantidad in cajas_agrupadas.items():
-			cajas_string += f'{descripcion}:({cantidad}), '
-		cajas_string = cajas_string[:-2]  # eliminamos la última coma y espacio
-
-		sheet[f'H{row}'] = cajas_string
-
-	for column_cells in sheet.columns:
-		length = max(len(str(cell.value)) for cell in column_cells)
-		sheet.column_dimensions[column_cells[0].column_letter].width = length
-	# Generar un nombre de archivo único
-	hoy = timezone.now()
-	fecha = hoy.strftime('%Y_%B%d_%H%M%S')
-	filename = f'envios_{contenedor.codigo_express}_{fecha}.xlsx'
-	# Guardar el archivo de Excel
-	workbook.save(filename)
-
-	# Crear una respuesta HTTP con el archivo adjunto
-	with open(filename, 'rb') as excel_file:
-		response = HttpResponse(excel_file.read(),
-                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-		response['Content-Disposition'] = f'attachment; filename="{filename}"'
-	os.remove(filename)
-	return response
 
 @login_required
 def estado_cajas_contenedor_pdf(request,id):
@@ -4442,7 +4375,53 @@ def obtener_clientes_ajax(request):
     }
 	return JsonResponse(data)
 
+@login_required
+def cajas_contenedor_xls(request,id):
+	# Crear un nuevo archivo de Excel
+	workbook = Workbook()
+	contenedor = Contenedor.objects.get(pk = id)
+    # Seleccionar la hoja activa
+	sheet = workbook.active
+    # Cabeceras
+	sheet['A1'] = 'Código de Envío'
+	sheet['B1'] = 'Código de Caja'
+	sheet['C1'] = 'Tamaño de Caja'
+	sheet['D1'] = 'Descripción Mercancía'
+	sheet['E1'] = 'Envía'
+	sheet['F1'] = 'Recibe'
 
+	envios = Envio.objects.filter(contenedor_id=id).order_by('codigo')
+
+	row = 2
+	for e in envios:
+		cajas = DetalleEnvio.objects.filter(envio_id=e.pk)
+		for caja in cajas:
+			sheet[f'A{row}'] = e.codigo
+			sheet[f'B{row}'] = caja.codigo
+			sheet[f'C{row}'] = caja.tipo_caja.tipo_caja.descripcion
+			sheet[f'D{row}'] = 'repuestos usados de carro' if e.codigo == 'EE0023897' else 'Ropa, zapatos y articulos de hogar'
+			sheet[f'E{row}'] = e.quien_envia.nombre_completo
+			sheet[f'F{row}'] = e.quien_recibe.nombre_completo
+			row += 1
+
+	for column_cells in sheet.columns:
+		length = max(len(str(cell.value)) for cell in column_cells)
+		sheet.column_dimensions[column_cells[0].column_letter].width = length + 2  # Ajuste de +2 para un poco más de espacio
+
+	# Generar un nombre de archivo único
+	hoy = timezone.now()
+	fecha = hoy.strftime('%Y_%B%d_%H%M%S')
+	filename = f'envios_{contenedor.codigo_express}_{fecha}.xlsx'
+	# Guardar el archivo de Excel
+	workbook.save(filename)
+
+	# Crear una respuesta HTTP con el archivo adjunto
+	with open(filename, 'rb') as excel_file:
+		response = HttpResponse(excel_file.read(),
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+		response['Content-Disposition'] = f'attachment; filename="{filename}"'
+	os.remove(filename)
+	return response
 
 @login_required
 def envios_rango_fecha_print(request):
@@ -4518,42 +4497,3 @@ def generar_recibos_por_contenedor(request, id):
         'altura': height if 'height' in locals() else None,
     })
 
-def envio_pdf(request, id):
-	envio = Envio.objects.get(pk = id)
-	detalle = DetalleEnvio.objects.filter(envio=envio).order_by('pk')
-	abonos = PagosCredito.objects.filter(envio=envio).aggregate(abonos_envios=Sum('pago'))
-	abonos_totales = 0
-	if abonos['abonos_envios'] == None:
-		abonos_totales = 0
-	else:
-		abonos_totales = float(abonos['abonos_envios'])
-	saldo = round(envio.total,2) - (float(envio.pago_recibido)+float(abonos_totales))
-	detalle_guia = []
-	for d in detalle:
-		lista = {}
-		lista['descripcion'] = d.tipo_caja.tipo_caja.descripcion
-		lista['cantidad'] = d.cantidad
-		barcode = get_barcode(value = d.codigo, width = 600)
-		codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
-		lista['codigo'] = codigo
-		detalle_guia.append(lista)
-	filename = envio.empresa.logo_empresa.name.split('/')[-1]
-	separar = filename.split('.')
-	if separar[1] == 'pdf':
-		nada = ''
-	elif separar[1].lower() == 'jpg' or separar[1].lower() == 'jpeg' or separar[1].lower() == 'png':
-		width, height = get_image_dimensions(envio.empresa.logo_empresa)
-	#print width, height
-	barcode = get_barcode(value = envio.codigo, width = 600)
-	codigo = b64encode(renderPM.drawToString(barcode, fmt = 'PNG'))	
-	return generar_pdf('envio_pdf.html',
-						{'pagesize':'A4',
-						'orientation':'landscape',
-						'envio':envio,
-						'codigo':codigo,
-						'anchura': width, 
-						'altura': height,
-						'detalle':detalle,
-						'detalle_guia':detalle_guia,
-						'abonos':abonos_totales,
-						'saldo':saldo}) 
